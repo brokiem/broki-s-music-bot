@@ -28,6 +28,9 @@ client.on("messageCreate", async message => {
             const args = message.content.slice(prefix.length).trim().split(/ +/)
 
             switch (args.shift().toLowerCase()) {
+                case "help":
+                    await message.reply("Command: /play, /stop, /volume")
+                    break
                 case "stop":
                     if (player == null) {
                         await message.reply("No audio playing")
