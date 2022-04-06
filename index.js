@@ -15,6 +15,7 @@ const prefix = "!"
 
 let player = new voice.AudioPlayer()
 let conn = voice.getVoiceConnection("868112125640454154")
+let resource
 
 client.login().catch((e) => {
     console.error("The bot token was incorrect.\n" + e)
@@ -29,6 +30,11 @@ client.on("messageCreate", async message => {
                 case "stop":
                     player.stop(true)
                     await message.reply("Music stopped")
+                    break
+                case "volume":
+                    if (args.length > 0) {
+                        resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
+                    }
                     break
                 case "play":
                 case "p":
@@ -64,8 +70,12 @@ client.on("messageCreate", async message => {
                         try {
                             if (ytdl.validateURL(args[0])) {
                                 const stream = ytdl(args[0], {filter: "audioonly"})
+                                resource = voice.createAudioResource(stream, {
+                                    inputType: voice.StreamType.Arbitrary,
+                                    inlineVolume: true
+                                })
 
-                                player.play(voice.createAudioResource(stream))
+                                player.play(resource)
                                 conn.subscribe(player)
                             } else {
                                 await message.reply("Invalid URL!")
