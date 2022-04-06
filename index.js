@@ -80,6 +80,8 @@ client.on("messageCreate", async message => {
 
                         try {
                             if (ytdl.validateURL(args[0])) {
+                                await message.reply("Playing audio from youtube by " + message.author)
+
                                 const stream = ytdl(args[0], {filter: "audioonly"})
                                 resource = voice.createAudioResource(stream, {
                                     inputType: voice.StreamType.Arbitrary,
