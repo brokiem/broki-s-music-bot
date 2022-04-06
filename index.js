@@ -41,10 +41,10 @@ client.on("messageCreate", async message => {
                     if (args.length > 0) {
                         if (parseInt(args[0]) <= 100) {
                             resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
-                            await message.reply("Audio volume set to " + args[0])
+                            await message.reply("Audio volume set to " + args[0] + "%")
                         } else {
                             resource.volume.setVolumeLogarithmic(1)
-                            await message.reply("Audio volume set to 100")
+                            await message.reply("Audio volume set to 100%")
                         }
                     }
                     break
@@ -81,7 +81,9 @@ client.on("messageCreate", async message => {
 
                         try {
                             if (ytdl.validateURL(args[0])) {
-                                await message.reply("Playing audio from youtube by " + message.author.username)
+                                ytdl(args[0]).on('info', (info) => {
+                                    message.reply("Playing **" + info.title + "** from youtube by **" + message.author.username + "**")
+                                })
 
                                 const stream = ytdl(args[0], {
                                     filter: "audioonly",
