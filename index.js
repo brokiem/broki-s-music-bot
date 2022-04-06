@@ -92,9 +92,9 @@ client.on("messageCreate", async message => {
                                 let yt_info = await playdl.search(args.join(" "), {
                                     limit: 1
                                 })
-                                stream = await playdl.stream(yt_info[0].url)
+                                stream = await playdl.stream(yt_info[0].url, 1)
 
-                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube with volume 60% by **" + message.author.username + "**")
+                                await message.reply("Playing audio from youtube with volume 60% by **" + message.author.username + "**")
                             }
 
                             resource = voice.createAudioResource(stream.stream, {
