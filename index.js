@@ -1,4 +1,3 @@
-const ytdl = require('ytdl-core')
 const playdl = require('play-dl')
 const discord = require('discord.js')
 const voice = require('@discordjs/voice')
@@ -17,6 +16,8 @@ const prefix = "!"
 let player = null
 let conn = voice.getVoiceConnection("868112125640454154")
 let resource
+let loop = false
+let loop_interval = null
 
 client.login().catch((e) => {
     console.error("The bot token was incorrect.\n" + e)
@@ -29,7 +30,7 @@ client.on("messageCreate", async message => {
 
             switch (args.shift().toLowerCase()) {
                 case "help":
-                    await message.reply("Command: /play, /stop, /volume")
+                    await message.reply("Command: !play, !loop, !stop, !volume")
                     break
                 case "stop":
                     if (player == null) {
@@ -51,6 +52,15 @@ client.on("messageCreate", async message => {
                             await message.reply("Audio volume set to 100%")
                         }
                     }
+                    break
+                case "loop":
+                    loop = !loop
+
+                    if (!loop) {
+                        clearInterval(loop_interval)
+                    }
+
+                    await message.reply(loop ? "Loop successfully **enabled**" : "Loop successfully **disabled**")
                     break
                 case "play":
                 case "p":
@@ -86,9 +96,24 @@ client.on("messageCreate", async message => {
                         try {
                             let stream
 
-                            if (ytdl.validateURL(args[0])) {
+                            if (playdl.yt_validate(args[0]) === 'video') {
                                 let yt_info = await playdl.video_info(args[0])
                                 stream = await playdl.stream_from_info(yt_info, {quality: 1})
+
+                                if (loop) {
+                                    loop_interval = setInterval(function () {
+                                        resource = voice.createAudioResource(stream.stream, {
+                                            inputType: stream.type,
+                                            inlineVolume: true
+                                        })
+
+                                        player = new voice.AudioPlayer()
+                                        player.play(resource)
+                                        conn.subscribe(player)
+
+                                        resource.volume.setVolumeLogarithmic(0.5)
+                                    }, yt_info.video_details.durationInSec * 1000)
+                                }
 
                                 await message.reply("Playing **" + yt_info.video_details.title + "** from youtube with volume 50% by **" + message.author.username + "**")
                             } else {
@@ -98,19 +123,36 @@ client.on("messageCreate", async message => {
                                 let yt_info2 = await playdl.video_info(yt_info[0].url)
                                 stream = await playdl.stream(yt_info[0].url, {quality: 1})
 
+                                if (loop) {
+                                    loop_interval = setInterval(function () {
+                                        resource = voice.createAudioResource(stream.stream, {
+                                            inputType: stream.type,
+                                            inlineVolume: true
+                                        })
+
+                                        player = new voice.AudioPlayer()
+                                        player.play(resource)
+                                        conn.subscribe(player)
+
+                                        resource.volume.setVolumeLogarithmic(0.5)
+                                    }, yt_info2.video_details.durationInSec * 1000)
+                                }
+
                                 await message.reply("Playing **" + yt_info2.video_details.title + "** from youtube with volume 50% by **" + message.author.username + "**")
                             }
 
-                            resource = voice.createAudioResource(stream.stream, {
-                                inputType: stream.type,
-                                inlineVolume: true
-                            })
+                            if (!loop) {
+                                resource = voice.createAudioResource(stream.stream, {
+                                    inputType: stream.type,
+                                    inlineVolume: true
+                                })
 
-                            player = new voice.AudioPlayer()
-                            player.play(resource)
-                            conn.subscribe(player)
+                                player = new voice.AudioPlayer()
+                                player.play(resource)
+                                conn.subscribe(player)
 
-                            resource.volume.setVolumeLogarithmic(0.5)
+                                resource.volume.setVolumeLogarithmic(0.5)
+                            }
                         } catch (e) {
                             await message.reply(e.toString())
                         }
