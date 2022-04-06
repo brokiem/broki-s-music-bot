@@ -81,30 +81,32 @@ client.on("messageCreate", async message => {
                         }
 
                         try {
+                            let stream
+
                             if (ytdl.validateURL(args[0])) {
                                 let yt_info = await playdl.video_info(args[0])
-                                let stream = await playdl.stream_from_info(yt_info)
+                                stream = await playdl.stream_from_info(yt_info)
 
                                 await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
-
-                                resource = voice.createAudioResource(stream.stream, {
-                                    inputType: stream.type,
-                                    inlineVolume: true
-                                })
                             } else {
-                                let stream = await playdl.stream(args.join(" "))
-
-                                await message.reply("Playing **" + args.join(" ") + "** from youtube by **" + message.author.username + "**")
-
-                                resource = voice.createAudioResource(stream.stream, {
-                                    inputType: stream.type,
-                                    inlineVolume: true
+                                let yt_info = await playdl.search(args.join(" "), {
+                                    limit: 1
                                 })
+                                stream = await play.stream(yt_info[0].url)
+
+                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
                             }
+
+                            resource = voice.createAudioResource(stream.stream, {
+                                inputType: stream.type,
+                                inlineVolume: true
+                            })
 
                             player = new voice.AudioPlayer()
                             player.play(resource)
                             conn.subscribe(player)
+
+                            resource.volume.setVolumeLogarithmic(0.8)
                         } catch (e) {
                             await message.reply(e.toString())
                         }
