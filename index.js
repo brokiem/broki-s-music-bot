@@ -92,10 +92,9 @@ client.on("messageCreate", async message => {
                                     inlineVolume: true
                                 })
                             } else {
-                                let yt_info = await playdl.video_info(args[0])
                                 let stream = await playdl.stream(args.join(" "))
 
-                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
+                                await message.reply("Playing **" + args.join(" ") + "** from youtube by **" + message.author.username + "**")
 
                                 resource = voice.createAudioResource(stream, {
                                     inputType: voice.StreamType.Arbitrary,
