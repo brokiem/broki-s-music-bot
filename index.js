@@ -1,4 +1,4 @@
-const ytdl = require('ytdl')
+const ytdl = require('ytdl-core')
 const playdl = require('play-dl')
 const discord = require('discord.js')
 const voice = require('@discordjs/voice')
