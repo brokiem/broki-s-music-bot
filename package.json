@@ -1,0 +1,9 @@
+{
+  "name": "watchtogether",
+  "version": "1.0.0",
+  "dependencies": {
+    "@discordjs/voice": "^0.8.0",
+    "discord.js": "^13.6.0",
+    "ytdl-core": "^4.11.0"
+  }
+}
