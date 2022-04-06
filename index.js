@@ -28,12 +28,23 @@ client.on("messageCreate", async message => {
 
             switch (args.shift().toLowerCase()) {
                 case "stop":
-                    player.stop(true)
-                    await message.reply("Music stopped")
+                    if (player == null) {
+                        await message.reply("No audio playing")
+                        return
+                    }
+
+                    player?.stop(true)
+                    await message.reply("Audio stopped")
                     break
                 case "volume":
                     if (args.length > 0) {
-                        resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
+                        if (parseInt(args[0]) >= 100) {
+                            resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
+                            await message.reply("Audio volume set to " + args[0])
+                        } else {
+                            resource.volume.setVolumeLogarithmic(1)
+                            await message.reply("Audio volume set to 100")
+                        }
                     }
                     break
                 case "play":
@@ -89,5 +100,6 @@ client.on("messageCreate", async message => {
         }
     } catch (e) {
         console.log("An error occurred!: " + e.toString())
+        await message.reply("An error occurred!: " + e.toString())
     }
 })
