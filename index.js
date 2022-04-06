@@ -85,8 +85,7 @@ client.on("messageCreate", async message => {
 
                                 const stream = ytdl(args[0], {
                                     filter: "audioonly",
-                                    quality: "highestaudio",
-                                    format: {qualityLabel: "144p 15fps"}
+                                    quality: "highestaudio"
                                 })
                                 resource = voice.createAudioResource(stream, {
                                     inputType: voice.StreamType.Arbitrary,
