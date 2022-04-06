@@ -1,4 +1,5 @@
-const ytdl = require('ytdl-core')
+const ytdl = require('ytdl')
+const playdl = require('play-dl')
 const discord = require('discord.js')
 const voice = require('@discordjs/voice')
 
@@ -81,25 +82,30 @@ client.on("messageCreate", async message => {
 
                         try {
                             if (ytdl.validateURL(args[0])) {
-                                ytdl(args[0]).on('info', (info) => {
-                                    message.reply("Playing **" + info.title + "** from youtube by **" + message.author.username + "**")
-                                })
+                                let yt_info = await playdl.video_info(args[0])
+                                let stream = await playdl.stream_from_info(yt_info)
 
-                                const stream = ytdl(args[0], {
-                                    filter: "audioonly",
-                                    quality: "highestaudio"
-                                })
+                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
+
                                 resource = voice.createAudioResource(stream, {
                                     inputType: voice.StreamType.Arbitrary,
                                     inlineVolume: true
                                 })
-
-                                player = new voice.AudioPlayer()
-                                player.play(resource)
-                                conn.subscribe(player)
                             } else {
-                                await message.reply("Invalid URL!")
+                                let yt_info = await playdl.video_info(args[0])
+                                let stream = await playdl.stream(args.join(" "))
+
+                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
+
+                                resource = voice.createAudioResource(stream, {
+                                    inputType: voice.StreamType.Arbitrary,
+                                    inlineVolume: true
+                                })
                             }
+
+                            player = new voice.AudioPlayer()
+                            player.play(resource)
+                            conn.subscribe(player)
                         } catch (e) {
                             await message.reply(e.toString())
                         }

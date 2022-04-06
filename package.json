@@ -9,7 +9,8 @@
     "discord.js": "^13.6.0",
     "ytdl-core": "^4.11.0",
     "sodium": "latest",
-    "@discordjs/opus": "latest"
+    "@discordjs/opus": "latest",
+    "play-dl": "latest"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
