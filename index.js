@@ -92,7 +92,7 @@ client.on("messageCreate", async message => {
                                 let yt_info = await playdl.search(args.join(" "), {
                                     limit: 1
                                 })
-                                stream = await play.stream(yt_info[0].url)
+                                stream = await playdl.stream(yt_info[0].url)
 
                                 await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
                             }
