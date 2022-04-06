@@ -38,7 +38,7 @@ client.on("messageCreate", async message => {
                     break
                 case "volume":
                     if (args.length > 0) {
-                        if (parseInt(args[0]) >= 100) {
+                        if (parseInt(args[0]) <= 100) {
                             resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
                             await message.reply("Audio volume set to " + args[0])
                         } else {
@@ -80,7 +80,7 @@ client.on("messageCreate", async message => {
 
                         try {
                             if (ytdl.validateURL(args[0])) {
-                                await message.reply("Playing audio from youtube by " + message.author)
+                                await message.reply("Playing audio from youtube by " + message.author.username)
 
                                 const stream = ytdl(args[0], {filter: "audioonly"})
                                 resource = voice.createAudioResource(stream, {
