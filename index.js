@@ -85,14 +85,14 @@ client.on("messageCreate", async message => {
 
                             if (ytdl.validateURL(args[0])) {
                                 let yt_info = await playdl.video_info(args[0])
-                                stream = await playdl.stream_from_info(yt_info)
+                                stream = await playdl.stream_from_info(yt_info, {quality: 1})
 
                                 await message.reply("Playing **" + yt_info.video_details.title + "** from youtube with volume 60% by **" + message.author.username + "**")
                             } else {
                                 let yt_info = await playdl.search(args.join(" "), {
                                     limit: 1
                                 })
-                                stream = await playdl.stream(yt_info[0].url, 1)
+                                stream = await playdl.stream(yt_info[0].url, {quality: 1})
 
                                 await message.reply("Playing audio from youtube with volume 60% by **" + message.author.username + "**")
                             }
