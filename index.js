@@ -87,14 +87,14 @@ client.on("messageCreate", async message => {
                                 let yt_info = await playdl.video_info(args[0])
                                 stream = await playdl.stream_from_info(yt_info)
 
-                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
+                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube with volume 60% by **" + message.author.username + "**")
                             } else {
                                 let yt_info = await playdl.search(args.join(" "), {
                                     limit: 1
                                 })
                                 stream = await playdl.stream(yt_info[0].url)
 
-                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
+                                await message.reply("Playing **" + yt_info.video_details.title + "** from youtube with volume 60% by **" + message.author.username + "**")
                             }
 
                             resource = voice.createAudioResource(stream.stream, {
@@ -106,7 +106,7 @@ client.on("messageCreate", async message => {
                             player.play(resource)
                             conn.subscribe(player)
 
-                            resource.volume.setVolumeLogarithmic(0.8)
+                            resource.volume.setVolumeLogarithmic(0.6)
                         } catch (e) {
                             await message.reply(e.toString())
                         }
