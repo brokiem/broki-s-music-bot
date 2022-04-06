@@ -59,7 +59,7 @@ client.on("messageCreate", async message => {
 
                         try {
                             if (ytdl.validateURL(args[0])) {
-                                const stream = ytdl(args[0])
+                                const stream = ytdl(args[0], {filter: "audioonly"})
 
                                 player.play(voice.createAudioResource(stream))
                                 conn.subscribe(player)
