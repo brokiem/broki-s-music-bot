@@ -13,7 +13,7 @@ const client = new discord.Client({
 
 const prefix = "!"
 
-let player = new voice.AudioPlayer()
+let player = null
 let conn = voice.getVoiceConnection("868112125640454154")
 let resource
 
@@ -34,6 +34,7 @@ client.on("messageCreate", async message => {
                     }
 
                     player?.stop(true)
+                    player = null
                     await message.reply("Audio stopped")
                     break
                 case "volume":
@@ -88,6 +89,7 @@ client.on("messageCreate", async message => {
                                     inlineVolume: true
                                 })
 
+                                player = new voice.AudioPlayer()
                                 player.play(resource)
                                 conn.subscribe(player)
                             } else {
