@@ -38,6 +38,7 @@ client.on("messageCreate", async message => {
                         return
                     }
 
+                    clearInterval(loop_interval)
                     player?.stop(true)
                     player = null
                     await message.reply("Audio stopped")
@@ -100,6 +101,8 @@ client.on("messageCreate", async message => {
                                 let yt_info = await playdl.video_info(args[0])
                                 stream = await playdl.stream_from_info(yt_info, {quality: 1})
 
+                                clearInterval(loop_interval)
+
                                 if (loop) {
                                     loop_interval = setInterval(function () {
                                         resource = voice.createAudioResource(stream.stream, {
@@ -123,6 +126,8 @@ client.on("messageCreate", async message => {
                                 let yt_info2 = await playdl.video_info(yt_info[0].url)
                                 stream = await playdl.stream(yt_info[0].url, {quality: 1})
 
+                                clearInterval(loop_interval)
+                                              
                                 if (loop) {
                                     loop_interval = setInterval(function () {
                                         resource = voice.createAudioResource(stream.stream, {
