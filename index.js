@@ -87,8 +87,8 @@ client.on("messageCreate", async message => {
 
                                 await message.reply("Playing **" + yt_info.video_details.title + "** from youtube by **" + message.author.username + "**")
 
-                                resource = voice.createAudioResource(stream, {
-                                    inputType: voice.StreamType.Arbitrary,
+                                resource = voice.createAudioResource(stream.stream, {
+                                    inputType: stream.type,
                                     inlineVolume: true
                                 })
                             } else {
@@ -96,8 +96,8 @@ client.on("messageCreate", async message => {
 
                                 await message.reply("Playing **" + args.join(" ") + "** from youtube by **" + message.author.username + "**")
 
-                                resource = voice.createAudioResource(stream, {
-                                    inputType: voice.StreamType.Arbitrary,
+                                resource = voice.createAudioResource(stream.stream, {
+                                    inputType: stream.type,
                                     inlineVolume: true
                                 })
                             }
