@@ -26,8 +26,12 @@ client.on("messageCreate", async message => {
             const args = message.content.slice(prefix.length).trim().split(/ +/)
 
             switch (args.shift().toLowerCase()) {
-                case "wt":
-                case "watchtogether":
+                case "stop":
+                    player.stop(true)
+                    await message.reply("Music stopped")
+                    break
+                case "play":
+                case "p":
                     if (args.length > 0) {
                         if (!voice.getVoiceConnection("868112125640454154") || voice.getVoiceConnection("868112125640454154")?.state.status === voice.VoiceConnectionStatus.Disconnected) {
                             conn?.destroy()
@@ -63,6 +67,8 @@ client.on("messageCreate", async message => {
 
                                 player.play(voice.createAudioResource(stream))
                                 conn.subscribe(player)
+                            } else {
+                                await message.reply("Invalid URL!")
                             }
                         } catch (e) {
                             await message.reply(e.toString())
