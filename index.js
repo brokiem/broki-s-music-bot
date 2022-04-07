@@ -142,14 +142,12 @@ function play_audio(args, message) {
                 channelId: message.member.voice.channel.id,
                 guildId: message.guild.id,
                 adapterCreator: message.guild.voiceAdapterCreator
-            })
+            }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
         } else {
             if (conn === null) {
                 conn = voice_connection
             }
         }
-
-        conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
