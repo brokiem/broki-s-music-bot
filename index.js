@@ -200,7 +200,6 @@ function broadcast_audio() {
 }
 
 player.on(AudioPlayerStatus.Idle, () => {
-    conn?.unsubscribe(player)
     resource = null
     stream = null
     playing = false
