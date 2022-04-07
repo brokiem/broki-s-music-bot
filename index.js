@@ -59,7 +59,7 @@ client.on("messageCreate", async message => {
                     }
 
                     loop = !loop
-                    await message.reply(loop ? "Loop successfully **enabled**" : "Loop successfully **disabled**")
+                    await message.reply(loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")
                     break
             }
         }
@@ -178,6 +178,8 @@ function play_audio(args, message) {
                 })
             })
         }
+
+        loop = false
     }
 }
 
