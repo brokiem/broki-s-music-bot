@@ -216,8 +216,8 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
 async function onDisconnect() {
     try {
         await Promise.race([
-            voice.entersState(conn, voice.VoiceConnectionStatus.Signalling, 5_000),
-            voice.entersState(conn, voice.VoiceConnectionStatus.Connecting, 5_000),
+            voice.entersState(conn, voice.VoiceConnectionStatus.Signalling, 3_000),
+            voice.entersState(conn, voice.VoiceConnectionStatus.Connecting, 3_000),
         ])
     } catch (error) {
         conn?.disconnect()
