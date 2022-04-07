@@ -53,6 +53,11 @@ client.on("messageCreate", async message => {
                     set_audio_volume(args, message)
                     break
                 case "loop":
+                    if (message.member.voice.channel === null) {
+                        await message.reply("You are not in a voice channel!")
+                        return
+                    }
+
                     loop = !loop
                     await message.reply(loop ? "Loop successfully **enabled**" : "Loop successfully **disabled**")
                     break
@@ -65,6 +70,11 @@ client.on("messageCreate", async message => {
 })
 
 function set_audio_volume(args, message) {
+    if (message.member.voice.channel === null) {
+        message.reply("You are not in a voice channel!")
+        return
+    }
+
     if (args.length > 0) {
         if (!playing) {
             message.reply("No audio playing")
@@ -82,6 +92,11 @@ function set_audio_volume(args, message) {
 }
 
 function pause_audio(args, message) {
+    if (message.member.voice.channel === null) {
+        message.reply("You are not in a voice channel!")
+        return
+    }
+
     if (!playing) {
         player.unpause()
         message.reply("Audio resumed")
@@ -94,6 +109,11 @@ function pause_audio(args, message) {
 }
 
 function stop_audio(args, message) {
+    if (message.member.voice.channel === null) {
+        message.reply("You are not in a voice channel!")
+        return
+    }
+
     if (!playing) {
         message.reply("No audio playing")
         return
