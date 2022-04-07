@@ -1,7 +1,7 @@
 const discord = require('discord.js')
 const playdl = require('play-dl')
 const voice = require('@discordjs/voice')
-const {AudioPlayerIdleState, AudioPlayerPausedState, AudioPlayerPlayingState} = require("@discordjs/voice");
+const {AudioPlayerStatus} = require("@discordjs/voice");
 
 const client = new discord.Client({
     intents: [
@@ -17,6 +17,7 @@ const prefix = "!"
 let conn = null
 let stream = null
 let resource = null
+let playing = false
 let player = voice.createAudioPlayer()
 
 client.login().catch((e) => {
@@ -59,14 +60,14 @@ client.on("messageCreate", async message => {
 
 function set_audio_volume(args, message) {
     if (args.length > 0) {
-        if (player.state === AudioPlayerIdleState) {
+        if (!playing) {
             message.reply("No audio playing")
             return
         }
 
         if (parseInt(args[0].replaceAll("%", "")) <= 100) {
             resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
-            message.reply("Audio volume set to " + args[0] + "%")
+            message.reply("Audio volume set to " + args[0].replaceAll("%", "") + "%")
         } else {
             resource.volume.setVolumeLogarithmic(1)
             message.reply("Audio volume set to 100%")
@@ -75,19 +76,19 @@ function set_audio_volume(args, message) {
 }
 
 function pause_audio(args, message) {
-    if (player.state === AudioPlayerIdleState) {
-        message.reply("No audio playing")
-    } else if (player.state === AudioPlayerPausedState) {
+    if (!playing) {
         player.unpause()
         message.reply("Audio resumed")
-    } else if (player.state === AudioPlayerPlayingState) {
+    } else {
         player.pause()
         message.reply("Audio paused")
     }
+
+    playing = !playing
 }
 
 function stop_audio(args, message) {
-    if (player.state === AudioPlayerIdleState) {
+    if (!playing) {
         message.reply("No audio playing")
         return
     }
@@ -123,7 +124,7 @@ function play_audio(args, message) {
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
-                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + "> (" + result.video_details.url + ")")
+                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
 
                 playdl.stream_from_info(result, {
                     discordPlayerCompatibility: true
@@ -161,6 +162,10 @@ function broadcast_audio() {
     player.play(resource)
     conn.subscribe(player)
 }
+
+player.on(AudioPlayerStatus.Idle, () => {
+    playing = false
+})
 
 async function onDisconnect() {
     try {
