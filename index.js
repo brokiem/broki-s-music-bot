@@ -177,12 +177,17 @@ function play_audio(args, message) {
             playdl.search(args.join(" "), {
                 limit: 1
             }).then(results => {
-                playdl.video_info(results[0].url).then(res => {
-                    message.channel.send({
-                        embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
+                try {
+                    playdl.video_info(results[0].url).then(res => {
+                        message.channel.send({
+                            embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
+                        })
+                        looped_url = results[0].url
                     })
-                    looped_url = results[0].url
-                })
+                } catch (e) {
+                    message.reply("No result found")
+                    return
+                }
 
                 playdl.stream(results[0].url, {
                     discordPlayerCompatibility: true
