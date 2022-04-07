@@ -127,6 +127,8 @@ function play_audio(args, message) {
                 stream = playdl.stream_from_info(result, {
                     discordPlayerCompatibility: true
                 })
+
+                broadcast_audio()
             })
         } else {
             playdl.search(args.join(" "), {
@@ -139,18 +141,22 @@ function play_audio(args, message) {
                 stream = playdl.stream(results[0].url, {
                     discordPlayerCompatibility: true
                 })
+
+                broadcast_audio()
             })
         }
-
-        resource = voice.createAudioResource(stream.stream, {
-            inputType: stream.type,
-            inlineVolume: true
-        })
-        resource.volume.setVolumeLogarithmic(0.5)
-
-        player.play(resource)
-        conn.subscribe(player)
     }
+}
+
+function broadcast_audio() {
+    resource = voice.createAudioResource(stream.stream, {
+        inputType: stream.type,
+        inlineVolume: true
+    })
+    resource.volume.setVolumeLogarithmic(0.5)
+
+    player.play(resource)
+    conn.subscribe(player)
 }
 
 async function onDisconnect() {
