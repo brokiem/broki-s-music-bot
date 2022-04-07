@@ -36,7 +36,7 @@ client.on("messageCreate", async message => {
                     break
                 case "play":
                 case "p":
-                    play_audio(args, message)
+                    await play_audio(args, message)
                     break
                 case "stop":
                 case "s":
@@ -137,7 +137,7 @@ function stop_audio(args, message) {
     message.channel.send({embeds: [embed]})
 }
 
-function play_audio(args, message) {
+async function play_audio(args, message) {
     if (args.length > 0) {
         if (message.member.voice.channel === null) {
             message.reply("You are not in a voice channel!")
@@ -174,15 +174,16 @@ function play_audio(args, message) {
                 })
             })
         } else {
-            playdl.search(args.join(" "), {
-                limit: 1
-            }).then(results => {
-                playdl.video_info(results[0].url).then(res => {
-                    message.channel.send({
-                        embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
-                    })
-                    looped_url = results[0].url
-                }).catch(reason => message.reply("No result found: " + reason))
+            try {
+                const results = await playdl.search(args.join(" "), {
+                    limit: 1
+                })
+                const res = await playdl.video_info(results[0].url)
+
+                message.channel.send({
+                    embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
+                })
+                looped_url = results[0].url
 
                 playdl.stream(results[0].url, {
                     discordPlayerCompatibility: true
@@ -190,7 +191,9 @@ function play_audio(args, message) {
                     stream = r
                     broadcast_audio()
                 }).catch()
-            })
+            } catch (e) {
+                message.reply(e.toString())
+            }
         }
 
         loop = false
