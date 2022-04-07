@@ -1,7 +1,7 @@
 const discord = require('discord.js')
 const playdl = require('play-dl')
 const voice = require('@discordjs/voice')
-const {AudioPlayerStatus} = require("@discordjs/voice");
+const {AudioPlayerStatus} = require("@discordjs/voice")
 
 const client = new discord.Client({
     intents: [
@@ -161,6 +161,8 @@ function broadcast_audio() {
 
     player.play(resource)
     conn.subscribe(player)
+
+    playing = true
 }
 
 player.on(AudioPlayerStatus.Idle, () => {
