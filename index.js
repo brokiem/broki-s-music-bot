@@ -32,7 +32,7 @@ client.on("messageCreate", async message => {
 
             switch (args.shift().toLowerCase()) {
                 case "help":
-                    await message.reply("Command: !play, !loop, !pause, !resume, !stop, !volume")
+                    await message.reply("Command: !play, !loop, !pause, !resume, !stop, !volume, !leave")
                     break
                 case "play":
                 case "p":
@@ -50,6 +50,11 @@ client.on("messageCreate", async message => {
                 case "volume":
                 case "vol":
                     set_audio_volume(args, message)
+                    break
+                case "leave":
+                    conn?.disconnect()
+                    conn?.destroy()
+                    conn = null
                     break
                 case "loop":
                     if (message.member.voice.channel === null) {
@@ -121,9 +126,6 @@ function stop_audio(args, message) {
     loop = false
     looped_url = null
     player.stop(true)
-    conn?.disconnect()
-    conn?.destroy()
-    conn = null
     message.reply("Audio stopped")
 }
 
@@ -151,7 +153,9 @@ function play_audio(args, message) {
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
-                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
+                message.channel.send({
+                    embeds: [makeEmbed(message, "Playing Audio", result.video_details.title, result.video_details.url, result.video_details.thumbnails[0].url)]
+                })
                 looped_url = result.video_details.url
 
                 playdl.stream_from_info(result, {
@@ -166,7 +170,9 @@ function play_audio(args, message) {
                 limit: 1
             }).then(results => {
                 playdl.video_info(results[0].url).then(res => {
-                    message.reply("Playing **" + res.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + "> (" + results[0].url + ")")
+                    message.channel.send({
+                        embeds: [makeEmbed(message, "Playing Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
+                    })
                     looped_url = results[0].url
                 })
 
@@ -212,6 +218,18 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
         })
     }
 })
+
+function makeEmbed(message, title, description, url, thumbnail_url) {
+    return new discord.MessageEmbed()
+        .setTitle(title)
+        .setURL(url)
+        .setDescription(description)
+        .setThumbnail(thumbnail_url)
+        .setFooter({
+            text: message.author.username,
+            iconURL: message.author.displayAvatarURL({size: 32, dynamic: true})
+        })
+}
 
 async function onDisconnect() {
     try {
