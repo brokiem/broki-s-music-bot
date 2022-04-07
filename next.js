@@ -99,6 +99,7 @@ function stop_audio(args, message) {
         return
     }
 
+    loop = false
     player.stop(true)
     message.reply("Audio stopped")
 }
@@ -131,9 +132,7 @@ function play_audio(args, message) {
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
                 message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
-                if (loop) {
-                    looped_url = result.video_details.url
-                }
+                looped_url = result.video_details.url
 
                 playdl.stream_from_info(result, {
                     discordPlayerCompatibility: true
@@ -148,9 +147,7 @@ function play_audio(args, message) {
             }).then(results => {
                 playdl.video_info(results[0].url).then(res => {
                     message.reply("Playing **" + res.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + "> (" + results[0].url + ")")
-                    if (loop) {
-                        looped_url = results[0].url
-                    }
+                    looped_url = results[0].url
                 })
 
                 playdl.stream(results[0].url, {
@@ -181,18 +178,14 @@ player.on(AudioPlayerStatus.Idle, () => {
     playing = false
 
     if (loop) {
-        if (looped_url !== null) {
-            playdl.video_info(looped_url).then(result => {
-                playdl.stream_from_info(result, {
-                    discordPlayerCompatibility: true
-                }).then(r => {
-                    stream = r
-                    broadcast_audio()
-                })
+        playdl.video_info(looped_url).then(result => {
+            playdl.stream_from_info(result, {
+                discordPlayerCompatibility: true
+            }).then(r => {
+                stream = r
+                broadcast_audio()
             })
-        }
-    } else {
-        looped_url = null
+        })
     }
 })
 
