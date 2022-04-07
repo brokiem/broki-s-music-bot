@@ -119,6 +119,7 @@ function stop_audio(args, message) {
     }
 
     loop = false
+    looped_url = null
     player.stop(true)
     conn?.disconnect()
     conn?.destroy()
@@ -147,6 +148,8 @@ function play_audio(args, message) {
                 conn = voice_connection
             }
         }
+
+        conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
@@ -211,8 +214,6 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
         })
     }
 })
-
-conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
 
 async function onDisconnect() {
     try {
