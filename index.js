@@ -1,7 +1,6 @@
 const discord = require('discord.js')
 const playdl = require('play-dl')
 const voice = require('@discordjs/voice')
-const {AudioPlayerStatus} = require("@discordjs/voice")
 
 const client = new discord.Client({
     intents: [
@@ -137,15 +136,12 @@ function play_audio(args, message) {
         const voice_connection = voice.getVoiceConnection(message.guildId)
         if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
             conn?.destroy()
-            conn = null
 
             conn = voice.joinVoiceChannel({
                 channelId: message.member.voice.channel.id,
                 guildId: message.guild.id,
                 adapterCreator: message.guild.voiceAdapterCreator
             })
-
-            conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
         } else {
             if (conn === null) {
                 conn = voice_connection
@@ -199,7 +195,7 @@ function broadcast_audio() {
     playing = true
 }
 
-player.on(AudioPlayerStatus.Idle, () => {
+player.on(voice.AudioPlayerStatus.Idle, () => {
     resource = null
     stream = null
     playing = false
@@ -215,6 +211,8 @@ player.on(AudioPlayerStatus.Idle, () => {
         })
     }
 })
+
+conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
 
 async function onDisconnect() {
     try {
