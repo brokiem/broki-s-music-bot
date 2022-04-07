@@ -39,6 +39,7 @@ client.on("messageCreate", async message => {
                         return
                     }
 
+                    clearInterval(loop_interval)
                     player?.stop(true)
                     player = null
                     await message.reply("Audio stopped")
@@ -102,6 +103,8 @@ client.on("messageCreate", async message => {
                                     discordPlayerCompatibility: true
                                 })
 
+                                clearInterval(loop_interval)
+
                                 if (loop) {
                                     stream = await playdl.stream_from_info(yt_info, {
                                         quality: 1,
@@ -132,6 +135,8 @@ client.on("messageCreate", async message => {
                                     discordPlayerCompatibility: true
                                 })
 
+                                clearInterval(loop_interval)
+                                              
                                 if (loop) {
                                     stream = await playdl.stream(yt_info[0].url, {
                                         quality: 1,
