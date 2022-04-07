@@ -18,6 +18,7 @@ let conn = voice.getVoiceConnection("868112125640454154")
 let resource
 let loop = false
 let loop_interval = null
+let stream
 
 client.login().catch((e) => {
     console.error("The bot token was incorrect.\n" + e)
@@ -94,13 +95,18 @@ client.on("messageCreate", async message => {
                         }
 
                         try {
-                            let stream
-
                             if (playdl.yt_validate(args[0]) === 'video') {
                                 let yt_info = await playdl.video_info(args[0])
-                                stream = await playdl.stream_from_info(yt_info, {quality: 1})
+                                stream = await playdl.stream_from_info(yt_info, {
+                                    quality: 1,
+                                    discordPlayerCompatibility: true
+                                })
 
                                 if (loop) {
+                                    stream = await playdl.stream_from_info(yt_info, {
+                                        quality: 1,
+                                        discordPlayerCompatibility: true
+                                    })
                                     loop_interval = setInterval(function () {
                                         resource = voice.createAudioResource(stream.stream, {
                                             inputType: stream.type,
@@ -121,9 +127,16 @@ client.on("messageCreate", async message => {
                                     limit: 1
                                 })
                                 let yt_info2 = await playdl.video_info(yt_info[0].url)
-                                stream = await playdl.stream(yt_info[0].url, {quality: 1})
+                                stream = await playdl.stream(yt_info[0].url, {
+                                    quality: 1,
+                                    discordPlayerCompatibility: true
+                                })
 
                                 if (loop) {
+                                    stream = await playdl.stream(yt_info[0].url, {
+                                        quality: 1,
+                                        discordPlayerCompatibility: true
+                                    })
                                     loop_interval = setInterval(function () {
                                         resource = voice.createAudioResource(stream.stream, {
                                             inputType: stream.type,
