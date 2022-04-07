@@ -1,0 +1,167 @@
+const discord = require('discord.js')
+const playdl = require('play-dl')
+const voice = require('@discordjs/voice')
+const {AudioPlayerIdleState, AudioPlayerPausedState, AudioPlayerPlayingState} = require("@discordjs/voice");
+
+const client = new discord.Client({
+    intents: [
+        discord.Intents.FLAGS.GUILDS,
+        discord.Intents.FLAGS.GUILD_MEMBERS,
+        discord.Intents.FLAGS.GUILD_MESSAGES,
+        discord.Intents.FLAGS.GUILD_VOICE_STATES
+    ]
+})
+
+const prefix = "!"
+
+let conn = null
+let stream = null
+let resource = null
+let player = voice.createAudioPlayer()
+
+client.login().catch((e) => {
+    console.error("The bot token was incorrect.\n" + e)
+})
+
+client.on("messageCreate", async message => {
+    try {
+        if (message.content.startsWith(prefix)) {
+            const args = message.content.slice(prefix.length).trim().split(/ +/)
+
+            switch (args.shift().toLowerCase()) {
+                case "help":
+                    await message.reply("Command: !play, !loop, !pause, !resume, !stop, !volume")
+                    break
+                case "play":
+                case "p":
+                    play_audio(args, message)
+                    break
+                case "stop":
+                case "s":
+                    stop_audio(args, message)
+                    break
+                case "pause":
+                case "break":
+                case "resume":
+                    pause_audio(args, message)
+                    break
+                case "volume":
+                case "vol":
+                    set_audio_volume(args, message)
+                    break
+            }
+        }
+    } catch (e) {
+        console.log("An error occurred!: " + e.toString())
+        await message.reply("An error occurred!: " + e.toString())
+    }
+})
+
+function set_audio_volume(args, message) {
+    if (args.length > 0) {
+        if (player.state === AudioPlayerIdleState) {
+            message.reply("No audio playing")
+            return
+        }
+
+        if (parseInt(args[0].replaceAll("%", "")) <= 100) {
+            resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
+            message.reply("Audio volume set to " + args[0] + "%")
+        } else {
+            resource.volume.setVolumeLogarithmic(1)
+            message.reply("Audio volume set to 100%")
+        }
+    }
+}
+
+function pause_audio(args, message) {
+    if (player.state === AudioPlayerIdleState) {
+        message.reply("No audio playing")
+    } else if (player.state === AudioPlayerPausedState) {
+        player.unpause()
+        message.reply("Audio resumed")
+    } else if (player.state === AudioPlayerPlayingState) {
+        player.pause()
+        message.reply("Audio paused")
+    }
+}
+
+function stop_audio(args, message) {
+    if (player.state === AudioPlayerIdleState) {
+        message.reply("No audio playing")
+        return
+    }
+
+    player.stop(true)
+    message.reply("Audio stopped")
+}
+
+function play_audio(args, message) {
+    if (args.length > 0) {
+        if (message.member.voice.channel === null) {
+            message.reply("You are not in a voice channel!")
+            return
+        }
+
+        const voice_connection = voice.getVoiceConnection(message.guildId)
+        if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+            conn?.destroy()
+            conn = null
+
+            conn = voice.joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator
+            })
+
+            conn.on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
+        } else {
+            if (conn === null) {
+                conn = voice_connection
+            }
+        }
+
+        if (playdl.yt_validate(args[0]) === 'video') {
+            playdl.video_info(args[0]).then(result => {
+                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
+                stream = playdl.stream_from_info(result, {
+                    discordPlayerCompatibility: true
+                })
+            })
+        } else {
+            playdl.search(args.join(" "), {
+                limit: 1
+            }).then(results => {
+                playdl.video_info(results[0].url).then(res => {
+                    message.reply("Playing **" + res.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
+                })
+
+                stream = playdl.stream(results[0].url, {
+                    discordPlayerCompatibility: true
+                })
+            })
+        }
+
+        resource = voice.createAudioResource(stream.stream, {
+            inputType: stream.type,
+            inlineVolume: true
+        })
+        resource.volume.setVolumeLogarithmic(0.5)
+
+        player.play(resource)
+        conn.subscribe(player)
+    }
+}
+
+async function onDisconnect() {
+    try {
+        await Promise.race([
+            voice.entersState(conn, voice.VoiceConnectionStatus.Signalling, 5_000),
+            voice.entersState(conn, voice.VoiceConnectionStatus.Connecting, 5_000),
+        ])
+    } catch (error) {
+        conn?.disconnect()
+        conn?.destroy()
+        conn = null
+    }
+}
