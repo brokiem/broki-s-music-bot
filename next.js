@@ -123,26 +123,29 @@ function play_audio(args, message) {
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
-                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
-                stream = playdl.stream_from_info(result, {
-                    discordPlayerCompatibility: true
-                })
+                message.reply("Playing **" + result.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + "> (" + result.video_details.url + ")")
 
-                broadcast_audio()
+                playdl.stream_from_info(result, {
+                    discordPlayerCompatibility: true
+                }).then(r => {
+                    stream = r
+                    broadcast_audio()
+                })
             })
         } else {
             playdl.search(args.join(" "), {
                 limit: 1
             }).then(results => {
                 playdl.video_info(results[0].url).then(res => {
-                    message.reply("Playing **" + res.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + ">")
+                    message.reply("Playing **" + res.video_details.title + "** from youtube with volume 50% by <@" + message.author.id + "> (" + results[0].url + ")")
                 })
 
-                stream = playdl.stream(results[0].url, {
+                playdl.stream(results[0].url, {
                     discordPlayerCompatibility: true
+                }).then(r => {
+                    stream = r
+                    broadcast_audio()
                 })
-
-                broadcast_audio()
             })
         }
     }
