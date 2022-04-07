@@ -221,7 +221,7 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
 
 function makeEmbed(message, title, description, url, thumbnail_url) {
     return new discord.MessageEmbed()
-        .setColor('#fa0001')
+        .setColor('#35cf7d')
         .setTitle(title)
         .setDescription("[" + description + "](" + url + ")")
         .setThumbnail(thumbnail_url)
