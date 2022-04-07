@@ -123,20 +123,18 @@ function stop_audio(args, message) {
         return
     }
 
+    loop = false
+    looped_url = null
+    player.stop(true)
+
     const embed = new discord.MessageEmbed()
         .setColor('#35cf7d')
-        .setTitle('Audio stopped')
         .setDescription("YouTube audio successfully stopped!")
         .setFooter({
             text: "by " + message.author.username + "#" + message.author.discriminator,
             iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
         })
     message.channel.send({embeds: [embed]})
-
-    loop = false
-    looped_url = null
-    player.stop(true)
-    message.reply("Audio stopped")
 }
 
 function play_audio(args, message) {
