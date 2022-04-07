@@ -123,6 +123,16 @@ function stop_audio(args, message) {
         return
     }
 
+    const embed = new discord.MessageEmbed()
+        .setColor('#35cf7d')
+        .setTitle('Audio stopped')
+        .setDescription("YouTube audio successfully stopped!")
+        .setFooter({
+            text: "by " + message.author.username + "#" + message.author.discriminator,
+            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+        })
+    message.channel.send({embeds: [embed]})
+
     loop = false
     looped_url = null
     player.stop(true)
@@ -154,7 +164,7 @@ function play_audio(args, message) {
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
                 message.channel.send({
-                    embeds: [makeEmbed(message, "Playing YouTube Audio", result.video_details.title, result.video_details.url, result.video_details.thumbnails[0].url)]
+                    embeds: [makePlayingEmbed(message, "Playing YouTube Audio", result.video_details.title, result.video_details.url, result.video_details.thumbnails[0].url)]
                 })
                 looped_url = result.video_details.url
 
@@ -171,7 +181,7 @@ function play_audio(args, message) {
             }).then(results => {
                 playdl.video_info(results[0].url).then(res => {
                     message.channel.send({
-                        embeds: [makeEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
+                        embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
                     })
                     looped_url = results[0].url
                 })
@@ -219,7 +229,7 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
     }
 })
 
-function makeEmbed(message, title, description, url, thumbnail_url) {
+function makePlayingEmbed(message, title, description, url, thumbnail_url) {
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
         .setTitle(title)
