@@ -121,6 +121,9 @@ function stop_audio(args, message) {
 
     loop = false
     player.stop(true)
+    conn?.disconnect()
+    conn?.destroy()
+    conn = null
     message.reply("Audio stopped")
 }
 
@@ -197,6 +200,9 @@ function broadcast_audio() {
 }
 
 player.on(AudioPlayerStatus.Idle, () => {
+    conn?.unsubscribe(player)
+    resource = null
+    stream = null
     playing = false
 
     if (loop) {
