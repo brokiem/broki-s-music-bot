@@ -13,8 +13,6 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "build": "webpack"
-  },
-  "heroku-run-build-script": true
+    "start": "npm run build && node index.js"
+  }
 }
