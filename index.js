@@ -292,25 +292,22 @@ client.on('interactionCreate', async interaction => {
 
     } else if (interaction.customId === 'pause') {
         const status = await pause_audio()
-        interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
-            setTimeout(function () {
-                msg.deleteReply()
-            }, 10000)
-        })
+        const inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        setTimeout(function () {
+            inter.deleteReply()
+        }, 10000)
     } else if (interaction.customId === 'play') {
         const status = await pause_audio()
-        interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
-            setTimeout(function () {
-                msg.deleteReply()
-            }, 10000)
-        })
+        const inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        setTimeout(function () {
+            inter.deleteReply()
+        }, 10000)
     } else if (interaction.customId === 'loop') {
         loop = !loop
-        interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
-            setTimeout(function () {
-                msg.deleteReply()
-            }, 10000)
-        })
+        const inter = interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        setTimeout(function () {
+            inter.deleteReply()
+        }, 10000)
     } else if (interaction.customId === 'forward') {
 
     }
