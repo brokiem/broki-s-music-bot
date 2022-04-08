@@ -81,7 +81,7 @@ async function play_audio(input, guild_id, channel_id) {
 }
 
 async function broadcast_audio(guild_id) {
-    streams[guild_id].resource = voice.createAudioResource(streams[guild_id].stream, {
+    streams[guild_id].resource = voice.createAudioResource(streams[guild_id].stream.stream, {
         inputType: streams[guild_id].stream.type,
         inlineVolume: true
     })
