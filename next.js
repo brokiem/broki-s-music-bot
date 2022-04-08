@@ -46,38 +46,38 @@ client.on("messageCreate", message => {
 })
 
 async function play_audio(input, guild_id, channel_id) {
-    prepare_voice_connection(guild_id, channel_id)
+    prepare_voice_connection(guild_id, channel_id).then(async () => {
+        if (playdl.yt_validate(input[0]) === 'video') {
+            playdl.video_info(input[0]).then(result => {
+                streams[guild_id].yt_title = result.video_details.title
+                streams[guild_id].yt_url = result.video_details.url
+                streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
 
-    if (playdl.yt_validate(input[0]) === 'video') {
-        playdl.video_info(input[0]).then(result => {
-            streams[guild_id].yt_title = result.video_details.title
-            streams[guild_id].yt_url = result.video_details.url
-            streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
+                streams[guild_id].looped_url = result.video_details.url
 
-            streams[guild_id].looped_url = result.video_details.url
+                playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
+                    streams[guild_id].stream = r
+                    broadcast_audio(guild_id)
+                })
+            })
+        } else {
+            const results = await playdl.search(input.join(" "), {
+                limit: 1
+            })
+            const res = await playdl.video_info(results[0].url)
 
-            playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
+            streams[guild_id].yt_title = res.video_details.title
+            streams[guild_id].yt_url = res.video_details.url
+            streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
+
+            streams[guild_id].looped_url = results[0].url
+
+            playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
                 streams[guild_id].stream = r
                 broadcast_audio(guild_id)
             })
-        })
-    } else {
-        const results = await playdl.search(input.join(" "), {
-            limit: 1
-        })
-        const res = await playdl.video_info(results[0].url)
-
-        streams[guild_id].yt_title = res.video_details.title
-        streams[guild_id].yt_url = res.video_details.url
-        streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
-
-        streams[guild_id].looped_url = results[0].url
-
-        playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
-            streams[guild_id].stream = r
-            broadcast_audio(guild_id)
-        })
-    }
+        }
+    })
 }
 
 async function broadcast_audio(guild_id) {
@@ -101,7 +101,7 @@ function is_same_vc_as(user_id, guild_id) {
     return guild.members.cache.get(user_id).voice.channel?.id === guild.members.cache.get(client.user.id).voice.channel?.id
 }
 
-function prepare_voice_connection(guild_id, channel_id) {
+async function prepare_voice_connection(guild_id, channel_id) {
     streams[guild_id] = {}
     streams[guild_id].player = voice.createAudioPlayer()
     streams[guild_id].resource = null
