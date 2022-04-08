@@ -280,33 +280,28 @@ function makePlayingEmbed(message) {
         })
 }
 
-client.on('interactionCreate', interaction => {
+client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return
 
-    console.log(interaction)
+    if (interaction.member.voice.channel?.id !== interaction.guild.me.voice.channel?.id) {
+        await interaction.channel.send("You are not in the same voice channel!")
+        return
+    }
 
-    const filter = i => i.style === 2
+    if (interaction.customId === 'rewind') {
 
-    const collector = interaction.channel.createMessageComponentCollector({filter, time: 15000})
+    } else if (interaction.customId === 'pause') {
+        const status = await pause_audio()
+        await interaction.channel.send(status)
+    } else if (interaction.customId === 'play') {
+        const status = await pause_audio()
+        await interaction.channel.send(status)
+    } else if (interaction.customId === 'loop') {
+        loop = !loop
+        await interaction.channel.send(loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")
+    } else if (interaction.customId === 'forward') {
 
-    collector.on('collect', async i => {
-        if (i.customId === 'rewind') {
-
-        } else if (i.customId === 'pause') {
-            const status = await pause_audio()
-            await interaction.channel.send({content: status})
-        } else if (i.customId === 'play') {
-            const status = await pause_audio()
-            await interaction.channel.send(status)
-        } else if (i.customId === 'loop') {
-            loop = !loop
-            await interaction.channel.send(loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")
-        } else if (i.customId === 'forward') {
-
-        }
-    })
-
-    collector.on('end', collected => console.log(`Collected ${collected.size} items`))
+    }
 })
 
 async function onDisconnect() {
