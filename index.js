@@ -49,7 +49,7 @@ client.on("messageCreate", async message => {
                     break
                 case "volume":
                 case "vol":
-                    set_audio_volume(args, message)
+                    await set_audio_volume(args, message)
                     break
                 case "control":
                 case "c":
@@ -61,8 +61,8 @@ client.on("messageCreate", async message => {
                     conn = null
                     break
                 case "loop":
-                    if (message.member.voice.channel === null) {
-                        await message.reply("You are not in a voice channel!")
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
                         return
                     }
 
@@ -77,9 +77,9 @@ client.on("messageCreate", async message => {
     }
 })
 
-function set_audio_volume(args, message) {
-    if (message.member.voice.channel === null) {
-        message.reply("You are not in a voice channel!")
+async function set_audio_volume(args, message) {
+    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+        message.reply("You are not in the same voice channel!")
         return
     }
 
@@ -100,8 +100,8 @@ function set_audio_volume(args, message) {
 }
 
 async function pause_audio(args, message) {
-    if (message.member.voice.channel === null) {
-        message.reply("You are not in a voice channel!")
+    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+        message.reply("You are not in the same voice channel!")
         return
     }
 
@@ -117,8 +117,8 @@ async function pause_audio(args, message) {
 }
 
 async function stop_audio(args, message) {
-    if (message.member.voice.channel === null) {
-        message.reply("You are not in a voice channel!")
+    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+        message.reply("You are not in the same voice channel!")
         return
     }
 
@@ -142,8 +142,8 @@ async function stop_audio(args, message) {
 }
 
 async function control_audio(args, message) {
-    if (message.member.voice.channel === null) {
-        message.reply("You are not in a voice channel!")
+    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+        message.reply("You are not in the same voice channel!")
         return
     }
 
@@ -152,8 +152,8 @@ async function control_audio(args, message) {
 
 async function play_audio(args, message) {
     if (args.length > 0) {
-        if (message.member.voice.channel === null) {
-            message.reply("You are not in a voice channel!")
+        if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+            message.reply("You are not in the same voice channel!")
             return
         }
 
