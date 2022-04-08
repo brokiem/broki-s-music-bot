@@ -308,7 +308,7 @@ client.on('interactionCreate', async interaction => {
         })
     } else if (interaction.customId === 'stop') {
         if (!playing) {
-            interaction.reply({content: "No audio playing", fetchReply: true})
+            inter = interaction.reply({content: "No audio playing", fetchReply: true})
             return
         }
 
