@@ -314,11 +314,9 @@ client.on('interactionCreate', async interaction => {
 
     }
 
-    console.log(inter)
-
     if (inter !== null) {
         setTimeout(function () {
-            inter.deleteReply()
+            inter.delete()
         }, 10000)
     }
 })
