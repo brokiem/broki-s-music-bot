@@ -78,6 +78,9 @@ function play_audio(input, guild_id, channel_id) {
             })
         })
     }
+
+    console.log(streams)
+    console.log(streams[guild_id])
 }
 
 async function broadcast_audio(guild_id) {
