@@ -159,7 +159,7 @@ async function control_audio(args, message) {
         .setThumbnail(yt_thumbnail_url)
 
     const rewind = new discord.MessageButton().setStyle(2).setCustomId("rewind").setLabel("⏪")
-    const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("⏯")
+    const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("▶")
     const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("⏸")
     const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("🔁")
     const forward = new discord.MessageButton().setStyle(2).setCustomId("forward").setLabel("⏩")
@@ -292,13 +292,25 @@ client.on('interactionCreate', async interaction => {
 
     } else if (interaction.customId === 'pause') {
         const status = await pause_audio()
-        interaction.reply({content: status})
+        interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
+            setTimeout(function () {
+                msg.delete()
+            }, 10000)
+        })
     } else if (interaction.customId === 'play') {
         const status = await pause_audio()
-        interaction.reply({content: status})
+        interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
+            setTimeout(function () {
+                msg.delete()
+            }, 10000)
+        })
     } else if (interaction.customId === 'loop') {
         loop = !loop
-        interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"})
+        interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator}).then(msg => {
+            setTimeout(function () {
+                msg.delete()
+            }, 10000)
+        })
     } else if (interaction.customId === 'forward') {
 
     }
