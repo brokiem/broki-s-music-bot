@@ -298,6 +298,11 @@ client.on('interactionCreate', async interaction => {
         return
     }
 
+    if (resource === null) {
+        interaction.reply({content: 'No audio playing!', ephemral: true})
+        return
+    }
+
     let inter = null
 
     if (interaction.customId === 'pause') {
@@ -307,11 +312,6 @@ client.on('interactionCreate', async interaction => {
             fetchReply: true
         })
     } else if (interaction.customId === 'stop') {
-        if (!playing) {
-            inter = interaction.reply({content: "No audio playing", fetchReply: true})
-            return
-        }
-
         loop = false
         looped_url = null
         player.stop(true)
