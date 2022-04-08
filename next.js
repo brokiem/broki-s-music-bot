@@ -50,14 +50,14 @@ async function play_audio(input, guild_id, channel_id) {
 
     if (playdl.yt_validate(input) === 'video') {
         playdl.video_info(input).then(result => {
-            streams[guild_id].player.yt_title = result.video_details.title
-            streams[guild_id].player.yt_url = result.video_details.url
-            streams[guild_id].player.yt_thumbnail_url = result.video_details.thumbnails[0].url
+            streams[guild_id].yt_title = result.video_details.title
+            streams[guild_id].yt_url = result.video_details.url
+            streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
 
-            streams[guild_id].stream.looped_url = result.video_details.url
+            streams[guild_id].looped_url = result.video_details.url
 
             playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
-                streams[guild_id].stream.stream = r
+                streams[guild_id].stream = r
                 broadcast_audio(guild_id)
             })
         })
@@ -67,30 +67,30 @@ async function play_audio(input, guild_id, channel_id) {
         })
         const res = await playdl.video_info(results[0].url)
 
-        streams[guild_id].player.yt_title = res.video_details.title
-        streams[guild_id].player.yt_url = res.video_details.url
-        streams[guild_id].player.yt_thumbnail_url = res.video_details.thumbnails[0].url
+        streams[guild_id].yt_title = res.video_details.title
+        streams[guild_id].yt_url = res.video_details.url
+        streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
 
-        streams[guild_id].stream.looped_url = results[0].url
+        streams[guild_id].looped_url = results[0].url
 
         playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
-            streams[guild_id].stream.stream = r
+            streams[guild_id].stream = r
             broadcast_audio(guild_id)
         })
     }
 }
 
 async function broadcast_audio(guild_id) {
-    streams[guild_id].stream.resource = voice.createAudioResource(streams[guild_id].stream.stream, {
-        inputType: streams[guild_id].stream.stream.type,
+    streams[guild_id].resource = voice.createAudioResource(streams[guild_id].stream, {
+        inputType: streams[guild_id].stream.type,
         inlineVolume: true
     })
-    streams[guild_id].stream.resource.volume.setVolumeLogarithmic(0.5)
+    streams[guild_id].resource.volume.setVolumeLogarithmic(0.5)
 
-    streams[guild_id].player.player.play(streams[guild_id].stream.resource)
-    streams[guild_id].conn.subscribe(streams[guild_id].player.player)
+    streams[guild_id].player.play(streams[guild_id].resource)
+    streams[guild_id].conn.subscribe(streams[guild_id].player)
 
-    streams[guild_id].stream.playing = true
+    streams[guild_id].playing = true
 }
 
 function is_same_vc_as(user_id, guild_id) {
@@ -103,29 +103,27 @@ function is_same_vc_as(user_id, guild_id) {
 
 function prepare_voice_connection(guild_id, channel_id) {
     streams[guild_id] = {}
-    streams[guild_id].player = null
+    streams[guild_id].player = voice.createAudioPlayer()
+    streams[guild_id].resource = null
     streams[guild_id].stream = null
-    streams[guild_id].player.player = voice.createAudioPlayer()
-    streams[guild_id].stream.resource = null
-    streams[guild_id].stream.stream = null
-    streams[guild_id].stream.playing = false
-    streams[guild_id].stream.looped_url = null
-    streams[guild_id].stream.loop = false
-    streams[guild_id].player.yt_title = undefined
-    streams[guild_id].player.yt_url = undefined
-    streams[guild_id].player.yt_thumbnail_url = undefined
+    streams[guild_id].playing = false
+    streams[guild_id].looped_url = null
+    streams[guild_id].loop = false
+    streams[guild_id].yt_title = undefined
+    streams[guild_id].yt_url = undefined
+    streams[guild_id].yt_thumbnail_url = undefined
 
-    streams[guild_id].player.player.on(voice.AudioPlayerStatus.Idle, () => {
-        streams[guild_id].stream.resource = null
-        streams[guild_id].stream.stream = null
-        streams[guild_id].stream.playing = false
+    streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, () => {
+        streams[guild_id].resource = null
+        streams[guild_id].stream = null
+        streams[guild_id].playing = false
 
-        if (streams[guild_id].stream.loop) {
-            playdl.video_info(streams[guild_id].stream.looped_url).then(result => {
+        if (streams[guild_id].loop) {
+            playdl.video_info(streams[guild_id].looped_url).then(result => {
                 playdl.stream_from_info(result, {
                     discordPlayerCompatibility: true
                 }).then(r => {
-                    streams[guild_id].stream.stream = r
+                    streams[guild_id].stream = r
                     broadcast_audio(guild_id)
                 })
             })
@@ -156,8 +154,8 @@ function make_playing_embed(guild_id, member) {
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
         .setTitle("Playing YouTube")
-        .setDescription("[" + streams[guild_id].player.yt_title + "](" + streams[guild_id].player.yt_url + ")")
-        .setThumbnail(streams[guild_id].player.yt_thumbnail_url)
+        .setDescription("[" + streams[guild_id].yt_title + "](" + streams[guild_id].yt_url + ")")
+        .setThumbnail(streams[guild_id].yt_thumbnail_url)
         .setFooter({
             text: "by " + member.username + "#" + member.discriminator,
             iconURL: member.displayAvatarURL({size: 16, dynamic: true})
