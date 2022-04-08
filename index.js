@@ -292,13 +292,13 @@ client.on('interactionCreate', async interaction => {
 
     } else if (interaction.customId === 'pause') {
         const status = await pause_audio()
-        await interaction.channel.send(status)
+        interaction.reply({content: status})
     } else if (interaction.customId === 'play') {
         const status = await pause_audio()
-        await interaction.channel.send(status)
+        interaction.reply({content: status})
     } else if (interaction.customId === 'loop') {
         loop = !loop
-        await interaction.channel.send(loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")
+        interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"})
     } else if (interaction.customId === 'forward') {
 
     }
