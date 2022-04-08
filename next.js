@@ -45,39 +45,40 @@ client.on("messageCreate", message => {
     }
 })
 
-async function play_audio(input, guild_id, channel_id) {
-    prepare_voice_connection(guild_id, channel_id).then(async () => {
-        if (playdl.yt_validate(input[0]) === 'video') {
-            playdl.video_info(input[0]).then(result => {
-                streams[guild_id].yt_title = result.video_details.title
-                streams[guild_id].yt_url = result.video_details.url
-                streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
+function play_audio(input, guild_id, channel_id) {
+    prepare_voice_connection(guild_id, channel_id)
 
-                streams[guild_id].looped_url = result.video_details.url
+    if (playdl.yt_validate(input[0]) === 'video') {
+        playdl.video_info(input[0]).then(result => {
+            streams[guild_id].yt_title = result.video_details.title
+            streams[guild_id].yt_url = result.video_details.url
+            streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
 
-                playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
+            streams[guild_id].looped_url = result.video_details.url
+
+            playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
+                streams[guild_id].stream = r
+                broadcast_audio(guild_id)
+            })
+        })
+    } else {
+        playdl.search(input.join(" "), {
+            limit: 1
+        }).then(results => {
+            playdl.video_info(results[0].url).then(res => {
+                streams[guild_id].yt_title = res.video_details.title
+                streams[guild_id].yt_url = res.video_details.url
+                streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
+
+                streams[guild_id].looped_url = results[0].url
+
+                playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
                     streams[guild_id].stream = r
                     broadcast_audio(guild_id)
                 })
             })
-        } else {
-            const results = await playdl.search(input.join(" "), {
-                limit: 1
-            })
-            const res = await playdl.video_info(results[0].url)
-
-            streams[guild_id].yt_title = res.video_details.title
-            streams[guild_id].yt_url = res.video_details.url
-            streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
-
-            streams[guild_id].looped_url = results[0].url
-
-            playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
-                streams[guild_id].stream = r
-                broadcast_audio(guild_id)
-            })
-        }
-    })
+        })
+    }
 }
 
 async function broadcast_audio(guild_id) {
@@ -101,9 +102,10 @@ function is_same_vc_as(user_id, guild_id) {
     return guild.members.cache.get(user_id).voice.channel?.id === guild.members.cache.get(client.user.id).voice.channel?.id
 }
 
-async function prepare_voice_connection(guild_id, channel_id) {
+function prepare_voice_connection(guild_id, channel_id) {
     streams[guild_id] = {}
     streams[guild_id].player = voice.createAudioPlayer()
+    streams[guild_id].conn = null
     streams[guild_id].resource = null
     streams[guild_id].stream = null
     streams[guild_id].playing = false
@@ -112,6 +114,21 @@ async function prepare_voice_connection(guild_id, channel_id) {
     streams[guild_id].yt_title = undefined
     streams[guild_id].yt_url = undefined
     streams[guild_id].yt_thumbnail_url = undefined
+
+    const voice_connection = voice.getVoiceConnection(guild_id)
+    if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+        streams[guild_id].conn?.destroy()
+
+        streams[guild_id].conn = voice.joinVoiceChannel({
+            channelId: channel_id,
+            guildId: guild_id,
+            adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
+        }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
+    } else {
+        if (!streams[guild_id].conn) {
+            streams[guild_id].conn = voice_connection
+        }
+    }
 
     streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, () => {
         streams[guild_id].resource = null
@@ -129,21 +146,6 @@ async function prepare_voice_connection(guild_id, channel_id) {
             })
         }
     })
-
-    const voice_connection = voice.getVoiceConnection(guild_id)
-    if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-        streams[guild_id].conn?.destroy()
-
-        streams[guild_id].conn = voice.joinVoiceChannel({
-            channelId: channel_id,
-            guildId: client.guilds.cache.get(guild_id).id,
-            adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
-        }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
-    } else {
-        if (!streams[guild_id].conn) {
-            streams[guild_id].conn = voice_connection
-        }
-    }
 }
 
 function make_simple_embed(string) {
