@@ -157,11 +157,13 @@ async function control_audio(args, message) {
         .setDescription("[" + yt_title + "](" + yt_url + ")")
         .setThumbnail(yt_thumbnail_url)
 
-    const rewind = new discord.MessageButton().setStyle(1).setCustomId("rewind").setLabel(":rewind:")
-    const pause = new discord.MessageButton().setStyle(1).setCustomId("pause").setLabel(":pause_button:")
-    const forward = new discord.MessageButton().setStyle(1).setCustomId("forward").setLabel(":fast_forward:")
+    const rewind = new discord.MessageButton().setStyle(1).setCustomId("rewind").setLabel("⏪")
+    const play = new discord.MessageButton().setStyle(1).setCustomId("play").setLabel("⏯")
+    const pause = new discord.MessageButton().setStyle(1).setCustomId("pause").setLabel("⏸")
+    const loop = new discord.MessageButton().setStyle(1).setCustomId("loop").setLabel("🔁")
+    const forward = new discord.MessageButton().setStyle(1).setCustomId("forward").setLabel("⏩")
 
-    const row = new discord.MessageActionRow().addComponents([rewind, pause, forward])
+    const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
 
     await message.reply({embeds: [embed], components: [row]})
 }
