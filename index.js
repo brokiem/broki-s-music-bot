@@ -159,7 +159,7 @@ async function control_audio(args, message) {
         .setThumbnail(yt_thumbnail_url)
 
     const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏯")
+    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
     const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
     const row = new discord.MessageActionRow().addComponents([play, pause, loop])
@@ -196,7 +196,7 @@ async function play_audio(args, message) {
                 yt_thumbnail_url = result.video_details.thumbnails[0].url
 
                 const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏯")
+                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
                 const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
                 const row = new discord.MessageActionRow().addComponents([play, pause, loop])
@@ -224,7 +224,7 @@ async function play_audio(args, message) {
                 yt_thumbnail_url = res.video_details.thumbnails[0].url
 
                 const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏯")
+                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
                 const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
                 const row = new discord.MessageActionRow().addComponents([play, pause, loop])
