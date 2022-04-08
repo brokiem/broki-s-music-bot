@@ -34,11 +34,10 @@ client.on("messageCreate", message => {
                     return
                 }
 
-                play_audio(args, message.guildId, message.channelId).then(() => {
-                    message.channel.send({
-                        embeds: [make_playing_embed(message.guildId, message.author)],
-                        components: [get_control_button_row()]
-                    })
+                play_audio(args, message.guildId, message.channelId)
+                message.channel.send({
+                    embeds: [make_playing_embed(message.guildId, message.author)],
+                    components: [get_control_button_row()]
                 })
                 break
         }
