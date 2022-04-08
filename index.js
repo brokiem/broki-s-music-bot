@@ -40,11 +40,33 @@ client.on("messageCreate", async message => {
                     break
                 case "play":
                 case "p":
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
+                        return
+                    }
+
                     await play_audio(args, message)
                     break
                 case "stop":
                 case "s":
-                    await stop_audio(args, message)
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
+                        return
+                    }
+
+                    const result = await stop_audio()
+                    if (result) {
+                        const embed = new discord.MessageEmbed()
+                            .setColor('#35cf7d')
+                            .setDescription("YouTube audio successfully stopped!")
+                            .setFooter({
+                                text: "by " + message.author.username + "#" + message.author.discriminator,
+                                iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                            })
+                        await message.channel.send({embeds: [embed]})
+                    } else {
+                        await message.reply(result)
+                    }
                     break
                 case "pause":
                 case "break":
@@ -59,11 +81,27 @@ client.on("messageCreate", async message => {
                     break
                 case "volume":
                 case "vol":
-                    await set_audio_volume(args, message)
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
+                        return
+                    }
+
+                    if (args.length > 0) {
+                        await set_audio_volume(args[0])
+                    }
                     break
                 case "control":
                 case "c":
-                    await control_audio(args, message)
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
+                        return
+                    }
+
+                    const control_embed = make_control_audio_embed()
+                    await message.reply((typeof control_embed === "string") ? control_embed : {
+                        embeds: [control_embed.embed],
+                        components: [control_embed.component]
+                    })
                     break
                 case "leave":
                     conn?.disconnect()
@@ -87,29 +125,25 @@ client.on("messageCreate", async message => {
     }
 })
 
-async function set_audio_volume(args, message) {
-    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
-        message.reply("You are not in the same voice channel!")
-        return
+async function set_audio_volume(volume) {
+    if (resource === null) {
+        return "No audio playing"
     }
 
-    if (args.length > 0) {
-        if (!playing) {
-            message.reply("No audio playing")
-            return
-        }
-
-        if (parseInt(args[0].replaceAll("%", "")) <= 100) {
-            resource.volume.setVolumeLogarithmic(parseInt(args[0]) / 100)
-            message.reply("Audio volume set to " + args[0].replaceAll("%", "") + "%")
-        } else {
-            resource.volume.setVolumeLogarithmic(1)
-            message.reply("Audio volume set to 100%")
-        }
+    if (parseInt(volume.toString().replaceAll("%", "")) <= 100) {
+        resource.volume.setVolumeLogarithmic(parseInt(volume) / 100)
+        return "Audio volume set to " + volume.toString().replaceAll("%", "") + "%"
+    } else {
+        resource.volume.setVolumeLogarithmic(1)
+        return "Audio volume set to 100%"
     }
 }
 
 async function pause_audio() {
+    if (resource === null) {
+        return "No audio playing"
+    }
+
     playing = !playing
 
     if (playing) {
@@ -121,35 +155,21 @@ async function pause_audio() {
     }
 }
 
-async function stop_audio(args, message) {
-    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
-        message.reply("You are not in the same voice channel!")
-        return
-    }
-
-    if (!playing) {
-        message.reply("No audio playing")
-        return
+async function stop_audio() {
+    if (resource === null) {
+        return "No audio playing"
     }
 
     loop = false
     looped_url = null
     player.stop(true)
 
-    const embed = new discord.MessageEmbed()
-        .setColor('#35cf7d')
-        .setDescription("YouTube audio successfully stopped!")
-        .setFooter({
-            text: "by " + message.author.username + "#" + message.author.discriminator,
-            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
-        })
-    message.channel.send({embeds: [embed]})
+    return true
 }
 
-async function control_audio(args, message) {
-    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
-        message.reply("You are not in the same voice channel!")
-        return
+function make_control_audio_embed() {
+    if (resource === null) {
+        return "No audio playing"
     }
 
     const embed = new discord.MessageEmbed()
@@ -164,88 +184,78 @@ async function control_audio(args, message) {
 
     const row = new discord.MessageActionRow().addComponents([play, pause, loop])
 
-    await message.reply({embeds: [embed], components: [row]})
+    return {embed: embed, component: row}
 }
 
-async function play_audio(args, message) {
-    if (args.length > 0) {
-        if (message.member.voice.channel?.id === null) {
-            message.reply("You are not in the same voice channel!")
-            return
+async function play_audio(url, message) {
+    const voice_connection = voice.getVoiceConnection(message.guildId)
+    if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+        conn?.destroy()
+
+        conn = voice.joinVoiceChannel({
+            channelId: message.member.voice.channel.id,
+            guildId: message.guild.id,
+            adapterCreator: message.guild.voiceAdapterCreator
+        }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
+    } else {
+        if (conn === null) {
+            conn = voice_connection
         }
-
-        const voice_connection = voice.getVoiceConnection(message.guildId)
-        if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-            conn?.destroy()
-
-            conn = voice.joinVoiceChannel({
-                channelId: message.member.voice.channel.id,
-                guildId: message.guild.id,
-                adapterCreator: message.guild.voiceAdapterCreator
-            }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
-        } else {
-            if (conn === null) {
-                conn = voice_connection
-            }
-        }
-
-        if (playdl.yt_validate(args[0]) === 'video') {
-            playdl.video_info(args[0]).then(result => {
-                yt_title = result.video_details.title
-                yt_url = result.video_details.url
-                yt_thumbnail_url = result.video_details.thumbnails[0].url
-
-                const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
-                const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
-
-                const row = new discord.MessageActionRow().addComponents([play, pause, loop])
-
-                message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
-
-                looped_url = result.video_details.url
-
-                playdl.stream_from_info(result, {
-                    discordPlayerCompatibility: true
-                }).then(r => {
-                    stream = r
-                    broadcast_audio()
-                })
-            })
-        } else {
-            try {
-                const results = await playdl.search(args.join(" "), {
-                    limit: 1
-                })
-                const res = await playdl.video_info(results[0].url)
-
-                yt_title = res.video_details.title
-                yt_url = res.video_details.url
-                yt_thumbnail_url = res.video_details.thumbnails[0].url
-
-                const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
-                const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
-
-                const row = new discord.MessageActionRow().addComponents([play, pause, loop])
-
-                message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
-
-                looped_url = results[0].url
-
-                playdl.stream(results[0].url, {
-                    discordPlayerCompatibility: true
-                }).then(r => {
-                    stream = r
-                    broadcast_audio()
-                }).catch()
-            } catch (e) {
-                message.reply(e.toString())
-            }
-        }
-
-        loop = false
     }
+
+    if (playdl.yt_validate(url) === 'video') {
+        playdl.video_info(url).then(result => {
+            yt_title = result.video_details.title
+            yt_url = result.video_details.url
+            yt_thumbnail_url = result.video_details.thumbnails[0].url
+
+            message.channel.send({
+                embeds: [make_playing_embed(message)],
+                components: [make_control_audio_embed().component]
+            })
+
+            looped_url = result.video_details.url
+
+            playdl.stream_from_info(result, {
+                discordPlayerCompatibility: true
+            }).then(r => {
+                stream = r
+                broadcast_audio()
+            })
+        })
+    } else {
+        try {
+            const results = await playdl.search(args.join(" "), {
+                limit: 1
+            })
+            const res = await playdl.video_info(results[0].url)
+
+            yt_title = res.video_details.title
+            yt_url = res.video_details.url
+            yt_thumbnail_url = res.video_details.thumbnails[0].url
+
+            const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
+            const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
+            const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
+
+            const row = new discord.MessageActionRow().addComponents([play, pause, loop])
+
+            message.channel.send({embeds: [make_playing_embed(message)], components: [row]})
+
+            looped_url = results[0].url
+
+            playdl.stream(results[0].url, {
+                discordPlayerCompatibility: true
+            }).then(r => {
+                stream = r
+                broadcast_audio()
+            }).catch()
+        } catch (e) {
+            message.reply(e.toString())
+        }
+    }
+
+    loop = false
 }
 
 async function broadcast_audio() {
@@ -278,7 +288,7 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
     }
 })
 
-function makePlayingEmbed(message) {
+function make_playing_embed(message) {
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
         .setTitle("Playing YouTube")
