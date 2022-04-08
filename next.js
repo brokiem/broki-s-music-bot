@@ -19,13 +19,13 @@ client.login().catch((e) => {
     console.error("The bot token was incorrect.\n" + e)
 })
 
-client.on("messageCreate", message => {
+client.on("messageCreate", async message => {
     if (message.content.startsWith(prefix)) {
         const args = message.content.slice(prefix.length).trim().split(/ +/)
 
         switch (args.shift().toLowerCase()) {
             case "help":
-                message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave")
+                await message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave")
                 break
             case "play":
             case "p":
@@ -34,8 +34,8 @@ client.on("messageCreate", message => {
                     return
                 }
 
-                play_audio(args, message.guildId, message.channelId)
-                message.channel.send({
+                await play_audio(args, message.guildId, message.channelId)
+                await message.channel.send({
                     embeds: [make_playing_embed(message.guildId, message.author)],
                     components: [get_control_button_row()]
                 })
@@ -44,7 +44,7 @@ client.on("messageCreate", message => {
     }
 })
 
-function play_audio(input, guild_id, channel_id) {
+async function play_audio(input, guild_id, channel_id) {
     prepare_voice_connection(guild_id, channel_id)
 
     if (playdl.yt_validate(input[0]) === 'video') {
@@ -58,6 +58,7 @@ function play_audio(input, guild_id, channel_id) {
             playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
                 streams[guild_id].stream = r
                 broadcast_audio(guild_id)
+                console.log(streams[guild_id])
             })
         })
     } else {
@@ -74,13 +75,11 @@ function play_audio(input, guild_id, channel_id) {
                 playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
                     streams[guild_id].stream = r
                     broadcast_audio(guild_id)
+                    console.log(streams[guild_id])
                 })
             })
         })
     }
-
-    console.log(streams)
-    console.log(streams[guild_id])
 }
 
 async function broadcast_audio(guild_id) {
