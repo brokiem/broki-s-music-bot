@@ -294,7 +294,7 @@ client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return
 
     if (interaction.member.voice.channel?.id !== interaction.guild.me.voice.channel?.id) {
-        await interaction.channel.send("You are not in the same voice channel!")
+        await interaction.reply({content: "You are not in the same voice channel!", ephemeral: true})
         return
     }
 
