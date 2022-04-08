@@ -158,11 +158,9 @@ async function control_audio(args, message) {
         .setDescription("[" + yt_title + "](" + yt_url + ")")
         .setThumbnail(yt_thumbnail_url)
 
-    const rewind = new discord.MessageButton().setStyle(2).setCustomId("rewind").setLabel("⏪")
-    const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("▶")
-    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("⏸")
-    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("🔁")
-    const forward = new discord.MessageButton().setStyle(2).setCustomId("forward").setLabel("⏩")
+    const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("PLAY ▶")
+    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
+    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
     const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
 
@@ -197,7 +195,13 @@ async function play_audio(args, message) {
                 yt_url = result.video_details.url
                 yt_thumbnail_url = result.video_details.thumbnails[0].url
 
-                message.channel.send({embeds: [makePlayingEmbed(message)]})
+                const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("PLAY ▶")
+                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
+                const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
+
+                const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
+
+                message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
 
                 looped_url = result.video_details.url
 
@@ -219,7 +223,13 @@ async function play_audio(args, message) {
                 yt_url = res.video_details.url
                 yt_thumbnail_url = res.video_details.thumbnails[0].url
 
-                message.channel.send({embeds: [makePlayingEmbed(message)]})
+                const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("PLAY ▶")
+                const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
+                const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
+
+                const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
+
+                message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
 
                 looped_url = results[0].url
 
@@ -290,9 +300,7 @@ client.on('interactionCreate', async interaction => {
 
     let inter = null
 
-    if (interaction.customId === 'rewind') {
-
-    } else if (interaction.customId === 'pause') {
+    if (interaction.customId === 'pause') {
         const status = await pause_audio()
         inter = await interaction.reply({
             content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -310,8 +318,6 @@ client.on('interactionCreate', async interaction => {
             content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator,
             fetchReply: true
         })
-    } else if (interaction.customId === 'forward') {
-
     }
 
     if (inter !== null) {
