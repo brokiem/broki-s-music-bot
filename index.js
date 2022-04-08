@@ -288,28 +288,27 @@ client.on('interactionCreate', async interaction => {
         return
     }
 
+    let inter = null
+
     if (interaction.customId === 'rewind') {
 
     } else if (interaction.customId === 'pause') {
         const status = await pause_audio()
-        const inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
-        setTimeout(function () {
-            inter.deleteReply()
-        }, 10000)
+        inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
     } else if (interaction.customId === 'play') {
         const status = await pause_audio()
-        const inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
-        setTimeout(function () {
-            inter.deleteReply()
-        }, 10000)
+        inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
     } else if (interaction.customId === 'loop') {
         loop = !loop
-        const inter = interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        inter = interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+    } else if (interaction.customId === 'forward') {
+
+    }
+
+    if (inter !== null) {
         setTimeout(function () {
             inter.deleteReply()
         }, 10000)
-    } else if (interaction.customId === 'forward') {
-
     }
 })
 
