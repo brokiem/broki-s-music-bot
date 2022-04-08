@@ -21,6 +21,10 @@ let playing = false
 let looped_url = null
 let loop = false
 
+let yt_title
+let yt_url
+let yt_thumbnail_url
+
 client.login().catch((e) => {
     console.error("The bot token was incorrect.\n" + e)
 })
@@ -147,7 +151,19 @@ async function control_audio(args, message) {
         return
     }
 
+    const embed = new discord.MessageEmbed()
+        .setColor("#35cf7d")
+        .setTitle("Now Playing")
+        .setDescription("[" + yt_title + "](" + yt_url + ")")
+        .setThumbnail(yt_thumbnail_url)
 
+    const rewind = new discord.MessageButton().setStyle(1).setCustomId("rewind").setLabel(":rewind:")
+    const pause = new discord.MessageButton().setStyle(1).setCustomId("pause").setLabel(":pause_button:")
+    const forward = new discord.MessageButton().setStyle(1).setCustomId("forward").setLabel(":fast_forward:")
+
+    const row = new discord.MessageActionRow().addComponents([rewind, pause, forward])
+
+    await message.reply({embeds: [embed], components: [row]})
 }
 
 async function play_audio(args, message) {
@@ -174,9 +190,12 @@ async function play_audio(args, message) {
 
         if (playdl.yt_validate(args[0]) === 'video') {
             playdl.video_info(args[0]).then(result => {
-                message.channel.send({
-                    embeds: [makePlayingEmbed(message, "Playing YouTube Audio", result.video_details.title, result.video_details.url, result.video_details.thumbnails[0].url)]
-                })
+                yt_title = result.video_details.title
+                yt_url = result.video_details.url
+                yt_thumbnail_url = result.video_details.thumbnails[0].url
+
+                message.channel.send({embeds: [makePlayingEmbed(message)]})
+
                 looped_url = result.video_details.url
 
                 playdl.stream_from_info(result, {
@@ -193,9 +212,12 @@ async function play_audio(args, message) {
                 })
                 const res = await playdl.video_info(results[0].url)
 
-                message.channel.send({
-                    embeds: [makePlayingEmbed(message, "Playing YouTube Audio", res.video_details.title, results[0].url, results[0].thumbnails[0].url)]
-                })
+                yt_title = res.video_details.title
+                yt_url = res.video_details.url
+                yt_thumbnail_url = res.video_details.thumbnails[0].url
+
+                message.channel.send({embeds: [makePlayingEmbed(message)]})
+
                 looped_url = results[0].url
 
                 playdl.stream(results[0].url, {
@@ -243,12 +265,12 @@ player.on(voice.AudioPlayerStatus.Idle, () => {
     }
 })
 
-function makePlayingEmbed(message, title, description, url, thumbnail_url) {
+function makePlayingEmbed(message) {
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
-        .setTitle(title)
-        .setDescription("[" + description + "](" + url + ")")
-        .setThumbnail(thumbnail_url)
+        .setTitle("Playing YouTube")
+        .setDescription("[" + yt_title + "](" + yt_url + ")")
+        .setThumbnail(yt_thumbnail_url)
         .setFooter({
             text: "by " + message.author.username + "#" + message.author.discriminator,
             iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
