@@ -283,6 +283,8 @@ function makePlayingEmbed(message) {
 client.on('interactionCreate', interaction => {
     if (!interaction.isButton()) return
 
+    console.log(interaction)
+
     const filter = i => i.style === 2
 
     const collector = interaction.channel.createMessageComponentCollector({filter, time: 15000})
