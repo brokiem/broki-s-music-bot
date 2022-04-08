@@ -294,13 +294,13 @@ client.on('interactionCreate', async interaction => {
 
     } else if (interaction.customId === 'pause') {
         const status = await pause_audio()
-        inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        inter = await interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
     } else if (interaction.customId === 'play') {
         const status = await pause_audio()
-        inter = interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        inter = await interaction.reply({content: status + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
     } else if (interaction.customId === 'loop') {
         loop = !loop
-        inter = interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
+        inter = await interaction.reply({content: loop ? "Loop successfully **enabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator : "Loop successfully **disabled** for current audio" + " | by " + interaction.user.username + "#" + interaction.user.discriminator})
     } else if (interaction.customId === 'forward') {
 
     }
