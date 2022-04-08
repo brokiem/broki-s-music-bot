@@ -299,7 +299,7 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (resource === null) {
-        interaction.reply({content: 'No audio playing!', ephemral: true})
+        interaction.reply({content: 'No audio playing!', ephemeral: true})
         return
     }
 
