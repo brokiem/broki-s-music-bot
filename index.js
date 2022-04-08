@@ -32,7 +32,7 @@ client.on("messageCreate", async message => {
 
             switch (args.shift().toLowerCase()) {
                 case "help":
-                    await message.reply("Command: !play, !loop, !pause, !resume, !stop, !volume, !leave")
+                    await message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave")
                     break
                 case "play":
                 case "p":
@@ -50,6 +50,10 @@ client.on("messageCreate", async message => {
                 case "volume":
                 case "vol":
                     set_audio_volume(args, message)
+                    break
+                case "control":
+                case "c":
+                    control_audio(args, message)
                     break
                 case "leave":
                     conn?.disconnect()
@@ -135,6 +139,15 @@ function stop_audio(args, message) {
             iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
         })
     message.channel.send({embeds: [embed]})
+}
+
+function control_audio(args, message) {
+    if (message.member.voice.channel === null) {
+        message.reply("You are not in a voice channel!")
+        return
+    }
+
+
 }
 
 async function play_audio(args, message) {
