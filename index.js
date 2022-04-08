@@ -49,7 +49,13 @@ client.on("messageCreate", async message => {
                 case "pause":
                 case "break":
                 case "resume":
-                    await pause_audio(args, message)
+                    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+                        await message.reply("You are not in the same voice channel!")
+                        return
+                    }
+
+                    const status = await pause_audio()
+                    await message.reply(status)
                     break
                 case "volume":
                 case "vol":
@@ -103,21 +109,16 @@ async function set_audio_volume(args, message) {
     }
 }
 
-async function pause_audio(args, message) {
-    if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
-        message.reply("You are not in the same voice channel!")
-        return
-    }
+async function pause_audio() {
+    playing = !playing
 
-    if (!playing) {
+    if (playing) {
         player.unpause()
-        message.reply("Audio resumed")
+        return "Audio resumed"
     } else {
         player.pause()
-        message.reply("Audio paused")
+        return "Audio paused"
     }
-
-    playing = !playing
 }
 
 async function stop_audio(args, message) {
@@ -157,11 +158,11 @@ async function control_audio(args, message) {
         .setDescription("[" + yt_title + "](" + yt_url + ")")
         .setThumbnail(yt_thumbnail_url)
 
-    const rewind = new discord.MessageButton().setStyle(1).setCustomId("rewind").setLabel("⏪")
-    const play = new discord.MessageButton().setStyle(1).setCustomId("play").setLabel("⏯")
-    const pause = new discord.MessageButton().setStyle(1).setCustomId("pause").setLabel("⏸")
-    const loop = new discord.MessageButton().setStyle(1).setCustomId("loop").setLabel("🔁")
-    const forward = new discord.MessageButton().setStyle(1).setCustomId("forward").setLabel("⏩")
+    const rewind = new discord.MessageButton().setStyle(2).setCustomId("rewind").setLabel("⏪")
+    const play = new discord.MessageButton().setStyle(2).setCustomId("play").setLabel("⏯")
+    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("⏸")
+    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("🔁")
+    const forward = new discord.MessageButton().setStyle(2).setCustomId("forward").setLabel("⏩")
 
     const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
 
@@ -278,6 +279,33 @@ function makePlayingEmbed(message) {
             iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
         })
 }
+
+client.on('interactionCreate', interaction => {
+    if (!interaction.isButton()) return
+
+    const filter = i => i.style === 2
+
+    const collector = interaction.channel.createMessageComponentCollector({filter, time: 15000})
+
+    collector.on('collect', async i => {
+        if (i.customId === 'rewind') {
+
+        } else if (i.customId === 'pause') {
+            const status = await pause_audio()
+            await interaction.channel.send({content: status})
+        } else if (i.customId === 'play') {
+            const status = await pause_audio()
+            await interaction.channel.send(status)
+        } else if (i.customId === 'loop') {
+            loop = !loop
+            await interaction.channel.send(loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")
+        } else if (i.customId === 'forward') {
+
+        }
+    })
+
+    collector.on('end', collected => console.log(`Collected ${collected.size} items`))
+})
 
 async function onDisconnect() {
     try {
