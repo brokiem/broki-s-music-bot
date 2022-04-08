@@ -95,9 +95,6 @@ async function broadcast_audio(guild_id) {
 
 function is_same_vc_as(user_id, guild_id) {
     const guild = client.guilds.cache.get(guild_id)
-    if (!guild.members.cache.get(user_id).voice.channel) {
-        return false
-    }
     return guild.members.cache.get(user_id).voice.channel?.id === guild.members.cache.get(client.user.id).voice.channel?.id
 }
 
