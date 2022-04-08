@@ -103,6 +103,8 @@ function is_same_vc_as(user_id, guild_id) {
 
 function prepare_voice_connection(guild_id, channel_id) {
     streams[guild_id] = {}
+    streams[guild_id].player = null
+    streams[guild_id].stream = null
     streams[guild_id].player.player = voice.createAudioPlayer()
     streams[guild_id].stream.resource = null
     streams[guild_id].stream.stream = null
