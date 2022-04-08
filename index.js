@@ -40,12 +40,12 @@ client.on("messageCreate", async message => {
                     break
                 case "stop":
                 case "s":
-                    stop_audio(args, message)
+                    await stop_audio(args, message)
                     break
                 case "pause":
                 case "break":
                 case "resume":
-                    pause_audio(args, message)
+                    await pause_audio(args, message)
                     break
                 case "volume":
                 case "vol":
@@ -53,7 +53,7 @@ client.on("messageCreate", async message => {
                     break
                 case "control":
                 case "c":
-                    control_audio(args, message)
+                    await control_audio(args, message)
                     break
                 case "leave":
                     conn?.disconnect()
@@ -99,7 +99,7 @@ function set_audio_volume(args, message) {
     }
 }
 
-function pause_audio(args, message) {
+async function pause_audio(args, message) {
     if (message.member.voice.channel === null) {
         message.reply("You are not in a voice channel!")
         return
@@ -116,7 +116,7 @@ function pause_audio(args, message) {
     playing = !playing
 }
 
-function stop_audio(args, message) {
+async function stop_audio(args, message) {
     if (message.member.voice.channel === null) {
         message.reply("You are not in a voice channel!")
         return
@@ -141,7 +141,7 @@ function stop_audio(args, message) {
     message.channel.send({embeds: [embed]})
 }
 
-function control_audio(args, message) {
+async function control_audio(args, message) {
     if (message.member.voice.channel === null) {
         message.reply("You are not in a voice channel!")
         return
@@ -213,7 +213,7 @@ async function play_audio(args, message) {
     }
 }
 
-function broadcast_audio() {
+async function broadcast_audio() {
     resource = voice.createAudioResource(stream.stream, {
         inputType: stream.type,
         inlineVolume: true
