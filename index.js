@@ -162,7 +162,7 @@ async function control_audio(args, message) {
     const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
     const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
-    const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
+    const row = new discord.MessageActionRow().addComponents([play, pause, loop])
 
     await message.reply({embeds: [embed], components: [row]})
 }
@@ -199,7 +199,7 @@ async function play_audio(args, message) {
                 const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
                 const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
-                const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
+                const row = new discord.MessageActionRow().addComponents([play, pause, loop])
 
                 message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
 
@@ -227,7 +227,7 @@ async function play_audio(args, message) {
                 const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE ⏸")
                 const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
 
-                const row = new discord.MessageActionRow().addComponents([rewind, play, pause, loop, forward])
+                const row = new discord.MessageActionRow().addComponents([play, pause, loop])
 
                 message.channel.send({embeds: [makePlayingEmbed(message)], components: [row]})
 
