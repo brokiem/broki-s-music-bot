@@ -168,7 +168,7 @@ async function control_audio(args, message) {
 
 async function play_audio(args, message) {
     if (args.length > 0) {
-        if (message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
+        if (message.guild.me.voice.channel?.id !== null && message.member.voice.channel?.id !== message.guild.me.voice.channel?.id) {
             message.reply("You are not in the same voice channel!")
             return
         }
