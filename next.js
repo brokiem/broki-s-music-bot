@@ -48,37 +48,28 @@ async function play_audio(input, guild_id, voice_channel_id) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
     if (playdl.yt_validate(input[0]) === 'video') {
-        playdl.video_info(input[0]).then(result => {
-            streams[guild_id].yt_title = result.video_details.title
-            streams[guild_id].yt_url = result.video_details.url
-            streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
+        const result = await playdl.video_info(input[0])
 
-            streams[guild_id].looped_url = result.video_details.url
+        streams[guild_id].yt_title = result.video_details.title
+        streams[guild_id].yt_url = result.video_details.url
+        streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
 
-            playdl.stream_from_info(result, {discordPlayerCompatibility: true}).then(r => {
-                streams[guild_id].stream = r
-                broadcast_audio(guild_id)
-                console.log(streams[guild_id])
-            })
-        })
+        streams[guild_id].looped_url = result.video_details.url
+
+        streams[guild_id].stream = await playdl.stream_from_info(result, {discordPlayerCompatibility: true})
+        await broadcast_audio(guild_id)
     } else {
-        playdl.search(input.join(" "), {
-            limit: 1
-        }).then(results => {
-            playdl.video_info(results[0].url).then(res => {
-                streams[guild_id].yt_title = res.video_details.title
-                streams[guild_id].yt_url = res.video_details.url
-                streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
+        const results = await playdl.search(input.join(" "), {limit: 1})
+        const res = await playdl.video_info(results[0].url)
 
-                streams[guild_id].looped_url = results[0].url
+        streams[guild_id].yt_title = res.video_details.title
+        streams[guild_id].yt_url = res.video_details.url
+        streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url
 
-                playdl.stream(results[0].url, {discordPlayerCompatibility: true}).then(r => {
-                    streams[guild_id].stream = r
-                    broadcast_audio(guild_id)
-                    console.log(streams[guild_id])
-                })
-            })
-        })
+        streams[guild_id].looped_url = results[0].url
+
+        streams[guild_id].stream = await playdl.stream_from_info(res, {discordPlayerCompatibility: true})
+        await broadcast_audio(guild_id)
     }
 }
 
@@ -147,8 +138,6 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             })
         }
     })
-
-    console.log("called")
 }
 
 function make_simple_embed(string) {
