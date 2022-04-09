@@ -323,6 +323,7 @@ function leave_voice_channel(guild_id) {
     streams[guild_id].conn?.destroy()
 
     delete streams[guild_id]
+    global.gc()
 }
 
 function make_simple_embed(string) {
