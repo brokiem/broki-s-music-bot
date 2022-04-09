@@ -261,6 +261,8 @@ client.on('interactionCreate', async interaction => {
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
+    if (newState.channelId === null) return
+
     console.log(newState.channel.members.size)
     console.log(newState.channelId)
     console.log(newState.guild.me.voice.channelId)
