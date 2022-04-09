@@ -122,20 +122,15 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         }
     }
 
-    streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, () => {
+    streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
         streams[guild_id].resource = null
         streams[guild_id].stream = null
         streams[guild_id].playing = false
 
         if (streams[guild_id].loop) {
-            playdl.video_info(streams[guild_id].looped_url).then(result => {
-                playdl.stream_from_info(result, {
-                    discordPlayerCompatibility: true
-                }).then(r => {
-                    streams[guild_id].stream = r
-                    broadcast_audio(guild_id)
-                })
-            })
+            const result = await playdl.video_info(streams[guild_id].looped_url)
+            streams[guild_id].stream = await playdl.stream_from_info(result, {discordPlayerCompatibility: true})
+            await broadcast_audio(guild_id)
         }
     })
 }
