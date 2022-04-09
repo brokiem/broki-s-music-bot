@@ -1,3 +1,5 @@
+'use strict'
+
 const discord = require('discord.js')
 const playdl = require('play-dl')
 const voice = require('@discordjs/voice')
@@ -320,11 +322,7 @@ function leave_voice_channel(guild_id) {
     streams[guild_id].conn?.disconnect()
     streams[guild_id].conn?.destroy()
 
-    setTimeout(() => {
-        if (streams[guild_id] !== undefined) {
-            delete streams[guild_id]
-        }
-    }, 5000)
+    delete streams[guild_id]
 }
 
 function make_simple_embed(string) {
@@ -371,10 +369,6 @@ async function onDisconnect(guild_id) {
         streams[guild_id].conn?.disconnect()
         streams[guild_id].conn?.destroy()
 
-        setTimeout(() => {
-            if (streams[guild_id] !== undefined) {
-                delete streams[guild_id]
-            }
-        }, 5000)
+        delete streams[guild_id]
     }
 }
