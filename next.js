@@ -47,19 +47,26 @@ client.on("messageCreate", async message => {
                     return
                 }
 
-                if (stop_audio(message.guildId)) {
-                    const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
-                        text: "by " + message.author.username + "#" + message.author.discriminator,
-                        iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
-                    })
-                    await message.channel.send({embeds: [embed]})
-                } else {
+                if (!any_audio_playing(message.guildId)) {
                     await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    return
                 }
+
+                stop_audio(message.guildId)
+                const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
+                    text: "by " + message.author.username + "#" + message.author.discriminator,
+                    iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                })
+                await message.channel.send({embeds: [embed]})
                 break
             case "loop":
                 if (!is_same_vc_as(message.member.id, message.guildId)) {
                     message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                if (!any_audio_playing(message.guildId)) {
+                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
                     return
                 }
 
@@ -74,11 +81,36 @@ client.on("messageCreate", async message => {
                     return
                 }
 
+                if (!any_audio_playing(message.guildId)) {
+                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    return
+                }
+
                 if (args.length > 0) {
                     const volume = args[0].replaceAll("%", "")
 
                     set_audio_volume(volume, message.guildId)
                     await message.reply({embeds: [make_simple_embed("Audio volume set to " + (parseInt(volume) > 100 ? "100" : volume) + "%")]})
+                }
+                break
+            case "pause":
+            case "resume":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                if (!any_audio_playing(message.guildId)) {
+                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    return
+                }
+
+                // 0 = resumed
+                // 1 = paused
+                if (pause_audio() === 0) {
+                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
+                } else {
+                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")]})
                 }
                 break
         }
@@ -128,31 +160,36 @@ async function broadcast_audio(guild_id) {
 }
 
 function stop_audio(guild_id) {
-    if (streams[guild_id].resource === null) {
-        return false
-    }
-
     streams[guild_id].loop = false
     streams[guild_id].looped_url = null
     streams[guild_id].player.stop(true)
-    return true
 }
 
 function set_audio_volume(volume, guild_id) {
-    if (streams[guild_id].resource === null) {
-        return false
-    }
-
     if (parseInt(volume) <= 100) {
         streams[guild_id].resource.volume.setVolumeLogarithmic(parseInt(volume) / 100)
     } else {
         streams[guild_id].resource.volume.setVolumeLogarithmic(1)
     }
-    return true
+}
+
+function pause_audio(guild_id) {
+    streams[guild_id].playing = !streams[guild_id].playing
+
+    if (streams[guild_id].playing) {
+        streams[guild_id].player.unpause()
+        return 0
+    } else {
+        streams[guild_id].player.pause()
+        return 1
+    }
 }
 
 function is_same_vc_as(user_id, guild_id) {
     const guild = client.guilds.cache.get(guild_id)
+    if (!guild.members.cache.get(user_id).voice.channel) {
+        return false
+    }
     if (guild.members.cache.get(user_id).voice.channel && !guild.members.cache.get(client.user.id).voice.channel) {
         return true
     }
@@ -221,6 +258,10 @@ function get_control_button_row() {
     const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
     const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
     return new discord.MessageActionRow().addComponents([play, pause, loop])
+}
+
+function any_audio_playing(guild_id) {
+    return streams[guild_id].resource !== null
 }
 
 async function onDisconnect(guild_id) {
