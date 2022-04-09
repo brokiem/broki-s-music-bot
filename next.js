@@ -133,7 +133,7 @@ client.on("messageCreate", async message => {
                 break
             case "leave":
             case "l":
-                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                if (!is_same_vc_as(message.member.id, message.guildId) && !guild.members.cache.get(client.user.id).voice.channel) {
                     message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
                     return
                 }
