@@ -307,7 +307,7 @@ async function broadcast_audio(guild_id, stream) {
     streams[guild_id].resource.volume.setVolumeLogarithmic(0.5)
 
     streams[guild_id].player.play(streams[guild_id].resource)
-    streams[guild_id].conn.subscribe(streams[guild_id].player)
+    voice.getVoiceConnection(guild_id).subscribe(streams[guild_id].player)
 
     streams[guild_id].playing = true
 }
@@ -352,7 +352,6 @@ function is_same_vc_as(user_id, guild_id) {
 function prepare_voice_connection(guild_id, voice_channel_id) {
     streams[guild_id] = {}
     streams[guild_id].player = voice.createAudioPlayer()
-    streams[guild_id].conn = null
     streams[guild_id].resource = null
     streams[guild_id].playing = false
     streams[guild_id].looped_url = null
@@ -361,19 +360,13 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
     streams[guild_id].yt_url = undefined
     streams[guild_id].yt_thumbnail_url = undefined
 
-    const voice_connection = voice.getVoiceConnection(guild_id)
-    if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-        streams[guild_id].conn?.destroy()
-
-        streams[guild_id].conn = voice.joinVoiceChannel({
+    const conn = voice.getVoiceConnection(guild_id)
+    if (!conn || conn?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+        voice.joinVoiceChannel({
             channelId: voice_channel_id,
             guildId: guild_id,
             adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
         }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
-    } else {
-        if (!streams[guild_id].conn) {
-            streams[guild_id].conn = voice_connection
-        }
     }
 
     streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
@@ -392,8 +385,9 @@ function leave_voice_channel(guild_id) {
         return false
     }
 
-    streams[guild_id].conn?.disconnect()
-    streams[guild_id].conn?.destroy()
+    const conn = voice.getVoiceConnection(guild_id)
+    conn?.disconnect()
+    conn?.destroy()
 
     delete streams[guild_id]
     global.gc()
@@ -432,9 +426,10 @@ function any_audio_playing(guild_id) {
 
 async function onDisconnect(guild_id) {
     try {
+        const conn = voice.getVoiceConnection(guild_id)
         await Promise.race([
-            voice.entersState(streams[guild_id].conn, voice.VoiceConnectionStatus.Signalling, 2_000),
-            voice.entersState(streams[guild_id].conn, voice.VoiceConnectionStatus.Connecting, 2_000),
+            voice.entersState(conn, voice.VoiceConnectionStatus.Signalling, 2_000),
+            voice.entersState(conn, voice.VoiceConnectionStatus.Connecting, 2_000),
         ])
     } catch (error) {
         leave_voice_channel(guild_id)
