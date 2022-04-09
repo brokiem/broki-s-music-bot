@@ -285,11 +285,17 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
 }
 
 function leave_voice_channel(guild_id) {
+    if (streams[guild_id] === undefined) {
+        return
+    }
+
     streams[guild_id].conn?.disconnect()
     streams[guild_id].conn?.destroy()
 
     setTimeout(() => {
-        delete streams[guild_id]
+        if (streams[guild_id] !== undefined) {
+            delete streams[guild_id]
+        }
     }, 5000)
 }
 
@@ -330,8 +336,17 @@ async function onDisconnect(guild_id) {
             voice.entersState(streams[guild_id].conn, voice.VoiceConnectionStatus.Connecting, 2_000),
         ])
     } catch (error) {
+        if (streams[guild_id] === undefined) {
+            return
+        }
+
         streams[guild_id].conn?.disconnect()
         streams[guild_id].conn?.destroy()
-        streams[guild_id].conn = null
+
+        setTimeout(() => {
+            if (streams[guild_id] !== undefined) {
+                delete streams[guild_id]
+            }
+        }, 5000)
     }
 }
