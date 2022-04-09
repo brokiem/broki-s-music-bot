@@ -265,7 +265,6 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
     if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
         setTimeout(() => {
-            leave_voice_channel(oldState.guild.id)
             if (oldState.channel.members.size <= 1) {
                 leave_voice_channel(oldState.guild.id)
             }
