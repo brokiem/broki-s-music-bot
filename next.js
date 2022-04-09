@@ -30,7 +30,7 @@ client.on("messageCreate", async message => {
 
         switch (args.shift().toLowerCase()) {
             case "help":
-                await message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")
+                await message.reply({embeds: [make_simple_embed("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]})
                 break
             case "play":
             case "p":
