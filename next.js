@@ -28,9 +28,15 @@ client.on("messageCreate", async message => {
     if (message.content.startsWith(prefix)) {
         const args = message.content.slice(prefix.length).trim().split(/ +/)
 
+        const loop = new discord.MessageButton().setStyle("LINK").setLabel("Invite Me!").setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=2184547392&scope=bot")
+        const row = new discord.MessageActionRow().addComponents([loop])
+
         switch (args.shift().toLowerCase()) {
             case "help":
-                await message.reply({embeds: [make_simple_embed("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]})
+                await message.reply({
+                    components: [row],
+                    embeds: [make_simple_embed("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
+                })
                 break
             case "play":
             case "p":
@@ -172,6 +178,7 @@ client.on("messageCreate", async message => {
                 break
             case "stats":
                 await message.reply({
+                    components: [row],
                     embeds: [make_simple_embed("" +
                         "**❯  broki's music bot** - v1-dev" +
                         "\n\n" +
