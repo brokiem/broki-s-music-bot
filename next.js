@@ -194,6 +194,67 @@ client.on("messageCreate", async message => {
     }
 })
 
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isButton()) return
+    const guild_id = interaction.guildId
+
+    if (interaction.member.voice.channel?.id !== interaction.guild.me.voice.channel?.id) {
+        await interaction.reply({embeds: make_simple_embed("You are not in the same voice channel!"), ephemeral: true})
+        return
+    }
+
+    if (streams[guild_id].resource === null) {
+        interaction.reply({embeds: make_simple_embed('No audio playing!'), ephemeral: true})
+        return
+    }
+
+    let inter = null
+
+    if (interaction.customId === 'pause') {
+        if (pause_audio(guild_id) === 0) {
+            inter = await interaction.reply({
+                embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
+                    text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
+                    iconURL: interaction.member.displayAvatarURL({size: 16, dynamic: true})
+                })],
+                fetchReply: true
+            })
+        } else {
+            inter = await interaction.reply({
+                embeds: [make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
+                    text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
+                    iconURL: interaction.member.displayAvatarURL({size: 16, dynamic: true})
+                })],
+                fetchReply: true
+            })
+        }
+    } else if (interaction.customId === 'stop') {
+        stop_audio()
+        const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
+            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+            iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+        })
+
+        interaction.reply({embeds: [embed], fetchReply: true})
+    } else if (interaction.customId === 'loop') {
+        streams[guild_id].loop = !streams[guild_id].loop
+        const embed = make_simple_embed(streams[message.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio").setFooter({
+            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+            iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+        })
+        inter = await interaction.reply({
+            embeds: [embed],
+            fetchReply: true
+        })
+    }
+
+    if (inter !== null) {
+        setTimeout(function () {
+            inter.delete()
+        }, 10000)
+    }
+})
+
 async function play_audio(input, guild_id, voice_channel_id) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
