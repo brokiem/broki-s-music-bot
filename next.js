@@ -261,14 +261,14 @@ client.on('interactionCreate', async interaction => {
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
-    if (newState.channelId === null) return
+    if (oldState.channelId === null) return
 
-    console.log(newState.channel.members.size)
-    console.log(newState.channelId)
-    console.log(newState.guild.me.voice.channelId)
+    console.log(oldState.channel.members.size)
+    console.log(oldState.channelId)
+    console.log(oldState.guild.me.voice.channelId)
 
-    if (newState.channelId === newState.guild.me.voice.channelId && (newState.channel.members.size <= 1)) {
-        leave_voice_channel(newState.guild.id)
+    if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
+        leave_voice_channel(oldState.guild.id)
     }
 })
 
