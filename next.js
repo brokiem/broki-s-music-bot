@@ -147,6 +147,8 @@ function prepare_voice_connection(guild_id, channel_id) {
             })
         }
     })
+
+    console.log("called")
 }
 
 function make_simple_embed(string) {
