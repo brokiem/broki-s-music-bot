@@ -108,9 +108,9 @@ client.on("messageCreate", async message => {
                 // 0 = resumed
                 // 1 = paused
                 if (pause_audio() === 0) {
-                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
-                } else {
                     await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")]})
+                } else {
+                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
                 }
                 break
         }
@@ -261,7 +261,7 @@ function get_control_button_row() {
 }
 
 function any_audio_playing(guild_id) {
-    return streams[guild_id].resource !== null
+    return streams[guild_id].resource === null ? false : true
 }
 
 async function onDisconnect(guild_id) {
