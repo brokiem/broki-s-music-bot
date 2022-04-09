@@ -21,6 +21,8 @@ client.login().catch((e) => {
 })
 
 client.on("messageCreate", async message => {
+    if (message.author.bot) return
+
     if (message.content.startsWith(prefix)) {
         const args = message.content.slice(prefix.length).trim().split(/ +/)
 
@@ -133,7 +135,7 @@ client.on("messageCreate", async message => {
                 break
             case "leave":
             case "l":
-                if (!is_same_vc_as(message.member.id, message.guildId) && !guild.members.cache.get(client.user.id).voice.channel) {
+                if (!is_same_vc_as(message.member.id, message.guildId) && !message.guild.members.cache.get(client.user.id).voice.channel) {
                     message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
                     return
                 }
@@ -285,6 +287,8 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
 function leave_voice_channel(guild_id) {
     console.log(streams)
     console.log(guild_id)
+    console.log(streams[guild_id])
+    console.log(streams[guild_id].conn)
     return
 
     streams[guild_id].conn?.disconnect()
