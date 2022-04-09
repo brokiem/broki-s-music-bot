@@ -107,7 +107,7 @@ client.on("messageCreate", async message => {
 
                 // 0 = resumed
                 // 1 = paused
-                if (pause_audio() === 0) {
+                if (pause_audio(message.guildId) === 0) {
                     await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")]})
                 } else {
                     await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
