@@ -40,7 +40,8 @@ client.on("messageCreate", async message => {
                 await play_audio(args, message.guildId, message.member.voice.channelId)
                 await message.channel.send({
                     embeds: [make_playing_embed(message.guildId, message.author)],
-                    components: [get_control_button_row()]
+                    components: [get_control_button_row()],
+                    allowedMentions: {repliedUser: false}
                 })
                 break
             case "stop":
@@ -51,7 +52,10 @@ client.on("messageCreate", async message => {
                 }
 
                 if (!any_audio_playing(message.guildId)) {
-                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("No audio is currently playing")],
+                        allowedMentions: {repliedUser: false}
+                    })
                     return
                 }
 
@@ -60,7 +64,10 @@ client.on("messageCreate", async message => {
                     text: "by " + message.author.username + "#" + message.author.discriminator,
                     iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
                 })
-                await message.channel.send({embeds: [embed]})
+                await message.channel.send({
+                    embeds: [embed],
+                    allowedMentions: {repliedUser: false}
+                })
                 break
             case "loop":
                 if (!is_same_vc_as(message.member.id, message.guildId)) {
@@ -69,12 +76,18 @@ client.on("messageCreate", async message => {
                 }
 
                 if (!any_audio_playing(message.guildId)) {
-                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("No audio is currently playing")],
+                        allowedMentions: {repliedUser: false}
+                    })
                     return
                 }
 
                 streams[message.guildId].loop = !streams[message.guildId].loop
-                await message.reply({embeds: [make_simple_embed(streams[message.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")]})
+                await message.reply({
+                    embeds: [make_simple_embed(streams[message.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")],
+                    allowedMentions: {repliedUser: false}
+                })
                 break
             case "volume":
             case "vol":
@@ -85,7 +98,10 @@ client.on("messageCreate", async message => {
                 }
 
                 if (!any_audio_playing(message.guildId)) {
-                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("No audio is currently playing")],
+                        allowedMentions: {repliedUser: false}
+                    })
                     return
                 }
 
@@ -93,7 +109,10 @@ client.on("messageCreate", async message => {
                     const volume = args[0].replaceAll("%", "")
 
                     set_audio_volume(volume, message.guildId)
-                    await message.reply({embeds: [make_simple_embed("Audio volume set to " + (parseInt(volume) > 100 ? "100" : volume) + "%")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("Audio volume set to " + (parseInt(volume) > 100 ? "100" : volume) + "%")],
+                        allowedMentions: {repliedUser: false}
+                    })
                 }
                 break
             case "pause":
@@ -111,9 +130,15 @@ client.on("messageCreate", async message => {
                 // 0 = resumed
                 // 1 = paused
                 if (pause_audio(message.guildId) === 0) {
-                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")],
+                        allowedMentions: {repliedUser: false}
+                    })
                 } else {
-                    await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
+                    await message.reply({
+                        embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")],
+                        allowedMentions: {repliedUser: false}
+                    })
                 }
                 break
             case "control":
@@ -130,7 +155,8 @@ client.on("messageCreate", async message => {
 
                 await message.channel.send({
                     embeds: [make_playing_embed(message.guildId, message.author)],
-                    components: [get_control_button_row()]
+                    components: [get_control_button_row()],
+                    allowedMentions: {repliedUser: false}
                 })
                 break
             case "leave":
@@ -159,6 +185,8 @@ client.on("messageCreate", async message => {
                     )],
                     allowedMentions: {repliedUser: false}
                 })
+
+                console.log(streams)
                 break
         }
     }
