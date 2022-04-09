@@ -40,6 +40,23 @@ client.on("messageCreate", async message => {
                     components: [get_control_button_row()]
                 })
                 break
+            case "stop":
+            case "s":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                if (stop_audio()) {
+                    const embed = make_simple_embed().setFooter({
+                        text: "by " + message.author.username + "#" + message.author.discriminator,
+                        iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                    })
+                    await message.channel.send({embeds: [embed]})
+                } else {
+                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                }
+                break
         }
     }
 })
@@ -84,6 +101,17 @@ async function broadcast_audio(guild_id) {
     streams[guild_id].conn.subscribe(streams[guild_id].player)
 
     streams[guild_id].playing = true
+}
+
+function stop_audio(guild_id) {
+    if (streams[guild_id].resource === null) {
+        return false
+    }
+
+    streams[guild_id].loop = false
+    streams[guild_id].looped_url = null
+    streams[guild_id].player.stop(true)
+    return true
 }
 
 function is_same_vc_as(user_id, guild_id) {
