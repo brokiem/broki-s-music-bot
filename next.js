@@ -1,6 +1,7 @@
 const discord = require('discord.js')
 const playdl = require('play-dl')
 const voice = require('@discordjs/voice')
+const os = require("os")
 
 const client = new discord.Client({
     intents: [
@@ -25,7 +26,7 @@ client.on("messageCreate", async message => {
 
         switch (args.shift().toLowerCase()) {
             case "help":
-                await message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave")
+                await message.reply("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")
                 break
             case "play":
             case "p":
@@ -128,6 +129,33 @@ client.on("messageCreate", async message => {
                 await message.channel.send({
                     embeds: [make_playing_embed(message.guildId, message.author)],
                     components: [get_control_button_row()]
+                })
+                break
+            case "leave":
+            case "l":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                leave_voice_channel(message.guildId)
+                break
+            case "stats":
+                await message.reply({
+                    embeds: [make_simple_embed("" +
+                        "**❯  broki's music bot** - v1-dev" +
+                        "\n\n" +
+                        "• CPU Usage: " + os.loadavg().toString().split(",")[0] + "%\n" +
+                        "• RAM Usage: " + (Math.round(process.memoryUsage().rss / 10485.76) / 100) + " MB\n" +
+                        "\n" +
+                        "• Latency: " + client.ws.ping + "ms\n" +
+                        "• Guilds: " + client.guilds.cache.size + "\n" +
+                        "\n" +
+                        "• Developer: [brokiem](https://github.com/brokiem)\n" +
+                        "• Library: discord.js\n" +
+                        "• Github: [broki's music bot](https://github.com/brokiem/broki-s-music-bot)"
+                    )],
+                    allowedMentions: {repliedUser: false}
                 })
                 break
         }
@@ -252,6 +280,15 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             await broadcast_audio(guild_id)
         }
     })
+}
+
+function leave_voice_channel(guild_id) {
+    streams[guild_id].conn?.disconnect()
+    streams[guild_id].conn?.destroy()
+
+    setTimeout(() => {
+        delete streams[guild_id]
+    }, 5000)
 }
 
 function make_simple_embed(string) {
