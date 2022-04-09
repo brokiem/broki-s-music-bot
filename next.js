@@ -48,7 +48,7 @@ client.on("messageCreate", async message => {
                 }
 
                 if (stop_audio(message.guildId)) {
-                    const embed = make_simple_embed().setFooter({
+                    const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
                         text: "by " + message.author.username + "#" + message.author.discriminator,
                         iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
                     })
@@ -75,7 +75,7 @@ client.on("messageCreate", async message => {
                 }
 
                 if (args.length > 0) {
-                    const volume = args[0].replaceAll("%", "") + "%"
+                    const volume = args[0].replaceAll("%", "")
 
                     set_audio_volume(volume, message.guildId)
                     await message.reply({embeds: [make_simple_embed("Audio volume set to " + (parseInt(volume) > 100 ? "100" : volume) + "%")]})
@@ -143,7 +143,7 @@ function set_audio_volume(volume, guild_id) {
         return false
     }
 
-    if (parseInt(volume.toString().replaceAll("%", "")) <= 100) {
+    if (parseInt(volume) <= 100) {
         streams[guild_id].resource.volume.setVolumeLogarithmic(parseInt(volume) / 100)
     } else {
         streams[guild_id].resource.volume.setVolumeLogarithmic(1)
