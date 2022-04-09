@@ -200,6 +200,7 @@ client.on('interactionCreate', async interaction => {
     if (!is_same_vc_as(interaction.user.id, interaction.guildId)) {
         await interaction.reply({
             embeds: [make_simple_embed("You are not in the same voice channel!")],
+            ephemeral: true,
             fetchReply: true
         })
         return
@@ -208,6 +209,7 @@ client.on('interactionCreate', async interaction => {
     if (!any_audio_playing(interaction.guildId)) {
         await interaction.reply({
             embeds: [make_simple_embed("No audio is currently playing")],
+            ephemeral: true,
             fetchReply: true
         })
         return
