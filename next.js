@@ -34,7 +34,7 @@ client.on("messageCreate", async message => {
                     return
                 }
 
-                await play_audio(args, message.guildId, message.channelId)
+                await play_audio(args, message.guildId, message.member.voice.channelId)
                 await message.channel.send({
                     embeds: [make_playing_embed(message.guildId, message.author)],
                     components: [get_control_button_row()]
@@ -44,8 +44,8 @@ client.on("messageCreate", async message => {
     }
 })
 
-async function play_audio(input, guild_id, channel_id) {
-    prepare_voice_connection(guild_id, channel_id)
+async function play_audio(input, guild_id, voice_channel_id) {
+    prepare_voice_connection(guild_id, voice_channel_id)
 
     if (playdl.yt_validate(input[0]) === 'video') {
         playdl.video_info(input[0]).then(result => {
@@ -103,7 +103,7 @@ function is_same_vc_as(user_id, guild_id) {
     return guild.members.cache.get(user_id).voice.channel?.id === guild.members.cache.get(client.user.id).voice.channel?.id
 }
 
-function prepare_voice_connection(guild_id, channel_id) {
+function prepare_voice_connection(guild_id, voice_channel_id) {
     streams[guild_id] = {}
     streams[guild_id].player = voice.createAudioPlayer()
     streams[guild_id].conn = null
@@ -121,7 +121,7 @@ function prepare_voice_connection(guild_id, channel_id) {
         streams[guild_id].conn?.destroy()
 
         streams[guild_id].conn = voice.joinVoiceChannel({
-            channelId: channel_id,
+            channelId: voice_channel_id,
             guildId: guild_id,
             adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
         }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
