@@ -197,13 +197,19 @@ client.on("messageCreate", async message => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return
 
-    if (interaction.member.voice.channel?.id !== interaction.guild.me.voice.channel?.id) {
-        await interaction.reply({embeds: make_simple_embed("You are not in the same voice channel!"), ephemeral: true})
+    if (!is_same_vc_as(interaction.user.id, interaction.guildId)) {
+        await interaction.reply({
+            embeds: [make_simple_embed("You are not in the same voice channel!")],
+            fetchReply: true
+        })
         return
     }
 
-    if (streams[interaction.guildId].resource === null) {
-        interaction.reply({embeds: make_simple_embed('No audio playing!'), ephemeral: true})
+    if (!any_audio_playing(message.guildId)) {
+        await interaction.reply({
+            embeds: [make_simple_embed("No audio is currently playing")],
+            fetchReply: true
+        })
         return
     }
 
@@ -213,16 +219,16 @@ client.on('interactionCreate', async interaction => {
         if (pause_audio(interaction.guildId) === 0) {
             inter = await interaction.reply({
                 embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
-                    text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
-                    iconURL: interaction.member.displayAvatarURL({size: 16, dynamic: true})
+                    text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+                    iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
                 })],
                 fetchReply: true
             })
         } else {
             inter = await interaction.reply({
                 embeds: [make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
-                    text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
-                    iconURL: interaction.member.displayAvatarURL({size: 16, dynamic: true})
+                    text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+                    iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
                 })],
                 fetchReply: true
             })
