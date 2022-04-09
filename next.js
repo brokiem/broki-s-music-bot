@@ -263,12 +263,13 @@ client.on('interactionCreate', async interaction => {
 client.on('voiceStateUpdate', (oldState, newState) => {
     if (oldState.channelId === null) return
 
-    console.log(oldState.channel.members.size)
-    console.log(oldState.channelId)
-    console.log(oldState.guild.me.voice.channelId)
-
     if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
-        leave_voice_channel(oldState.guild.id)
+        setTimeout(() => {
+            leave_voice_channel(oldState.guild.id)
+            if (oldState.channel.members.size <= 1) {
+                leave_voice_channel(oldState.guild.id)
+            }
+        }, 30000)
     }
 })
 
