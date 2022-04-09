@@ -311,7 +311,7 @@ async function broadcast_audio(guild_id, stream) {
         inputType: stream.type,
         inlineVolume: true
     })
-    streams[guild_id].resource.volume.setVolumeLogarithmic(0.5)
+    streams[guild_id].resource.volume.setVolumeLogarithmic(0.9)
 
     streams[guild_id].player.play(streams[guild_id].resource)
     voice.getVoiceConnection(guild_id).subscribe(streams[guild_id].player)
