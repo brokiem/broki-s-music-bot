@@ -261,14 +261,12 @@ client.on('interactionCreate', async interaction => {
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
-    if (newState.channelId === null) {
-        if (newState.channelId === newState.guild.me.voice.channelId && (newState.channel.members.size <= 1)) {
-            setTimeout(() => {
-                if (newState.channel.members.size <= 1) {
-                    leave_voice_channel(newState.guild.id)
-                }
-            }, 5000)
-        }
+    if (newState.channelId === newState.guild.me.voice.channelId && (newState.channel.members.size <= 1)) {
+        setTimeout(() => {
+            if (newState.channel.members.size <= 1) {
+                leave_voice_channel(newState.guild.id)
+            }
+        }, 5000)
     }
 })
 
