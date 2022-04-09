@@ -316,7 +316,7 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
 
 function leave_voice_channel(guild_id) {
     if (streams[guild_id] === undefined) {
-        return
+        return false
     }
 
     streams[guild_id].conn?.disconnect()
@@ -324,6 +324,7 @@ function leave_voice_channel(guild_id) {
 
     delete streams[guild_id]
     global.gc()
+    return true
 }
 
 function make_simple_embed(string) {
@@ -371,5 +372,6 @@ async function onDisconnect(guild_id) {
         streams[guild_id].conn?.destroy()
 
         delete streams[guild_id]
+        global.gc()
     }
 }
