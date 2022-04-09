@@ -205,7 +205,7 @@ client.on('interactionCreate', async interaction => {
         return
     }
 
-    if (!any_audio_playing(message.guildId)) {
+    if (!any_audio_playing(interaction.guildId)) {
         await interaction.reply({
             embeds: [make_simple_embed("No audio is currently playing")],
             fetchReply: true
