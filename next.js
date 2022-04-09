@@ -113,6 +113,23 @@ client.on("messageCreate", async message => {
                     await message.reply({embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")]})
                 }
                 break
+            case "control":
+            case "c":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                if (!any_audio_playing(message.guildId)) {
+                    await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
+                    return
+                }
+
+                await message.channel.send({
+                    embeds: [make_playing_embed(message.guildId, message.author)],
+                    components: [get_control_button_row()]
+                })
+                break
         }
     }
 })
@@ -261,6 +278,9 @@ function get_control_button_row() {
 }
 
 function any_audio_playing(guild_id) {
+    if (streams[guild_id] === undefined) {
+        return false
+    }
     return streams[guild_id].resource === null ? false : true
 }
 
