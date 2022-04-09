@@ -47,7 +47,7 @@ client.on("messageCreate", async message => {
                     return
                 }
 
-                if (stop_audio()) {
+                if (await stop_audio()) {
                     const embed = make_simple_embed().setFooter({
                         text: "by " + message.author.username + "#" + message.author.discriminator,
                         iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
@@ -56,6 +56,15 @@ client.on("messageCreate", async message => {
                 } else {
                     await message.reply({embeds: [make_simple_embed("No audio is currently playing")]})
                 }
+                break
+            case "loop":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                streams[message.guildId].loop = !streams[message.guildId].loop
+                await message.reply({embeds: [make_simple_embed(streams[message.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")]})
                 break
         }
     }
@@ -103,7 +112,7 @@ async function broadcast_audio(guild_id) {
     streams[guild_id].playing = true
 }
 
-function stop_audio(guild_id) {
+async function stop_audio(guild_id) {
     if (streams[guild_id].resource === null) {
         return false
     }
