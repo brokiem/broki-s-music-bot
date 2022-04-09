@@ -283,6 +283,10 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
 }
 
 function leave_voice_channel(guild_id) {
+    console.log(streams)
+    console.log(guild_id)
+    return
+
     streams[guild_id].conn?.disconnect()
     streams[guild_id].conn?.destroy()
 
