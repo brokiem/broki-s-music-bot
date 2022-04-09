@@ -47,7 +47,7 @@ client.on("messageCreate", async message => {
                     return
                 }
 
-                if (await stop_audio()) {
+                if (stop_audio(message.guildId)) {
                     const embed = make_simple_embed().setFooter({
                         text: "by " + message.author.username + "#" + message.author.discriminator,
                         iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
@@ -65,6 +65,21 @@ client.on("messageCreate", async message => {
 
                 streams[message.guildId].loop = !streams[message.guildId].loop
                 await message.reply({embeds: [make_simple_embed(streams[message.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio")]})
+                break
+            case "volume":
+            case "vol":
+            case "v":
+                if (!is_same_vc_as(message.member.id, message.guildId)) {
+                    message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                    return
+                }
+
+                if (args.length > 0) {
+                    const volume = args[0].replaceAll("%", "") + "%"
+
+                    set_audio_volume(volume, message.guildId)
+                    await message.reply({embeds: [make_simple_embed("Audio volume set to " + (parseInt(volume) > 100 ? "100" : volume) + "%")]})
+                }
                 break
         }
     }
@@ -112,7 +127,7 @@ async function broadcast_audio(guild_id) {
     streams[guild_id].playing = true
 }
 
-async function stop_audio(guild_id) {
+function stop_audio(guild_id) {
     if (streams[guild_id].resource === null) {
         return false
     }
@@ -120,6 +135,19 @@ async function stop_audio(guild_id) {
     streams[guild_id].loop = false
     streams[guild_id].looped_url = null
     streams[guild_id].player.stop(true)
+    return true
+}
+
+function set_audio_volume(volume, guild_id) {
+    if (streams[guild_id].resource === null) {
+        return false
+    }
+
+    if (parseInt(volume.toString().replaceAll("%", "")) <= 100) {
+        streams[guild_id].resource.volume.setVolumeLogarithmic(parseInt(volume) / 100)
+    } else {
+        streams[guild_id].resource.volume.setVolumeLogarithmic(1)
+    }
     return true
 }
 
