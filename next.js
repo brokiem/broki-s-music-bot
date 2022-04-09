@@ -187,8 +187,6 @@ client.on("messageCreate", async message => {
                     )],
                     allowedMentions: {repliedUser: false}
                 })
-
-                console.log(streams)
                 break
         }
     }
@@ -274,8 +272,7 @@ async function play_audio(input, guild_id, voice_channel_id) {
 
         streams[guild_id].looped_url = result.video_details.url
 
-        streams[guild_id].stream = await playdl.stream_from_info(result, {discordPlayerCompatibility: true})
-        await broadcast_audio(guild_id)
+        await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
     } else {
         const results = await playdl.search(input.join(" "), {limit: 1})
         const res = await playdl.video_info(results[0].url)
@@ -286,14 +283,13 @@ async function play_audio(input, guild_id, voice_channel_id) {
 
         streams[guild_id].looped_url = results[0].url
 
-        streams[guild_id].stream = await playdl.stream_from_info(res, {discordPlayerCompatibility: true})
-        await broadcast_audio(guild_id)
+        await broadcast_audio(guild_id, await playdl.stream_from_info(res, {discordPlayerCompatibility: true}))
     }
 }
 
-async function broadcast_audio(guild_id) {
-    streams[guild_id].resource = voice.createAudioResource(streams[guild_id].stream.stream, {
-        inputType: streams[guild_id].stream.type,
+async function broadcast_audio(guild_id, stream) {
+    streams[guild_id].resource = voice.createAudioResource(stream.stream, {
+        inputType: stream.type,
         inlineVolume: true
     })
     streams[guild_id].resource.volume.setVolumeLogarithmic(0.5)
@@ -346,7 +342,6 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
     streams[guild_id].player = voice.createAudioPlayer()
     streams[guild_id].conn = null
     streams[guild_id].resource = null
-    streams[guild_id].stream = null
     streams[guild_id].playing = false
     streams[guild_id].looped_url = null
     streams[guild_id].loop = false
@@ -371,13 +366,11 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
 
     streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
         streams[guild_id].resource = null
-        streams[guild_id].stream = null
         streams[guild_id].playing = false
 
         if (streams[guild_id].loop) {
             const result = await playdl.video_info(streams[guild_id].looped_url)
-            streams[guild_id].stream = await playdl.stream_from_info(result, {discordPlayerCompatibility: true})
-            await broadcast_audio(guild_id)
+            await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
         }
     })
 }
