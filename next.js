@@ -260,6 +260,16 @@ client.on('interactionCreate', async interaction => {
     }
 })
 
+client.on('voiceStateUpdate', (oldState, newState) => {
+    if (newState.channelId === null) {
+        if (newState.channelId === newState.guild.me.voice.channelId && newState.channel.members.size === 1) {
+            setTimeout(() => {
+                leave_voice_channel(newState.guild.id)
+            }, 5000)
+        }
+    }
+})
+
 async function play_audio(input, guild_id, voice_channel_id) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
@@ -425,14 +435,6 @@ async function onDisconnect(guild_id) {
             voice.entersState(streams[guild_id].conn, voice.VoiceConnectionStatus.Connecting, 2_000),
         ])
     } catch (error) {
-        if (streams[guild_id] === undefined) {
-            return
-        }
-
-        streams[guild_id].conn?.disconnect()
-        streams[guild_id].conn?.destroy()
-
-        delete streams[guild_id]
-        global.gc()
+        leave_voice_channel(guild_id)
     }
 }
