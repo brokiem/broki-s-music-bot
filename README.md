@@ -1,3 +1,3 @@
 # broki's music bot
 
-Commands: !play, !skip, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats
+Commands: !play, !skip, !queue, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats
