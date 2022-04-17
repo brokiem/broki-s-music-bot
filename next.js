@@ -418,7 +418,7 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         }
 
         if (streams[guild_id].queue.length >= 1) {
-            const url = streams[guild_id].queue[streams[guild_id].queue.length - streams[guild_id].queue.length].shift()
+            const url = streams[guild_id].queue.shift()
             await play_audio([url], guild_id, voice_channel_id, true)
         }
     })
