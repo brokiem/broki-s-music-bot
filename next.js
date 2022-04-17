@@ -64,6 +64,7 @@ client.on("messageCreate", async message => {
                 case "skip":
                 case "next":
                     if (!message.member.roles.cache.has("877891698200543293")) {
+                        message.reply({embeds: [make_simple_embed("You dont have permission!")]})
                         return
                     }
 
@@ -98,6 +99,18 @@ client.on("messageCreate", async message => {
                         })],
                         allowedMentions: {repliedUser: false}
                     })
+                    break
+                case "queue":
+                case "q":
+                    let q = ""
+
+                    for (const url of streams[message.guildId].queue) {
+                        const result = await playdl.video_info(url)
+
+                        q = q + "- " + result.video_details.title + "\n"
+                    }
+
+                    message.channel.send({embeds: [make_simple_embed(q)]})
                     break
                 case "stop":
                 case "s":
