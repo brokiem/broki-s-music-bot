@@ -48,7 +48,7 @@ client.on("messageCreate", async message => {
 
                     await play_audio(args, message.guildId, message.member.voice.channelId)
 
-                    if (any_audio_playing(message.guildId)) {
+                    if (streams[message.guildId].queue.length >= 1) {
                         await message.channel.send({
                             embeds: [make_playing_embed(message.guildId, message.author).setTitle("Added to queue")],
                             allowedMentions: {repliedUser: false}
