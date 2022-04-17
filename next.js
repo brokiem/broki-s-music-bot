@@ -407,6 +407,7 @@ async function broadcast_audio(guild_id, stream) {
 }
 
 function stop_audio(guild_id) {
+    streams[guild_id].queue = []
     streams[guild_id].loop = false
     streams[guild_id].looped_url = null
     streams[guild_id].force_stop = true
