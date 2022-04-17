@@ -342,13 +342,12 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         return result
     } else {
         const results = await playdl.search(input.join(" "), {limit: 1})
+        const res = await playdl.video_info(results[0].url)
 
         if (!is_queue && any_audio_playing(guild_id)) {
             streams[guild_id].queue.push(results[0].url)
-            return results[0]
+            return res
         }
-
-        const res = await playdl.video_info(results[0].url)
 
         streams[guild_id].yt_title = res.video_details.title
         streams[guild_id].yt_url = res.video_details.url
