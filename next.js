@@ -63,6 +63,10 @@ client.on("messageCreate", async message => {
                     break
                 case "skip":
                 case "next":
+                    if (!message.member.roles.cache.has("877891698200543293")) {
+                        return
+                    }
+
                     if (!is_same_vc_as(message.member.id, message.guildId)) {
                         message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
                         return
@@ -102,7 +106,7 @@ client.on("messageCreate", async message => {
                         return
                     }
 
-                    stop_audio(message.guildId, true)
+                    stop_audio(message.guildId)
                     await message.channel.send({
                         embeds: [make_simple_embed("YouTube audio successfully stopped!").setFooter({
                             text: "by " + message.author.username + "#" + message.author.discriminator,
@@ -356,7 +360,7 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         streams[guild_id].looped_url = results[0].url
 
         await broadcast_audio(guild_id, await playdl.stream_from_info(res, {discordPlayerCompatibility: true}))
-        return results[0]
+        return res
     }
 }
 
@@ -373,10 +377,10 @@ async function broadcast_audio(guild_id, stream) {
     streams[guild_id].playing = true
 }
 
-function stop_audio(guild_id, force_stop = false) {
+function stop_audio(guild_id) {
     streams[guild_id].loop = false
     streams[guild_id].looped_url = null
-    streams[guild_id].force_stop = force_stop
+    streams[guild_id].force_stop = true
     streams[guild_id].player.stop(true)
 }
 
