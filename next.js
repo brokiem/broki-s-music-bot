@@ -36,7 +36,7 @@ client.on("messageCreate", async message => {
                 case "help":
                     await message.reply({
                         components: [row],
-                        embeds: [make_simple_embed("Command: !play, !skip, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
+                        embeds: [make_simple_embed("Command: !play, !skip, !queue, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
                     })
                     break
                 case "play":
@@ -457,6 +457,22 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         streams[guild_id].yt_thumbnail_url = undefined
         streams[guild_id].force_stop = false
         streams[guild_id].queue = []
+
+        streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
+            streams[guild_id].resource = null
+            streams[guild_id].playing = false
+
+            if (streams[guild_id].loop) {
+                const result = await playdl.video_info(streams[guild_id].looped_url)
+                await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
+                return
+            }
+
+            if ((!streams[guild_id].force_stop) && streams[guild_id].queue.length >= 1) {
+                const url = streams[guild_id].queue.shift()
+                await play_audio([url], guild_id, voice_channel_id, true)
+            }
+        })
     }
 
     const conn = voice.getVoiceConnection(guild_id)
@@ -467,22 +483,6 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
         }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
     }
-
-    streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
-        streams[guild_id].resource = null
-        streams[guild_id].playing = false
-
-        if (streams[guild_id].loop) {
-            const result = await playdl.video_info(streams[guild_id].looped_url)
-            await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
-            return
-        }
-
-        if ((!streams[guild_id].force_stop) && streams[guild_id].queue.length >= 1) {
-            const url = streams[guild_id].queue.shift()
-            await play_audio([url], guild_id, voice_channel_id, true)
-        }
-    })
 }
 
 function leave_voice_channel(guild_id) {
