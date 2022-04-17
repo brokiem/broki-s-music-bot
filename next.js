@@ -102,15 +102,23 @@ client.on("messageCreate", async message => {
                     break
                 case "queue":
                 case "q":
+                    if (streams[message.guildId] === undefined) {
+                        message.channel.send({embeds: [make_simple_embed("No queue, start playing audio with !play")]})
+                        return
+                    }
+
                     let q = ""
 
                     for (const url of streams[message.guildId].queue) {
                         const result = await playdl.video_info(url)
 
-                        q = q + "- " + result.video_details.title + "\n"
+                        q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ")\n"
                     }
 
-                    message.channel.send({embeds: [make_simple_embed(q)]})
+                    message.channel.send({embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
+                            text: "by " + message.author.username + "#" + message.author.discriminator,
+                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                    })]})
                     break
                 case "stop":
                 case "s":
