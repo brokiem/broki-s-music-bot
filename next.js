@@ -80,6 +80,14 @@ client.on("messageCreate", async message => {
                         return
                     }
 
+                    if (streams[message.guildId].queue.length <= 0) {
+                        await message.reply({
+                            embeds: [make_simple_embed("No queue left, cannot skipping")],
+                            allowedMentions: {repliedUser: false}
+                        })
+                        return
+                    }
+
                     const url = streams[message.guildId].queue.shift()
                     await play_audio([url], message.guildId, message.member.voice.channelId, true)
 
