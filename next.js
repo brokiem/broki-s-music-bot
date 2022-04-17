@@ -36,7 +36,7 @@ client.on("messageCreate", async message => {
                 case "help":
                     await message.reply({
                         components: [row],
-                        embeds: [make_simple_embed("Command: !play, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
+                        embeds: [make_simple_embed("Command: !play, !skip, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
                     })
                     break
                 case "play":
@@ -46,20 +46,46 @@ client.on("messageCreate", async message => {
                         return
                     }
 
-                    await play_audio(args, message.guildId, message.member.voice.channelId)
+                    const yt_data = await play_audio(args, message.guildId, message.member.voice.channelId)
 
                     if (streams[message.guildId].queue.length >= 1) {
                         await message.channel.send({
-                            embeds: [make_playing_embed(message.guildId, message.author).setTitle("Added to queue")],
+                            embeds: [make_playing_embed(message.guildId, message.author, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
                             allowedMentions: {repliedUser: false}
                         })
                     } else {
                         await message.channel.send({
-                            embeds: [make_playing_embed(message.guildId, message.author)],
+                            embeds: [make_playing_embed(message.guildId, message.author, yt_data)],
                             components: [get_control_button_row()],
                             allowedMentions: {repliedUser: false}
                         })
                     }
+                    break
+                case "skip":
+                case "next":
+                    if (!is_same_vc_as(message.member.id, message.guildId)) {
+                        message.channel.send({embeds: [make_simple_embed("You are not in the same voice channel!")]})
+                        return
+                    }
+
+                    if (!any_audio_playing(message.guildId)) {
+                        await message.reply({
+                            embeds: [make_simple_embed("No audio is currently playing")],
+                            allowedMentions: {repliedUser: false}
+                        })
+                        return
+                    }
+
+                    const url = streams[message.guildId].queue.shift()
+                    await play_audio([url], message.guildId, message.member.voice.channelId, true)
+
+                    await message.channel.send({
+                        embeds: [make_simple_embed("Audio skipped to next queue").setFooter({
+                            text: "by " + message.author.username + "#" + message.author.discriminator,
+                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                        })],
+                        allowedMentions: {repliedUser: false}
+                    })
                     break
                 case "stop":
                 case "s":
@@ -76,13 +102,12 @@ client.on("messageCreate", async message => {
                         return
                     }
 
-                    stop_audio(message.guildId)
-                    const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
-                        text: "by " + message.author.username + "#" + message.author.discriminator,
-                        iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
-                    })
+                    stop_audio(message.guildId, true)
                     await message.channel.send({
-                        embeds: [embed],
+                        embeds: [make_simple_embed("YouTube audio successfully stopped!").setFooter({
+                            text: "by " + message.author.username + "#" + message.author.discriminator,
+                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                        })],
                         allowedMentions: {repliedUser: false}
                     })
                     break
@@ -300,12 +325,12 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
     if (playdl.yt_validate(input[0]) === 'video') {
+        const result = await playdl.video_info(input[0])
+
         if (!is_queue && any_audio_playing(guild_id)) {
             streams[guild_id].queue.push(input[0])
-            return
+            return result
         }
-
-        const result = await playdl.video_info(input[0])
 
         streams[guild_id].yt_title = result.video_details.title
         streams[guild_id].yt_url = result.video_details.url
@@ -314,12 +339,13 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         streams[guild_id].looped_url = result.video_details.url
 
         await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
+        return result
     } else {
         const results = await playdl.search(input.join(" "), {limit: 1})
 
         if (!is_queue && any_audio_playing(guild_id)) {
             streams[guild_id].queue.push(results[0].url)
-            return
+            return results[0]
         }
 
         const res = await playdl.video_info(results[0].url)
@@ -331,6 +357,7 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         streams[guild_id].looped_url = results[0].url
 
         await broadcast_audio(guild_id, await playdl.stream_from_info(res, {discordPlayerCompatibility: true}))
+        return results[0]
     }
 }
 
@@ -347,9 +374,10 @@ async function broadcast_audio(guild_id, stream) {
     streams[guild_id].playing = true
 }
 
-function stop_audio(guild_id) {
+function stop_audio(guild_id, force_stop = false) {
     streams[guild_id].loop = false
     streams[guild_id].looped_url = null
+    streams[guild_id].force_stop = force_stop
     streams[guild_id].player.stop(true)
 }
 
@@ -395,6 +423,7 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         streams[guild_id].yt_title = undefined
         streams[guild_id].yt_url = undefined
         streams[guild_id].yt_thumbnail_url = undefined
+        streams[guild_id].force_stop = false
         streams[guild_id].queue = []
     }
 
@@ -417,7 +446,7 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             return
         }
 
-        if (streams[guild_id].queue.length >= 1) {
+        if (streams[guild_id].force_stop && streams[guild_id].queue.length >= 1) {
             const url = streams[guild_id].queue.shift()
             await play_audio([url], guild_id, voice_channel_id, true)
         }
@@ -442,12 +471,12 @@ function make_simple_embed(string) {
     return new discord.MessageEmbed().setDescription(string)
 }
 
-function make_playing_embed(guild_id, member) {
+function make_playing_embed(guild_id, member, yt_data) {
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
         .setTitle("Playing YouTube")
-        .setDescription("[" + streams[guild_id].yt_title + "](" + streams[guild_id].yt_url + ")")
-        .setThumbnail(streams[guild_id].yt_thumbnail_url)
+        .setDescription("[" + yt_data.video_details.title + "](" + yt_data.video_details.url + ")")
+        .setThumbnail(yt_data.video_details.thumbnails[0].url)
         .setFooter({
             text: "by " + member.username + "#" + member.discriminator,
             iconURL: member.displayAvatarURL({size: 16, dynamic: true})
