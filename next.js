@@ -47,11 +47,19 @@ client.on("messageCreate", async message => {
                     }
 
                     await play_audio(args, message.guildId, message.member.voice.channelId)
-                    await message.channel.send({
-                        embeds: [make_playing_embed(message.guildId, message.author)],
-                        components: [get_control_button_row()],
-                        allowedMentions: {repliedUser: false}
-                    })
+
+                    if (any_audio_playing(message.guildId)) {
+                        await message.channel.send({
+                            embeds: [make_playing_embed(message.guildId, message.author).setTitle("Added to queue")],
+                            allowedMentions: {repliedUser: false}
+                        })
+                    } else {
+                        await message.channel.send({
+                            embeds: [make_playing_embed(message.guildId, message.author)],
+                            components: [get_control_button_row()],
+                            allowedMentions: {repliedUser: false}
+                        })
+                    }
                     break
                 case "stop":
                 case "s":
@@ -288,10 +296,15 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
 })
 
-async function play_audio(input, guild_id, voice_channel_id) {
+async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
     if (playdl.yt_validate(input[0]) === 'video') {
+        if (!is_queue && any_audio_playing(guild_id)) {
+            streams[guild_id].queue.push(input[0])
+            return
+        }
+
         const result = await playdl.video_info(input[0])
 
         streams[guild_id].yt_title = result.video_details.title
@@ -303,6 +316,12 @@ async function play_audio(input, guild_id, voice_channel_id) {
         await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
     } else {
         const results = await playdl.search(input.join(" "), {limit: 1})
+
+        if (!is_queue && any_audio_playing(guild_id)) {
+            streams[guild_id].queue.push(results[0].url)
+            return
+        }
+
         const res = await playdl.video_info(results[0].url)
 
         streams[guild_id].yt_title = res.video_details.title
@@ -366,15 +385,18 @@ function is_same_vc_as(user_id, guild_id) {
 }
 
 function prepare_voice_connection(guild_id, voice_channel_id) {
-    streams[guild_id] = {}
-    streams[guild_id].player = voice.createAudioPlayer()
-    streams[guild_id].resource = null
-    streams[guild_id].playing = false
-    streams[guild_id].looped_url = null
-    streams[guild_id].loop = false
-    streams[guild_id].yt_title = undefined
-    streams[guild_id].yt_url = undefined
-    streams[guild_id].yt_thumbnail_url = undefined
+    if (streams[guild_id].queue.length <= 0) {
+        streams[guild_id] = {}
+        streams[guild_id].player = voice.createAudioPlayer()
+        streams[guild_id].resource = null
+        streams[guild_id].playing = false
+        streams[guild_id].looped_url = null
+        streams[guild_id].loop = false
+        streams[guild_id].yt_title = undefined
+        streams[guild_id].yt_url = undefined
+        streams[guild_id].yt_thumbnail_url = undefined
+        streams[guild_id].queue = []
+    }
 
     const conn = voice.getVoiceConnection(guild_id)
     if (!conn || conn?.state.status === voice.VoiceConnectionStatus.Disconnected) {
@@ -392,6 +414,12 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         if (streams[guild_id].loop) {
             const result = await playdl.video_info(streams[guild_id].looped_url)
             await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
+            return
+        }
+
+        if (streams[guild_id].queue.length >= 1) {
+            const url = streams[guild_id].queue[streams[guild_id].queue.length - streams[guild_id].queue.length].shift()
+            await play_audio([url], guild_id, voice_channel_id, true)
         }
     })
 }
