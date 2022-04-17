@@ -112,7 +112,7 @@ client.on("messageCreate", async message => {
                     for (const url of streams[message.guildId].queue) {
                         const result = await playdl.video_info(url)
 
-                        q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ")\n"
+                        q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
                     }
 
                     message.channel.send({embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
@@ -495,7 +495,6 @@ function leave_voice_channel(guild_id) {
     conn?.destroy()
 
     delete streams[guild_id]
-    global.gc()
     return true
 }
 
@@ -539,4 +538,9 @@ async function onDisconnect(guild_id) {
     } catch (error) {
         leave_voice_channel(guild_id)
     }
+}
+
+function convert_seconds_to_minutes(value) {
+    value = parseInt(value)
+    return Math.floor(value / 60) + ":" + (value % 60 ? value % 60 : '00')
 }
