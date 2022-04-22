@@ -164,7 +164,7 @@ client.on("messageCreate", async message => {
                         allowedMentions: {repliedUser: false}
                     })
                     break
-                case "volume":
+                /*case "volume":
                 case "vol":
                 case "v":
                     if (!is_same_vc_as(message.member.id, message.guildId)) {
@@ -189,7 +189,7 @@ client.on("messageCreate", async message => {
                             allowedMentions: {repliedUser: false}
                         })
                     }
-                    break
+                    break*/
                 case "pause":
                 case "resume":
                     if (!is_same_vc_as(message.member.id, message.guildId)) {
@@ -342,7 +342,7 @@ client.on('interactionCreate', async interaction => {
     }
 })
 
-client.on('voiceStateUpdate', (oldState, newState) => {
+client.on('voiceStateUpdate', (oldState) => {
     if (oldState.channelId === null) return
 
     if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
@@ -395,10 +395,10 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
 async function broadcast_audio(guild_id, stream) {
     streams[guild_id].resource = voice.createAudioResource(stream.stream, {
-        inputType: stream.type,
-        inlineVolume: true
+        inputType: stream.type/*,
+        inlineVolume: true*/
     })
-    streams[guild_id].resource.volume.setVolumeLogarithmic(0.9)
+    //streams[guild_id].resource.volume.setVolumeLogarithmic(0.9)
 
     streams[guild_id].player.play(streams[guild_id].resource)
     voice.getVoiceConnection(guild_id).subscribe(streams[guild_id].player)
@@ -414,13 +414,13 @@ function stop_audio(guild_id) {
     streams[guild_id].player.stop(true)
 }
 
-function set_audio_volume(volume, guild_id) {
+/*function set_audio_volume(volume, guild_id) {
     if (parseInt(volume) <= 100) {
         streams[guild_id].resource.volume.setVolumeLogarithmic(parseInt(volume) / 100)
     } else {
         streams[guild_id].resource.volume.setVolumeLogarithmic(1)
     }
-}
+}*/
 
 function pause_audio(guild_id) {
     streams[guild_id].playing = !streams[guild_id].playing
@@ -482,7 +482,7 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             channelId: voice_channel_id,
             guildId: guild_id,
             adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator
-        }).on(voice.VoiceConnectionStatus.Disconnected, onDisconnect)
+        }).on(voice.VoiceConnectionStatus.Disconnected, on_disconnect)
     }
 }
 
@@ -529,7 +529,7 @@ function any_audio_playing(guild_id) {
     return streams[guild_id].resource === null ? false : true
 }
 
-async function onDisconnect(guild_id) {
+async function on_disconnect(guild_id) {
     try {
         const conn = voice.getVoiceConnection(guild_id)
         await Promise.race([
