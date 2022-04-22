@@ -1,6 +1,6 @@
 {
   "name": "watchtogether",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "engines": {
     "node": "17.x"
   },
@@ -13,6 +13,6 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node next.js"
+    "start": "node index.js"
   }
 }
