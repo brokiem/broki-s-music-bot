@@ -458,7 +458,6 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
         streams[guild_id].yt_title = undefined
         streams[guild_id].yt_url = undefined
         streams[guild_id].yt_thumbnail_url = undefined
-        streams[guild_id].force_stop = false
         streams[guild_id].queue = []
 
         streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
@@ -477,6 +476,8 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             }
         })
     }
+    
+    streams[guild_id].force_stop = false
 
     const conn = voice.getVoiceConnection(guild_id)
     if (!conn || conn?.state.status === voice.VoiceConnectionStatus.Disconnected) {
