@@ -110,9 +110,9 @@ client.on("messageCreate", async message => {
                     let q = ""
 
                     for (const url of streams[message.guildId].queue) {
-                        playdl.video_info(url).then(result => {
-                            q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
-                        })
+                        const result = await playdl.video_info(url)
+
+                        q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
                     }
 
                     message.channel.send({
