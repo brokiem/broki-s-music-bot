@@ -16,6 +16,8 @@ const client = new discord.Client({
 
 const prefix = "!"
 
+let blocked = ''
+
 const streams = []
 
 client.login().catch((e) => {
@@ -24,7 +26,7 @@ client.login().catch((e) => {
 
 client.on("messageCreate", async message => {
     try {
-        if (message.author.bot) return
+        if (message.author.bot || blocked === message.member.id) return
 
         if (message.content.startsWith(prefix)) {
             const args = message.content.slice(prefix.length).trim().split(/ +/)
@@ -38,6 +40,11 @@ client.on("messageCreate", async message => {
                         components: [row],
                         embeds: [make_simple_embed("Command: !play, !skip, !queue, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
                     })
+                    break
+                case "block":
+                    if (args.length > 0) {
+                        blocked = args[0]
+                    }
                     break
                 case "play":
                 case "p":
