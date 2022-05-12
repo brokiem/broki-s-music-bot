@@ -107,6 +107,10 @@ client.on("messageCreate", async message => {
                         return
                     }
 
+                    await message.channel.send({
+                        embeds: [make_simple_embed("Fetching queue...")]
+                    })
+
                     let q = ""
 
                     for (const url of streams[message.guildId].queue) {
@@ -114,10 +118,6 @@ client.on("messageCreate", async message => {
 
                         q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
                     }
-
-                    await message.channel.send({
-                        embeds: [make_simple_embed("Fetching queue...")]
-                    })
 
                     await message.channel.send({
                         embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
