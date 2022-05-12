@@ -126,7 +126,7 @@ client.on("messageCreate", async message => {
                                 iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
                             })]
                         })
-                    }, 2000)
+                    }, 1200)
                     break
                 case "stop":
                 case "s":
@@ -551,6 +551,16 @@ async function on_disconnect(guild_id) {
 }
 
 function convert_seconds_to_minutes(value) {
-    value = parseInt(value)
-    return Math.floor(value / 60) + ":" + (value % 60 ? value % 60 : '00')
+    const hrs = ~~(value / 3600)
+    const mins = ~~((value % 3600) / 60)
+    const secs = ~~value % 60
+
+    let ret = ""
+    if (hrs > 0) {
+        ret += "" + hrs + ":" + (mins < 10 ? "0" : "")
+    }
+
+    ret += "" + String(mins).padStart(2, '0') + ":" + (secs < 10 ? "0" : "")
+    ret += "" + secs
+    return ret
 }
