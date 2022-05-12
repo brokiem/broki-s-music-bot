@@ -63,7 +63,7 @@ client.on("messageCreate", async message => {
                     break
                 case "skip":
                 case "next":
-                    if (!message.member.roles.cache.has("877891698200543293")) {
+                    if (!message.member.roles.cache.find(role => role.name.toLowerCase() === 'dj')) {
                         message.reply({embeds: [make_simple_embed("You dont have permission!")]})
                         return
                     }
@@ -115,18 +115,16 @@ client.on("messageCreate", async message => {
                         q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
                     }
 
-                    message.channel.send({
+                    await message.channel.send({
                         embeds: [make_simple_embed("Fetching queue...")]
                     })
 
-                    setTimeout(() => {
-                        message.channel.send({
-                            embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
-                                text: "by " + message.author.username + "#" + message.author.discriminator,
-                                iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
-                            })]
-                        })
-                    }, 1200)
+                    await message.channel.send({
+                        embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
+                            text: "by " + message.author.username + "#" + message.author.discriminator,
+                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                        })]
+                    })
                     break
                 case "stop":
                 case "s":
