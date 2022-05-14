@@ -109,7 +109,12 @@ client.on("messageCreate", async message => {
                     break
                 case "queue":
                 case "q":
-                    if (streams[message.guildId]?.queue.length <= 0) {
+                    if (streams[message.guildId] === undefined) {
+                        message.channel.send({embeds: [make_simple_embed("No queue, start playing audio with !play")]})
+                        return
+                    }
+
+                    if (streams[message.guildId].queue.length <= 0) {
                         message.channel.send({embeds: [make_simple_embed("No queue, start playing audio with !play")]})
                         return
                     }
