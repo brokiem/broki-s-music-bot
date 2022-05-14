@@ -484,6 +484,10 @@ function prepare_voice_connection(guild_id, voice_channel_id) {
             if ((!streams[guild_id].force_stop) && streams[guild_id].queue.length >= 1) {
                 const url = streams[guild_id].queue.shift()
                 await play_audio([url], guild_id, voice_channel_id, true)
+
+                if (streams[guild_id].queue.length <= 0) {
+                    delete streams[guild_id]
+                }
             }
         })
     }
