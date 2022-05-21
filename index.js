@@ -119,23 +119,23 @@ client.on("messageCreate", async message => {
                         return
                     }
 
-                    await message.channel.send({
+                    message.channel.send({
                         embeds: [make_simple_embed("Fetching queue...")]
-                    })
+                    }).then(async msg => {
+                        let q = ""
 
-                    let q = ""
+                        for (const url of streams[message.guildId].queue) {
+                            const result = await playdl.video_info(url)
 
-                    for (const url of streams[message.guildId].queue) {
-                        const result = await playdl.video_info(url)
+                            q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
+                        }
 
-                        q = q + "- [" + result.video_details.title + "](" + result.video_details.url + ") (" + convert_seconds_to_minutes(result.video_details.durationInSec) + ")\n"
-                    }
-
-                    await message.channel.send({
-                        embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
-                            text: "by " + message.author.username + "#" + message.author.discriminator,
-                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
-                        })]
+                        msg.edit({
+                            embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
+                                text: "by " + message.author.username + "#" + message.author.discriminator,
+                                iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                            })]
+                        })
                     })
                     break
                 case "stop":
