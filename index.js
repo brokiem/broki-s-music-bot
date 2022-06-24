@@ -56,7 +56,7 @@ client.on("messageCreate", async message => {
                     const yt_data = await play_audio(args, message.guildId, message.member.voice.channelId)
 
                     if (yt_data === null) {
-                        await message.channel.send({embeds: [make_simple_embed("No results found!")]})
+                        await message.reply({embeds: [make_simple_embed("No results found!")]})
                         return
                     }
 
