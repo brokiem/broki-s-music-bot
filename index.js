@@ -55,6 +55,11 @@ client.on("messageCreate", async message => {
 
                     const yt_data = await play_audio(args, message.guildId, message.member.voice.channelId)
 
+                    if (yt_data === null) {
+                        await message.channel.send({embeds: [make_simple_embed("No results found!")]})
+                        return
+                    }
+
                     if (streams[message.guildId].queue.length >= 1) {
                         await message.channel.send({
                             embeds: [make_playing_embed(message.guildId, message.author, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
@@ -315,42 +320,42 @@ client.on('interactionCreate', async interaction => {
 
     let inter = null
 
-    if (interaction.customId === 'pause') {
-        if (pause_audio(interaction.guildId) === 0) {
-            inter = await interaction.reply({
-                embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
+    switch (interaction.customId) {
+        case "pause":
+            if (pause_audio(interaction.guildId) === 0) {
+                inter = await interaction.reply({
+                    embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
+                        text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+                        iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                    })], fetchReply: true
+                })
+            } else {
+                inter = await interaction.reply({
+                    embeds: [make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
+                        text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+                        iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                    })], fetchReply: true
+                })
+            }
+            break;
+        case "stop":
+            stop_audio(interaction.guildId)
+            interaction.reply({
+                embeds: [make_simple_embed("YouTube audio successfully stopped!").setFooter({
                     text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
                     iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
-                })],
-                fetchReply: true
+                })], fetchReply: true
             })
-        } else {
+            break;
+        case "loop":
+            streams[interaction.guildId].loop = !streams[interaction.guildId].loop
             inter = await interaction.reply({
-                embeds: [make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
+                embeds: [make_simple_embed(streams[interaction.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio").setFooter({
                     text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
                     iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
-                })],
-                fetchReply: true
+                })], fetchReply: true
             })
-        }
-    } else if (interaction.customId === 'stop') {
-        stop_audio(interaction.guildId)
-        const embed = make_simple_embed("YouTube audio successfully stopped!").setFooter({
-            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-            iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
-        })
-
-        interaction.reply({embeds: [embed], fetchReply: true})
-    } else if (interaction.customId === 'loop') {
-        streams[interaction.guildId].loop = !streams[interaction.guildId].loop
-        const embed = make_simple_embed(streams[interaction.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio").setFooter({
-            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-            iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
-        })
-        inter = await interaction.reply({
-            embeds: [embed],
-            fetchReply: true
-        })
+            break;
     }
 
     if (inter !== null) {
@@ -393,6 +398,11 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         return result
     } else {
         const results = await playdl.search(input.join(" "), {limit: 1})
+
+        if (results.length <= 0) {
+            return null
+        }
+
         const res = await playdl.video_info(results[0].url)
 
         if (!is_queue && any_audio_playing(guild_id)) {
