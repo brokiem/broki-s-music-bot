@@ -545,9 +545,9 @@ function make_playing_embed(guild_id, member, yt_data) {
 }
 
 function get_control_button_row() {
-    const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("STOP ⏹")
-    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("PAUSE/RESUME ⏯")
-    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("LOOP 🔁")
+    const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("Stop")
+    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("Pause/Resume")
+    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("Loop")
     return new discord.MessageActionRow().addComponents([play, pause, loop])
 }
 
