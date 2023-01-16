@@ -1,15 +1,12 @@
 {
-  "name": "watchtogether",
+  "name": "broki-s-music-bot",
   "version": "2.0.0",
-  "engines": {
-    "node": "17.x"
-  },
   "dependencies": {
-    "@discordjs/opus": "latest",
     "@discordjs/voice": "^0.8.0",
     "discord.js": "^13.6.0",
     "play-dl": "^1.9.6",
-    "sodium": "latest"
+    "libsodium-wrappers": "latest",
+    "opusscript": "latest"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
