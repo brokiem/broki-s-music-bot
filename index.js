@@ -253,7 +253,7 @@ client.on("messageCreate", async message => {
 
                     const stream_data = streams[message.guildId]
                     await message.channel.send({
-                        embeds: [make_playing_embed(message.guildId, message.author, null, stream_data.yt_title, stream_data.yt_url, stream_data.yt_thumbnail_url)],
+                        embeds: [make_playing_embed(message.guildId, message.author, null, stream_data.yt_title, stream_data.yt_url, stream_data.yt_thumbnail_url, true)],
                         components: [get_control_button_row()],
                         allowedMentions: {repliedUser: false}
                     })
@@ -533,7 +533,7 @@ function make_simple_embed(string) {
     return new discord.MessageEmbed().setDescription(string)
 }
 
-function make_playing_embed(guild_id, member, yt_data, title = null, url = null, thumbnail_url = null) {
+function make_playing_embed(guild_id, member, yt_data, title = null, url = null, thumbnail_url = null, isControl = false) {
     if (yt_data !== null) {
         title = yt_data.video_details.title
         url = yt_data.video_details.url
@@ -542,7 +542,7 @@ function make_playing_embed(guild_id, member, yt_data, title = null, url = null,
 
     return new discord.MessageEmbed()
         .setColor('#35cf7d')
-        .setTitle("Playing YouTube")
+        .setTitle(isControl ? "Now Playing" : "Playing YouTube")
         .setDescription("[" + title + "](" + url + ")")
         .setThumbnail(thumbnail_url)
         .setFooter({
