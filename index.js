@@ -76,7 +76,7 @@ client.on("messageCreate", async message => {
                 case "skip":
                 case "next":
                     if (!message.member.roles.cache.find(role => role.name.toLowerCase() === 'dj')) {
-                        message.reply({embeds: [make_simple_embed("You dont have permission!")]})
+                        await message.reply({embeds: [make_simple_embed("You dont have permission!")]})
                         return
                     }
 
@@ -286,6 +286,12 @@ client.on("messageCreate", async message => {
                         allowedMentions: {repliedUser: false}
                     })
                     break
+                case "restart":
+                    if (message.author.id === "548120702373593090") {
+                        await message.reply({embeds: [make_simple_embed("Restarting...")]})
+                        process.exit()
+                    }
+                    break;
             }
         }
     } catch (e) {
