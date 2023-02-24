@@ -50,7 +50,7 @@ client.on("ready", async () => {
                 // Check if the command is not registered on the guild
                 guild.commands.fetch().then((reg_commands) => {
                     // Check if the guild has no commands registered
-                    if (!reg_commands.size) {
+                    if (reg_commands.size <= 0) {
                         console.log(`The guild with ID ${guild.id} does not have any commands registered.`);
                         console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
 
