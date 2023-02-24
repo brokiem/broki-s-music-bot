@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import discord from "discord.js";
 import {make_simple_embed} from "../utils/utils.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder()
     .setName('help')

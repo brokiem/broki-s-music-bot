@@ -46,21 +46,20 @@ client.on("ready", async () => {
     console.log('Started refreshing application (/) commands.');
     client.guilds.cache.forEach(guild => {
         // Check if the command is not registered on the guild
-        guild.commands.fetch().then((reg_commands) => {
+        guild.commands.fetch().then(async (reg_commands) => {
             if (reg_commands.size < commands.length) {
                 console.log(`The guild with ID ${guild.id} has less commands than the bot.`);
                 console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...\n`)
 
-                rest.get(Routes.applicationGuildCommands(client.user.id, guild.id)).then(async (reg_cmds) => {
-                    for (const command of reg_cmds) {
-                        // Delete all commands
-                        await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
-                    }
+                const reg_cmds = await rest.get(Routes.applicationGuildCommands(client.user.id, guild.id));
+                for (const command of reg_cmds) {
+                    // Delete all commands
+                    await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
+                }
 
-                    // Register commands
-                    await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
-                    console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
-                })
+                // Register commands
+                await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
+                console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
             }
         });
     });
