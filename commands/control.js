@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import {is_same_vc_as, make_simple_embed} from "../utils/utils.js";
+import {is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row} from "../utils/utils.js";
 import {any_audio_playing} from "../utils/audio.js";
 import {client} from "../index.js";
 
