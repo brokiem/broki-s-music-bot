@@ -47,33 +47,21 @@ client.on("ready", async () => {
     client.guilds.cache.forEach(guild => {
         // Check if the command is not registered on the guild
         guild.commands.fetch().then((reg_commands) => {
-            // Check if the guild has no commands registered
-            if (reg_commands.size <= 0) {
-                console.log(`The guild with ID ${guild.id} does not have any commands registered.`);
-                console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
+            if (reg_commands.size < commands.length) {
+                console.log(`The guild with ID ${guild.id} has less commands than the bot.`);
+                console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...\n`)
 
-                // Register commands
-                rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
-                    body: commands
-                }).then(() => {
+                rest.get(Routes.applicationGuildCommands(client.user.id, guild.id)).then(async (reg_cmds) => {
+                    for (const command of reg_cmds) {
+                        // Delete all commands
+                        await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
+                    }
+
+                    // Register commands
+                    await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
                     console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
-                });
-                return;
+                })
             }
-
-            // Check new added commands and register them
-            const unregistered_commands = commands.filter(command => !reg_commands.find(reg_command => reg_command.name === command.name));
-            if (unregistered_commands.length > 0) {
-                console.log(`The guild with ID ${guild.id} does not have ${unregistered_commands.length} commands registered.`);
-                console.log(`Registering ${unregistered_commands.length} new commands for guild with ID ${guild.id}...`)
-
-                rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
-                    body: unregistered_commands
-                }).then(() => {
-                    console.log(`Successfully registered ${unregistered_commands.length} new commands for guild with ID ${guild.id}`);
-                });
-            }
-
         });
     });
     console.log('Successfully reloaded application (/) commands.');
