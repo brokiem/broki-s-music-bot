@@ -19,6 +19,11 @@ export async function execute(interaction) {
         return
     }
 
+    if (client.streams[interaction.guildId].queue.length >= 5) {
+        await interaction.editReply({embeds: [make_simple_embed("Queue is full (max 5)!")]})
+        return
+    }
+
     const query = interaction.options.getString('query');
 
     const yt_data = await play_audio(query, interaction.guildId, interaction.member.voice.channelId)

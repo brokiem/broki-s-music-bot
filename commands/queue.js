@@ -13,7 +13,9 @@ export async function execute(interaction) {
         return
     }
 
-    if (client.streams[interaction.guildId].queue.length <= 0) {
+    const queue = client.streams[interaction.guildId].queue;
+
+    if (queue.length <= 0) {
         await interaction.editReply({embeds: [make_simple_embed("No queue, start playing audio with /play")]})
         return
     }
@@ -31,7 +33,7 @@ export async function execute(interaction) {
     }
 
     await interaction.editReply({
-        embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
+        embeds: [make_simple_embed(q).setTitle("Queue (" + queue.length + ")").setFooter({
             text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
             iconURL: interaction.member.user.displayAvatarURL({size: 16})
         })]
