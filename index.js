@@ -48,17 +48,19 @@ client.on("ready", async () => {
             console.log('Started refreshing application (/) commands.');
             client.guilds.cache.forEach(guild => {
                 // Check if the command is not registered on the guild
-                if (!guild.commands.cache.size) {
-                    console.log(`The guild with ID ${guild.id} does not have any commands registered.`);
-                    console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
+                guild.commands.fetch().then((reg_commands) => {
+                    if (!reg_commands.size) {
+                        console.log(`The guild with ID ${guild.id} does not have any commands registered.`);
+                        console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
 
-                    // Register commands
-                    rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
-                        body: commands
-                    }).then(() => {
-                        console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
-                    });
-                }
+                        // Register commands
+                        rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
+                            body: commands
+                        }).then(() => {
+                            console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
+                        });
+                    }
+                });
             });
             console.log('Successfully reloaded application (/) commands.');
         } catch (error) {
