@@ -1,9 +1,9 @@
 'use strict'
 
-const discord = require('discord.js')
-const playdl = require('play-dl')
-const voice = require('@discordjs/voice')
-const os = require("os")
+import discord from 'discord.js'
+import playdl from 'play-dl'
+import * as voice from '@discordjs/voice'
+import os from "os"
 
 const client = new discord.Client({
     intents: [
