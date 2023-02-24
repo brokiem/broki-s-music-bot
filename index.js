@@ -7,10 +7,11 @@ const os = require("os")
 
 const client = new discord.Client({
     intents: [
-        discord.Intents.FLAGS.GUILDS,
-        discord.Intents.FLAGS.GUILD_MEMBERS,
-        discord.Intents.FLAGS.GUILD_MESSAGES,
-        discord.Intents.FLAGS.GUILD_VOICE_STATES
+        discord.GatewayIntentBits.Guilds,
+        discord.GatewayIntentBits.GuildMessages,
+        discord.GatewayIntentBits.MessageContent,
+        discord.GatewayIntentBits.GuildMembers,
+        discord.GatewayIntentBits.GuildVoiceStates,
     ]
 })
 
@@ -25,14 +26,13 @@ client.login().catch((e) => {
 })
 
 client.on("messageCreate", async message => {
-    try {
         if (message.author.bot || blocked === message.member.id) return
 
         if (message.content.startsWith(prefix)) {
             const args = message.content.slice(prefix.length).trim().split(/ +/)
 
-            const loop = new discord.MessageButton().setStyle("LINK").setLabel("Invite Me!").setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=2184547392&scope=bot")
-            const row = new discord.MessageActionRow().addComponents([loop])
+            const loop = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Link).setLabel("Invite Me!").setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=2184547392&scope=bot")
+            const row = new discord.ActionRowBuilder().addComponents([loop])
 
             switch (args.shift().toLowerCase()) {
                 case "help":
@@ -62,12 +62,12 @@ client.on("messageCreate", async message => {
 
                     if (streams[message.guildId].queue.length >= 1) {
                         await message.channel.send({
-                            embeds: [make_playing_embed(message.guildId, message.author, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
+                            embeds: [await make_playing_embed(message.guildId, message.author, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
                             allowedMentions: {repliedUser: false}
                         })
                     } else {
                         await message.channel.send({
-                            embeds: [make_playing_embed(message.guildId, message.author, yt_data)],
+                            embeds: [await make_playing_embed(message.guildId, message.author, yt_data)],
                             components: [get_control_button_row()],
                             allowedMentions: {repliedUser: false}
                         })
@@ -107,7 +107,7 @@ client.on("messageCreate", async message => {
                     await message.channel.send({
                         embeds: [make_simple_embed("Audio skipped to next queue").setFooter({
                             text: "by " + message.author.username + "#" + message.author.discriminator,
-                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                            iconURL: message.author.displayAvatarURL({size: 16})
                         })],
                         allowedMentions: {repliedUser: false}
                     })
@@ -138,7 +138,7 @@ client.on("messageCreate", async message => {
                         msg.edit({
                             embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
                                 text: "by " + message.author.username + "#" + message.author.discriminator,
-                                iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                                iconURL: message.author.displayAvatarURL({size: 16})
                             })]
                         })
                     })
@@ -162,7 +162,7 @@ client.on("messageCreate", async message => {
                     await message.channel.send({
                         embeds: [make_simple_embed("YouTube audio successfully stopped!").setFooter({
                             text: "by " + message.author.username + "#" + message.author.discriminator,
-                            iconURL: message.author.displayAvatarURL({size: 16, dynamic: true})
+                            iconURL: message.author.displayAvatarURL({size: 16})
                         })],
                         allowedMentions: {repliedUser: false}
                     })
@@ -294,14 +294,6 @@ client.on("messageCreate", async message => {
                     break;
             }
         }
-    } catch (e) {
-        await message.reply({embeds: [make_simple_embed(":( I got an error: " + e.toString())]})
-        console.log("An error occurred: " + e.toString())
-
-        if (e.toString().includes("429")) {
-            process.exit()
-        }
-    }
 })
 
 client.on('interactionCreate', async interaction => {
@@ -333,14 +325,14 @@ client.on('interactionCreate', async interaction => {
                 inter = await interaction.reply({
                     embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
                         text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                        iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                        iconURL: interaction.user.displayAvatarURL({size: 16})
                     })], fetchReply: true
                 })
             } else {
                 inter = await interaction.reply({
                     embeds: [make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
                         text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                        iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                        iconURL: interaction.user.displayAvatarURL({size: 16})
                     })], fetchReply: true
                 })
             }
@@ -350,7 +342,7 @@ client.on('interactionCreate', async interaction => {
             interaction.reply({
                 embeds: [make_simple_embed("YouTube audio successfully stopped!").setFooter({
                     text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                    iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                    iconURL: interaction.user.displayAvatarURL({size: 16})
                 })], fetchReply: true
             })
             break;
@@ -359,7 +351,7 @@ client.on('interactionCreate', async interaction => {
             inter = await interaction.reply({
                 embeds: [make_simple_embed(streams[interaction.guildId].loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio").setFooter({
                     text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                    iconURL: interaction.user.displayAvatarURL({size: 16, dynamic: true})
+                    iconURL: interaction.user.displayAvatarURL({size: 16})
                 })], fetchReply: true
             })
             break;
@@ -372,17 +364,17 @@ client.on('interactionCreate', async interaction => {
     }
 })
 
-client.on('voiceStateUpdate', (oldState) => {
-    if (oldState.channelId === null) return
-
-    if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
-        setTimeout(() => {
-            if (oldState.channel.members.size <= 1) {
-                leave_voice_channel(oldState.guild.id)
-            }
-        }, 30000)
-    }
-})
+// client.on('voiceStateUpdate', (oldState) => {
+//     if (oldState.channelId === null) return
+//
+//     if (oldState.channelId === oldState.guild.me.voice.channelId && (oldState.channel.members.size <= 1)) {
+//         setTimeout(() => {
+//             if (oldState.channel.members.size <= 1) {
+//                 leave_voice_channel(oldState.guild.id)
+//             }
+//         }, 30000)
+//     }
+// })
 
 async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
@@ -430,10 +422,8 @@ async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
 async function broadcast_audio(guild_id, stream) {
     streams[guild_id].resource = voice.createAudioResource(stream.stream, {
-        inputType: stream.type/*,
-        inlineVolume: true*/
+        inputType: stream.type
     })
-    //streams[guild_id].resource.volume.setVolumeLogarithmic(0.9)
 
     streams[guild_id].player.play(streams[guild_id].resource)
     voice.getVoiceConnection(guild_id).subscribe(streams[guild_id].player)
@@ -536,7 +526,7 @@ function leave_voice_channel(guild_id) {
 }
 
 function make_simple_embed(string) {
-    return new discord.MessageEmbed().setDescription(string)
+    return new discord.EmbedBuilder().setDescription(string)
 }
 
 function make_playing_embed(guild_id, member, yt_data, title = null, url = null, thumbnail_url = null, isControl = false) {
@@ -546,22 +536,22 @@ function make_playing_embed(guild_id, member, yt_data, title = null, url = null,
         thumbnail_url = yt_data.video_details.thumbnails[0].url
     }
 
-    return new discord.MessageEmbed()
+    return new discord.EmbedBuilder()
         .setColor('#35cf7d')
         .setTitle(isControl ? "Now Playing" : "Playing YouTube")
         .setDescription("[" + title + "](" + url + ")")
         .setThumbnail(thumbnail_url)
         .setFooter({
             text: "by " + member.username + "#" + member.discriminator,
-            iconURL: member.displayAvatarURL({size: 16, dynamic: true})
+            iconURL: member.displayAvatarURL({size: 16})
         })
 }
 
 function get_control_button_row() {
-    const play = new discord.MessageButton().setStyle(2).setCustomId("stop").setLabel("Stop")
-    const pause = new discord.MessageButton().setStyle(2).setCustomId("pause").setLabel("Pause/Resume")
-    const loop = new discord.MessageButton().setStyle(2).setCustomId("loop").setLabel("Loop")
-    return new discord.MessageActionRow().addComponents([play, pause, loop])
+    const play = new discord.ButtonBuilder().setStyle(2).setCustomId("stop").setLabel("Stop")
+    const pause = new discord.ButtonBuilder().setStyle(2).setCustomId("pause").setLabel("Pause/Resume")
+    const loop = new discord.ButtonBuilder().setStyle(2).setCustomId("loop").setLabel("Loop")
+    return new discord.ActionRowBuilder().addComponents([play, pause, loop])
 }
 
 function any_audio_playing(guild_id) {

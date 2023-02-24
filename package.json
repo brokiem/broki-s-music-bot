@@ -2,11 +2,11 @@
   "name": "broki-s-music-bot",
   "version": "2.0.0",
   "dependencies": {
-    "@discordjs/voice": "^0.8.0",
-    "discord.js": "v13-lts",
-    "play-dl": "^1.9.6",
+    "@discordjs/voice": "^0.14.0",
+    "discord.js": "^14.7.1",
     "libsodium-wrappers": "latest",
-    "opusscript": "latest"
+    "opusscript": "latest",
+    "play-dl": "^1.9.6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
