@@ -51,9 +51,9 @@ export function make_playing_embed(guild_id, member, yt_data, title = null, url 
 }
 
 export function get_control_button_row() {
-    const play = new discord.ButtonBuilder().setStyle(2).setCustomId("stop").setLabel("Stop")
-    const pause = new discord.ButtonBuilder().setStyle(2).setCustomId("pause").setLabel("Pause/Resume")
-    const loop = new discord.ButtonBuilder().setStyle(2).setCustomId("loop").setLabel("Loop")
+    const play = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("stop").setLabel("Stop")
+    const pause = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("pause").setLabel("Pause/Resume")
+    const loop = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("loop").setLabel("Loop")
     return new discord.ActionRowBuilder().addComponents([play, pause, loop])
 }
 
