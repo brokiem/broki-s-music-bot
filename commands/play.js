@@ -19,7 +19,7 @@ export async function execute(interaction) {
         return
     }
 
-    if (client.streams[interaction.guildId].queue.length >= 5) {
+    if (client.streams[interaction.guildId]?.queue?.length >= 5) {
         await interaction.editReply({embeds: [make_simple_embed("Queue is full (max 5)!")]})
         return
     }
