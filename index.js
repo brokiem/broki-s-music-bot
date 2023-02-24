@@ -26,6 +26,7 @@ client.login().catch((e) => {
 })
 
 client.on("messageCreate", async message => {
+    try {
         if (message.author.bot || blocked === message.member.id) return
 
         if (message.content.startsWith(prefix)) {
@@ -294,6 +295,14 @@ client.on("messageCreate", async message => {
                     break;
             }
         }
+    } catch (e) {
+        await message.reply({embeds: [make_simple_embed(":( I got an error: " + e.toString())]})
+        console.log("An error occurred: " + e.toString())
+
+        if (e.toString().includes("429")) {
+            process.exit()
+        }
+    }
 })
 
 client.on('interactionCreate', async interaction => {
