@@ -12,6 +12,6 @@ export async function execute(interaction) {
 
     await interaction.editReply({
         components: [row],
-        embeds: [make_simple_embed("Command: !play, !skip, !queue, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats")]
+        embeds: [make_simple_embed("Command: /play, /skip, /queue, /control, /loop, /pause, /resume, /stop, /volume, /leave, /stats")]
     })
 }
