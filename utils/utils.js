@@ -2,6 +2,21 @@ import {client} from "../index.js";
 import discord from "discord.js";
 import * as voice from "@discordjs/voice";
 
+export function convert_seconds_to_minutes(value) {
+    const hrs = ~~(value / 3600)
+    const mins = ~~((value % 3600) / 60)
+    const secs = ~~value % 60
+
+    let ret = ""
+    if (hrs > 0) {
+        ret += "" + hrs + ":" + (mins < 10 ? "0" : "")
+    }
+
+    ret += "" + String(mins).padStart(2, '0') + ":" + (secs < 10 ? "0" : "")
+    ret += "" + secs
+    return ret
+}
+
 export function is_same_vc_as(user_id, guild_id) {
     const guild = client.guilds.cache.get(guild_id)
     if (!guild.members.cache.get(user_id).voice.channel) {
