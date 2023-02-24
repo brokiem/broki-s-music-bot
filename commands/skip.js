@@ -39,8 +39,8 @@ export async function execute(interaction) {
 
     await interaction.editReply({
         embeds: [make_simple_embed("Audio skipped to next queue").setFooter({
-            text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
-            iconURL: interaction.member.displayAvatarURL({size: 16})
+            text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
+            iconURL: interaction.member.user.displayAvatarURL({size: 16})
         })],
         allowedMentions: {repliedUser: false}
     })

@@ -32,8 +32,8 @@ export async function execute(interaction) {
 
     await interaction.editReply({
         embeds: [make_simple_embed(q).setTitle("Queue").setFooter({
-            text: "by " + interaction.member.username + "#" + interaction.member.discriminator,
-            iconURL: interaction.member.displayAvatarURL({size: 16})
+            text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
+            iconURL: interaction.member.user.displayAvatarURL({size: 16})
         })]
     })
 }
