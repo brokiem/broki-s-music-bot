@@ -9,4 +9,4 @@ RUN yarn install
 # Bundle app source
 COPY . .
 
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
