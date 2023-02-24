@@ -5,8 +5,8 @@ import {client} from "../index.js";
 import discord from "discord.js";
 
 export const data = new SlashCommandBuilder()
-    .setName('stop')
-    .setDescription('Stop current audio');
+    .setName('stats')
+    .setDescription('Stats command');
 
 export async function execute(interaction) {
     const loop = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Link).setLabel("Invite Me!").setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=2184547392&scope=bot")

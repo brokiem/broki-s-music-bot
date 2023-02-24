@@ -62,19 +62,18 @@ client.on("ready", async () => {
             }
 
             // Check new added commands and register them
-            commands.forEach(command => {
-                if (!reg_commands.find(reg_command => reg_command.name === command.name)) {
-                    console.log(`The guild with ID ${guild.id} does not have the command ${command.name} registered.`);
-                    console.log(`Registering ${command.name} command for guild with ID ${guild.id}...`)
+            const unregistered_commands = commands.filter(command => !reg_commands.find(reg_command => reg_command.name === command.name));
+            if (unregistered_commands.length > 0) {
+                console.log(`The guild with ID ${guild.id} does not have ${unregistered_commands.length} commands registered.`);
+                console.log(`Registering ${unregistered_commands.length} new commands for guild with ID ${guild.id}...`)
 
-                    // Register command
-                    rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
-                        body: command
-                    }).then(() => {
-                        console.log(`Successfully registered ${command.name} command for guild with ID ${guild.id}`);
-                    });
-                }
-            });
+                rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {
+                    body: unregistered_commands
+                }).then(() => {
+                    console.log(`Successfully registered ${unregistered_commands.length} new commands for guild with ID ${guild.id}`);
+                });
+            }
+
         });
     });
     console.log('Successfully reloaded application (/) commands.');
