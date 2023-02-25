@@ -4,7 +4,7 @@ import discord from 'discord.js'
 import * as fs from "fs";
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
-import {make_simple_embed, is_same_vc_as} from "./utils/utils.js";
+import {make_simple_embed, is_same_vc_as, leave_voice_channel} from "./utils/utils.js";
 import {any_audio_playing, stop_audio, pause_audio} from "./utils/audio.js";
 
 const token = process.env.DISCORD_TOKEN;
@@ -66,6 +66,30 @@ client.on("ready", async () => {
 
     console.log("\nBot is ready!\n")
 })
+
+client.on('voiceStateUpdate', (oldState, newState) => {
+    // Check if the bot was kicked from a voice channel
+    if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
+        // Check if the bot is in a voice channel
+        if (client.streams[oldState.guild.id]) {
+            // Stop the audio
+            stop_audio(oldState.guild.id)
+            delete client.streams[oldState.guild.id]
+            return;
+        }
+    }
+
+    // Leave the voice channel if the bot is the only one in it
+    if (oldState.channel && newState.channel) {
+        if (oldState.channel.members.size === 1 && oldState.channel.members.first().user.id === client.user.id) {
+            setTimeout(() => {
+                if (oldState.channel.members.size <= 1) {
+                    leave_voice_channel(oldState.guild.id)
+                }
+            }, 30000)
+        }
+    }
+});
 
 client.on("guildCreate", async guild => {
     // Register commands

@@ -1,6 +1,7 @@
 import playdl from "play-dl";
 import * as voice from "@discordjs/voice";
 import {client} from "./../index.js";
+import {leave_voice_channel} from "./utils.js";
 
 export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
