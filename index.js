@@ -68,27 +68,32 @@ client.on("ready", async () => {
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
-    // Check if the bot was kicked from a voice channel
-    if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
-        // Check if the bot is in a voice channel
-        if (client.streams[oldState.guild.id]) {
-            // Stop the audio
-            stop_audio(oldState.guild.id)
-            delete client.streams[oldState.guild.id]
-            return;
+    try {
+        // Check if the bot was kicked from a voice channel
+        if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
+            // Check if the bot is in a voice channel
+            if (client.streams[oldState.guild.id]) {
+                // Stop the audio
+                stop_audio(oldState.guild.id)
+                delete client.streams[oldState.guild.id]
+                return;
+            }
         }
-    }
 
-    // Leave the voice channel if the bot is the only one in it
-    if (oldState.channel) {
-        if (oldState.channel.members.size === 1 && oldState.channel.members.first().user.id === client.user.id) {
-            setTimeout(async () => {
-                const channel = await client.channels.fetch(oldState.channel.id);
-                if (channel && channel.members.size <= 1) {
-                    leave_voice_channel(oldState.guild.id)
-                }
-            }, 30000)
+        // Leave the voice channel if the bot is the only one in it
+        if (oldState.channel) {
+            if (oldState.channel.members.size === 1 && oldState.channel.members.first().user.id === client.user.id) {
+                setTimeout(async () => {
+                    const channel = await client.channels.fetch(oldState.channel.id);
+                    if (channel && channel.members.size <= 1) {
+                        leave_voice_channel(oldState.guild.id)
+                    }
+                }, 30000)
+            }
         }
+    } catch (e) {
+        console.log("An error occurred!")
+        console.error(e)
     }
 });
 
