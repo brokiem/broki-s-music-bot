@@ -43,26 +43,15 @@ client.on("ready", async () => {
     }
     console.log("Loaded " + client.commands.size + " commands!\n");
 
-    console.log('Started refreshing application (/) commands.');
+    //console.log(`Started refreshing application (/) commands.`);
     for await (const guild of client.guilds.cache.values()) {
-        // Check if the command is not registered on the guild
-        const reg_commands = await guild.commands.fetch();
-        if (reg_commands.size < commands.length) {
-            console.log(`The guild with ID ${guild.id} has less commands than the bot.`);
-            console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...\n`)
-
-            const reg_cmds = await rest.get(Routes.applicationGuildCommands(client.user.id, guild.id));
-            for (const command of reg_cmds) {
-                // Delete all commands
-                await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
-            }
-
-            // Register all commands
-            await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
-            console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
+        const registered_cmds = await rest.get(Routes.applicationGuildCommands(client.user.id, guild.id));
+        for (const command of registered_cmds) {
+            // Delete all commands
+            await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
         }
     }
-    console.log('Successfully reloaded application (/) commands.');
+    //console.log('Successfully reloaded application (/) commands.');
 
     console.log("\nBot is ready!\n")
 })
@@ -97,13 +86,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
 });
 
-client.on("guildCreate", async guild => {
-    // Register commands
-    console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
-
-    await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
-    console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
-});
+// client.on("guildCreate", async guild => {
+//     // Register commands
+//     console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
+//
+//     await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
+//     console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
+// });
 
 client.on("messageCreate", async message => {
     try {
