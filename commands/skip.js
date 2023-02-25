@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Skip to next audio');
 
 export async function execute(interaction) {
-    if (!await interaction.member.roles.fetch().then(roles => roles.cache.find(role => role.name.toLowerCase() === 'dj'))) {
+    if (!interaction.member.roles.cache.find(role => role.name.toLowerCase() === 'dj')) {
         await interaction.editReply({embeds: [make_simple_embed("You dont have permission!")]})
         return
     }
