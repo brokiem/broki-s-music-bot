@@ -17,10 +17,14 @@ export function convert_seconds_to_minutes(value) {
     return ret
 }
 
-export async function is_same_vc_as(user_id, guild_id) {
+export async function is_same_vc_as(user_id, guild_id, initial = false) {
     const guild = client.guilds.cache.get(guild_id);
     const user = await guild.members.fetch(user_id);
     const bot = await guild.members.fetch(client.user.id);
+
+    if (initial) {
+        return true;
+    }
 
     if (!user.voice.channel || !bot.voice.channel) {
         return false;
