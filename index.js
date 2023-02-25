@@ -54,8 +54,9 @@ client.on("ready", async () => {
     }
 
     if (promises.length > 0) {
-        await Promise.all(promises);
-        console.log("Deleted all commands from all guilds.")
+        Promise.all(promises).then(() => {
+            console.log("Deleted all commands from all guilds.")
+        });
     }
     //console.log('Successfully reloaded application (/) commands.');
 
