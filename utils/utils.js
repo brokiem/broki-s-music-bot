@@ -17,15 +17,20 @@ export function convert_seconds_to_minutes(value) {
     return ret
 }
 
-export function is_same_vc_as(user_id, guild_id) {
-    const guild = client.guilds.cache.get(guild_id)
-    if (!guild.members.cache.get(user_id).voice.channel) {
-        return false
+export async function is_same_vc_as(user_id, guild_id) {
+    const guild = client.guilds.cache.get(guild_id);
+    const user = await guild.members.fetch(user_id);
+    const bot = await guild.members.fetch(client.user.id);
+
+    if (!user.voice.channel) {
+        return false;
     }
-    if (guild.members.cache.get(user_id).voice.channel && !guild.members.cache.get(client.user.id).voice.channel) {
-        return true
+
+    if (user.voice.channel && !bot.voice.channel) {
+        return true;
     }
-    return guild.members.cache.get(user_id).voice.channel?.id === guild.members.cache.get(client.user.id).voice.channel?.id
+
+    return user.voice.channel && bot.voice.channel && user.voice.channel.id === bot.voice.channel.id;
 }
 
 export function make_simple_embed(string) {

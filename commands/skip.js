@@ -13,7 +13,7 @@ export async function execute(interaction) {
         return
     }
 
-    if (!is_same_vc_as(interaction.member.id, interaction.guildId)) {
+    if (!await is_same_vc_as(interaction.member.id, interaction.guildId)) {
         await interaction.editReply({embeds: [make_simple_embed("You are not in the same voice channel!")]})
         return
     }

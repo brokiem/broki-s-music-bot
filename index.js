@@ -165,7 +165,7 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isButton()) {
-        if (!is_same_vc_as(interaction.user.id, interaction.guildId)) {
+        if (!await is_same_vc_as(interaction.user.id, interaction.guildId)) {
             await interaction.reply({
                 embeds: [make_simple_embed("You are not in the same voice channel!")],
                 ephemeral: true,
