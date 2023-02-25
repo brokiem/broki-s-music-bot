@@ -81,12 +81,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
     // Leave the voice channel if the bot is the only one in it
     if (oldState.channel && newState.channel) {
-        if (oldState.channel.members.size === 1 && oldState.channel.members.first().user.id === client.user.id) {
-            setTimeout(() => {
-                if (oldState.channel.members.size <= 1) {
-                    leave_voice_channel(oldState.guild.id)
+        if (newState.channel.members.size === 1 && newState.channel.members.first().user.id === client.user.id) {
+            const interval = setInterval(() => {
+                if (newState.channel.members.size <= 1) {
+                    clearInterval(interval);
+                    leave_voice_channel(oldState.guild.id);
                 }
-            }, 30000)
+            }, 5000);
         }
     }
 });
