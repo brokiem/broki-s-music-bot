@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import {is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row} from "../utils/utils.js";
-import {play_audio} from "../utils/audio.js";
+import {any_audio_playing, play_audio} from "../utils/audio.js";
 import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder()
@@ -14,7 +14,9 @@ export const data = new SlashCommandBuilder()
     );
 
 export async function execute(interaction) {
-    if (!await is_same_vc_as(interaction.member.id, interaction.guildId, true)) {
+    const initial = !any_audio_playing(interaction.guildId)
+
+    if (!await is_same_vc_as(interaction.member.id, interaction.guildId, initial)) {
         await interaction.editReply({embeds: [make_simple_embed("You are not in the same voice channel!")]})
         return
     }
