@@ -44,13 +44,16 @@ client.on("ready", async () => {
     console.log("Loaded " + client.commands.size + " commands!\n");
 
     //console.log(`Started refreshing application (/) commands.`);
+    const promises = [];
     for await (const guild of client.guilds.cache.values()) {
         const registered_cmds = await rest.get(Routes.applicationGuildCommands(client.user.id, guild.id));
         for (const command of registered_cmds) {
             // Delete all commands
-            await rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id));
+            promises.push(rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id)));
         }
     }
+    await Promise.all(promises);
+    console.log("Deleted all commands from all guilds.")
     //console.log('Successfully reloaded application (/) commands.');
 
     console.log("\nBot is ready!\n")
