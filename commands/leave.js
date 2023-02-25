@@ -7,7 +7,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Leave the voice channel');
 
 export async function execute(interaction) {
-    if (!await is_same_vc_as(interaction.member.id, interaction.guildId) && !(await interaction.guild.members.fetch(client.user.id)).voice.channel) {
+    if (!await is_same_vc_as(interaction.member.id, interaction.guildId)) {
         await interaction.editReply({embeds: [make_simple_embed("You are not in the same voice channel!")]})
         return
     }
