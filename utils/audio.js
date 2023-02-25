@@ -6,6 +6,10 @@ import {leave_voice_channel} from "./utils.js";
 export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
+    const options = {
+        discordPlayerCompatibility: true
+    }
+
     if (playdl.yt_validate(input) === 'video') {
         const result = await playdl.video_info(input)
 
@@ -20,11 +24,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
         client.streams[guild_id].looped_url = result.video_details.url
 
-        const options = {
-            discordPlayerCompatibility: true
-        }
-
-        const urlParams = new URLSearchParams(result.video_details.url);
+        const urlParams = new URLSearchParams(input);
         const timeSeconds = urlParams.get('t');
 
         if (timeSeconds) {
@@ -53,13 +53,13 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
         client.streams[guild_id].looped_url = results[0].url
 
-        await broadcast_audio(guild_id, await playdl.stream_from_info(res, {discordPlayerCompatibility: true}))
+        await broadcast_audio(guild_id, await playdl.stream_from_info(res, options))
         return res
     }
 }
 
 export async function seek_audio(guild_id, timeSeconds) {
-    const stream = await playdl.stream_from_info(client.streams[guild_id].yt_url, {
+    const stream = await playdl.stream(client.streams[guild_id].yt_url, {
         seek: timeSeconds,
         discordPlayerCompatibility: true
     })
