@@ -52,8 +52,11 @@ client.on("ready", async () => {
             promises.push(rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id)));
         }
     }
-    await Promise.all(promises);
-    console.log("Deleted all commands from all guilds.")
+
+    if (promises.length > 0) {
+        await Promise.all(promises);
+        console.log("Deleted all commands from all guilds.")
+    }
     //console.log('Successfully reloaded application (/) commands.');
 
     console.log("\nBot is ready!\n")
