@@ -22,12 +22,8 @@ export async function is_same_vc_as(user_id, guild_id) {
     const user = await guild.members.fetch(user_id);
     const bot = await guild.members.fetch(client.user.id);
 
-    if (!user.voice.channel) {
+    if (!user.voice.channel || !bot.voice.channel) {
         return false;
-    }
-
-    if (user.voice.channel && !bot.voice.channel) {
-        return true;
     }
 
     return user.voice.channel && bot.voice.channel && user.voice.channel.id === bot.voice.channel.id;
