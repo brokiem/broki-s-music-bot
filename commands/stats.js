@@ -15,7 +15,7 @@ export async function execute(interaction) {
     await interaction.editReply({
         components: [row],
         embeds: [make_simple_embed("" +
-            "**❯  broki's music bot** - v3.0.0" +
+            "**❯  broki's music bot** - v3.1.0" +
             "\n\n" +
             "• CPU Usage: " + os.loadavg().toString().split(",")[0] + "%\n" +
             "• RAM Usage: " + (Math.round(process.memoryUsage().rss / 10485.76) / 100) + " MB\n" +

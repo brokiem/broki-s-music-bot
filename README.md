@@ -1,6 +1,6 @@
 # broki's music bot
 
-Commands: !play, !skip, !queue, !control, !loop, !pause, !resume, !stop, !volume, !leave, !stats
+Commands: /play, /skip, /seek, /queue, /control, /loop, /pause, /resume, /stop, /volume, /leave, /stats
 
 # Images
 ![Img](/img/img.png)

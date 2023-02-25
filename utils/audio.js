@@ -20,7 +20,18 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
         client.streams[guild_id].looped_url = result.video_details.url
 
-        await broadcast_audio(guild_id, await playdl.stream_from_info(result, {discordPlayerCompatibility: true}))
+        const options = {
+            discordPlayerCompatibility: true
+        }
+
+        const urlParams = new URLSearchParams(result.video_details.url);
+        const timeSeconds = urlParams.get('t');
+
+        if (timeSeconds) {
+            options.seek = timeSeconds;
+        }
+
+        await broadcast_audio(guild_id, await playdl.stream_from_info(result, options))
         return result
     } else {
         const results = await playdl.search(input, {limit: 1})
@@ -45,6 +56,15 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         await broadcast_audio(guild_id, await playdl.stream_from_info(res, {discordPlayerCompatibility: true}))
         return res
     }
+}
+
+export async function seek_audio(guild_id, timeSeconds) {
+    const stream = await playdl.stream_from_info(client.streams[guild_id].yt_url, {
+        seek: timeSeconds,
+        discordPlayerCompatibility: true
+    })
+
+    await broadcast_audio(guild_id, stream)
 }
 
 export async function broadcast_audio(guild_id, stream) {
