@@ -6,9 +6,7 @@ import {leave_voice_channel} from "./utils.js";
 export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     prepare_voice_connection(guild_id, voice_channel_id)
 
-    const options = {
-        discordPlayerCompatibility: true
-    }
+    const options = {}
 
     if (playdl.yt_validate(input) === 'video') {
         const result = await playdl.video_info(input)
@@ -60,8 +58,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
 export async function seek_audio(guild_id, timeSeconds) {
     const stream = await playdl.stream(client.streams[guild_id].yt_url, {
-        seek: timeSeconds,
-        discordPlayerCompatibility: true
+        seek: timeSeconds
     })
 
     await broadcast_audio(guild_id, stream)
