@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN apk add --no-cache yarn && yarn install --production=true
+RUN apt-get update \
+    && apt-get install -y yarn \
+    && yarn install --production=true
 
 COPY . .
 
