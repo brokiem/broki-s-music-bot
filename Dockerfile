@@ -1,12 +1,12 @@
-FROM node:19
+FROM node:19-alpine3.16
+
+WORKDIR /app
 
 COPY package.json ./
+COPY yarn.lock ./
 
-RUN yarn install
-# If you are building your code for production
-# RUN npm ci --only=production
+RUN yarn install --production=true
 
-# Bundle app source
 COPY . .
 
-CMD [ "yarn", "start" ]
+CMD ["yarn", "start"]
