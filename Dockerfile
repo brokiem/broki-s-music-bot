@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN yarn install --production=true
+RUN bun install
 
 COPY . .
 
