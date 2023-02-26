@@ -1,11 +1,10 @@
-FROM node:19-alpine3.16
+FROM oven/bun:latest
 
 WORKDIR /app
 
 COPY package.json ./
 
-RUN npm install && \
-    npm install -g bun
+RUN npm install
 
 COPY . .
 
