@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN bun install
+RUN apk add --no-cache yarn && yarn install --production=true
 
 COPY . .
 
