@@ -10,7 +10,8 @@
     "discord.js": "^14.7.1",
     "libsodium-wrappers": "latest",
     "opusscript": "latest",
-    "play-dl": "^1.9.6"
+    "play-dl": "^1.9.6",
+    "prettier": "^2.8.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

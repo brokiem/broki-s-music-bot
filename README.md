@@ -3,6 +3,7 @@
 Commands: /play, /skip, /seek, /queue, /control, /loop, /pause, /resume, /stop, /volume, /leave, /stats
 
 # Images
+
 ![Img](/img/img.png)
 ![Img](/img/img_1.png)
 
