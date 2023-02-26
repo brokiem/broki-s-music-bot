@@ -3,9 +3,10 @@ FROM node:19
 WORKDIR /app
 
 # Install bun.js
-RUN apk add --no-cache curl \
+RUN apt-get update \
+    && apt-get install -y curl \
     && curl -fsSL https://bun.sh/install | bash \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and install dependencies
 COPY package.json ./
