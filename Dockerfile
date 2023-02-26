@@ -8,6 +8,9 @@ RUN apt-get update \
     && curl -fsSL https://bun.sh/install | bash \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PATH="/root/.bun/bin:${PATH}"
+RUN echo 'source /root/.bashrc' >> ~/.bashrc
+
 # Copy package.json and install dependencies
 COPY package.json ./
 RUN yarn install --production=true
