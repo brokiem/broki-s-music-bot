@@ -1,18 +1,11 @@
-FROM oven/bun:latest
-
-RUN apt-get update \
-    && apt-get install -y curl \
-    && curl -sL https://deb.nodesource.com/setup_19.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+FROM node:19-alpine3.16
 
 WORKDIR /app
 
 COPY package.json ./
 
-RUN npm install
+RUN yarn install --production=true
 
 COPY . .
 
-CMD ["bun", "index.js"]
+CMD ["yarn", "start"]
