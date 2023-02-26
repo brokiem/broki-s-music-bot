@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN yarn install --production=true && \
-    yarn global add bun
+RUN npm install && \
+    npm install -g bun
 
 COPY . .
 
