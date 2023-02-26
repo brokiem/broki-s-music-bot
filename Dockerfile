@@ -1,12 +1,11 @@
-FROM oven/bun:latest
+FROM node:19-alpine3.16
 
 WORKDIR /app
 
 COPY package.json ./
 
-RUN apt-get update \
-    && apt-get install -y yarn \
-    && yarn install --production=true
+RUN yarn install --production=true && \
+    yarn global add bun
 
 COPY . .
 
