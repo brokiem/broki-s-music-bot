@@ -1,18 +1,11 @@
-FROM node:19
+FROM oven/bun:latest
 
 WORKDIR /app
 
-# Install bun.js
-RUN apt-get update \
-    && apt-get install -y curl \
-    && curl -fsSL https://bun.sh/install | bash \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy package.json and install dependencies
 COPY package.json ./
+
 RUN yarn install --production=true
 
-# Copy the rest of the application files
 COPY . .
 
-CMD ["~/.bun/bin/bun", "index.js"]
+CMD ["bun", "start"]
