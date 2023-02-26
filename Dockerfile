@@ -8,8 +8,6 @@ RUN apt-get update \
     && curl -fsSL https://bun.sh/install | bash \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo 'source /root/.bashrc' >> ~/.bashrc
-
 # Copy package.json and install dependencies
 COPY package.json ./
 RUN yarn install --production=true
@@ -17,4 +15,4 @@ RUN yarn install --production=true
 # Copy the rest of the application files
 COPY . .
 
-CMD ["bun", "index.js"]
+CMD ["~/.bun/bin/bun", "index.js"]
