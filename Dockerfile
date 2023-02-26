@@ -15,4 +15,4 @@ RUN npm install
 
 COPY . .
 
-CMD ["bun", "start"]
+CMD ["bun", "index.js"]
