@@ -9,8 +9,8 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     const options = {}
 
     if (input.startsWith('https')) {
-        const urlParams = new URLSearchParams(input);
-        const timeSeconds = urlParams.get('t');
+        const url = new URL(input);
+        const timeSeconds = url.searchParams.get('t');
 
         if (timeSeconds) {
             options.seek = timeSeconds;
@@ -30,13 +30,6 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
         client.streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url
 
         client.streams[guild_id].looped_url = result.video_details.url
-
-        const urlParams = new URLSearchParams(input);
-        const timeSeconds = urlParams.get('t');
-
-        if (timeSeconds) {
-            options.seek = timeSeconds;
-        }
 
         await broadcast_audio(guild_id, await playdl.stream_from_info(result, options))
         return result
