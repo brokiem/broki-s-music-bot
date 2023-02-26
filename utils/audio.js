@@ -8,7 +8,16 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 
     const options = {}
 
-    if (playdl.yt_validate(input) === 'video') {
+    if (input.startsWith('https')) {
+        const urlParams = new URLSearchParams(input);
+        const timeSeconds = urlParams.get('t');
+
+        if (timeSeconds) {
+            options.seek = timeSeconds;
+        }
+    }
+
+    if (input.startsWith('https') && playdl.yt_validate(input) === 'video') {
         const result = await playdl.video_info(input)
 
         if (!is_queue && any_audio_playing(guild_id)) {
