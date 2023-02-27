@@ -9,7 +9,7 @@ export async function execute(interaction) {
   const loop = new discord.ButtonBuilder()
     .setStyle(discord.ButtonStyle.Link)
     .setLabel("Invite Link")
-    .setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=2184547392&scope=bot");
+    .setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=4331667456&scope=bot");
   const row = new discord.ActionRowBuilder().addComponents([loop]);
 
   await interaction.editReply({
