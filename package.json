@@ -8,8 +8,8 @@
     "@discordjs/voice": "^0.14.0",
     "discord-api-types": "^0.37.35",
     "discord.js": "^14.7.1",
-    "libsodium-wrappers": "latest",
-    "opusscript": "latest",
+    "sodium-native": "latest",
+    "@discordjs/opus": "latest",
     "play-dl": "^1.9.6",
     "prettier": "^2.8.4"
   },
