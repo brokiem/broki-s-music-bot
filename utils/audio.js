@@ -121,9 +121,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         const result = await playdl.video_info(client.streams[guild_id].looped_url);
         await broadcast_audio(
           guild_id,
-          await playdl.stream_from_info(result, {
-            discordPlayerCompatibility: true,
-          })
+          await playdl.stream_from_info(result, {})
         );
         return;
       }
