@@ -70,11 +70,11 @@ export async function broadcast_audio(guild_id, stream) {
   client.streams[guild_id].resource = voice.createAudioResource(stream.stream, {
     inputType: stream.type,
   });
-
-  client.streams[guild_id].player.play(client.streams[guild_id].resource);
-  client.streams[guild_id].player.on("error", (error) => {
+  client.streams[guild_id].resource.playStream.on('error', error => {
     console.error(error);
   });
+
+  client.streams[guild_id].player.play(client.streams[guild_id].resource);
   voice.getVoiceConnection(guild_id).subscribe(client.streams[guild_id].player);
 
   client.streams[guild_id].playing = true;
@@ -108,6 +108,9 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         noSubscriber: voice.NoSubscriberBehavior.Pause,
       }
     });
+    client.streams[guild_id].player.on("error", (error) => {
+      console.error(error);
+    });
     client.streams[guild_id].resource = null;
     client.streams[guild_id].playing = false;
     client.streams[guild_id].looped_url = null;
@@ -119,8 +122,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
     client.streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
       console.log("Player for guild " + guild_id + " is idling.")
-      //client.streams[guild_id].resource = null;
-      //client.streams[guild_id].playing = false;
+      client.streams[guild_id].resource = null;
+      client.streams[guild_id].playing = false;
 
       if (client.streams[guild_id].loop) {
         const result = await playdl.video_info(client.streams[guild_id].looped_url);
