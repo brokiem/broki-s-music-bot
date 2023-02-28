@@ -119,8 +119,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
     client.streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
       console.log("Player for guild " + guild_id + " is idling.")
-      client.streams[guild_id].resource = null;
-      client.streams[guild_id].playing = false;
+      //client.streams[guild_id].resource = null;
+      //client.streams[guild_id].playing = false;
 
       if (client.streams[guild_id].loop) {
         const result = await playdl.video_info(client.streams[guild_id].looped_url);
