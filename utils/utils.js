@@ -72,6 +72,7 @@ export function leave_voice_channel(guild_id) {
   conn?.destroy();
 
   delete client.streams[guild_id];
+  console.log("Left voice channel in guild " + guild_id + "");
   return true;
 }
 
