@@ -7,9 +7,6 @@ import { Routes } from "discord-api-types/v10";
 import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean } from "./utils/utils.js";
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
 import {inspect} from "util";
-import { generateDependencyReport } from "@discordjs/voice";
-
-console.log(generateDependencyReport());
 
 const token = process.env.DISCORD_TOKEN;
 

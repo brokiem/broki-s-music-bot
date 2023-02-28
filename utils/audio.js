@@ -72,6 +72,9 @@ export async function broadcast_audio(guild_id, stream) {
   });
 
   client.streams[guild_id].player.play(client.streams[guild_id].resource);
+  client.streams[guild_id].player.on("error", (error) => {
+    console.error(error);
+  });
   voice.getVoiceConnection(guild_id).subscribe(client.streams[guild_id].player);
 
   client.streams[guild_id].playing = true;
