@@ -4,8 +4,9 @@ import discord from "discord.js";
 import * as fs from "fs";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v10";
-import { make_simple_embed, is_same_vc_as, leave_voice_channel } from "./utils/utils.js";
+import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean } from "./utils/utils.js";
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
+import {inspect} from "util";
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -144,6 +145,28 @@ client.on("messageCreate", async (message) => {
               allowedMentions: { repliedUser: false },
             });
             process.exit();
+          }
+          break;
+        case "eval":
+          if (message.author.id === "548120702373593090") {
+            try {
+              const code = args.join(" ")
+              let evaled = eval(code)
+
+              if (typeof evaled !== "string") {
+                evaled = inspect(evaled)
+              }
+
+              await message.reply({
+                content: `\`\`\`${clean(evaled)}\`\`\``,
+                allowedMentions: {repliedUser: false}
+              })
+            } catch (e) {
+              await message.reply({
+                content: `Error: \`\`\`xl\n${clean(e)}\n\`\`\``,
+                allowedMentions: {repliedUser: false}
+              })
+            }
           }
           break;
       }
