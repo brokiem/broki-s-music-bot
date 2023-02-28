@@ -6,7 +6,9 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN yarn install --production=true
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    apk add --no-cache libsodium && \
+    yarn install --production=true
 
 COPY --from=ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/
 
