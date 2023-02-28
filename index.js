@@ -66,16 +66,16 @@ client.on("ready", async () => {
 
 client.on("voiceStateUpdate", (oldState, newState) => {
   try {
-    // Check if the bot was kicked from a voice channel
-    if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
-      // Check if the bot is in a voice channel
-      if (client.streams[oldState.guild.id]) {
-        // Stop the audio
-        stop_audio(oldState.guild.id);
-        delete client.streams[oldState.guild.id];
-        return;
-      }
-    }
+    // // Check if the bot was kicked from a voice channel
+    // if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
+    //   // Check if the bot is in a voice channel
+    //   if (client.streams[oldState.guild.id]) {
+    //     // Stop the audio
+    //     stop_audio(oldState.guild.id);
+    //     delete client.streams[oldState.guild.id];
+    //     return;
+    //   }
+    // }
 
     // Leave the voice channel if the bot is the only one in it
     if (oldState.channel) {
