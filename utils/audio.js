@@ -118,6 +118,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     client.streams[guild_id].queue = [];
 
     client.streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
+      console.log("Player for guild " + guild_id + " is idling.")
       client.streams[guild_id].resource = null;
       client.streams[guild_id].playing = false;
 
