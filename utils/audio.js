@@ -103,7 +103,11 @@ export function pause_audio(guild_id) {
 export function prepare_voice_connection(guild_id, voice_channel_id) {
   if (client.streams[guild_id] === undefined) {
     client.streams[guild_id] = {};
-    client.streams[guild_id].player = voice.createAudioPlayer();
+    client.streams[guild_id].player = voice.createAudioPlayer({
+      behaviors: {
+        noSubscriber: voice.NoSubscriberBehavior.Pause,
+      }
+    });
     client.streams[guild_id].resource = null;
     client.streams[guild_id].playing = false;
     client.streams[guild_id].looped_url = null;
@@ -119,10 +123,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
       if (client.streams[guild_id].loop) {
         const result = await playdl.video_info(client.streams[guild_id].looped_url);
-        await broadcast_audio(
-          guild_id,
-          await playdl.stream_from_info(result, {})
-        );
+        await broadcast_audio(guild_id, await playdl.stream_from_info(result, {}));
         return;
       }
 
