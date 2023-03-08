@@ -142,15 +142,23 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
   const conn = voice.getVoiceConnection(guild_id);
   if (!conn || conn?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-    voice
-      .joinVoiceChannel({
-        channelId: voice_channel_id,
-        guildId: guild_id,
-        adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
-      })
-      .on(voice.VoiceConnectionStatus.Disconnected, on_disconnect);
+    voice.joinVoiceChannel({
+      channelId: voice_channel_id,
+      guildId: guild_id,
+      adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
+    }).on(voice.VoiceConnectionStatus.Disconnected, on_disconnect)
+      .on('stateChange', (oldState, newState) => {
+        Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
+        Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
+      });
+  } else {
   }
 }
+
+const networkStateChangeHandler = (_, newNetworkState) => {
+  const newUdp = Reflect.get(newNetworkState, 'udp');
+  clearInterval(newUdp?.keepAliveInterval);
+};
 
 export function any_audio_playing(guild_id) {
   if (client.streams[guild_id] === undefined) {
