@@ -140,19 +140,16 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
   client.streams[guild_id].force_stop = false;
 
-  const conn = voice.getVoiceConnection(guild_id);
-  if (!conn || conn?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-    voice.joinVoiceChannel({
+  const voice_connection = voice.getVoiceConnection(guild_id);
+  if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+    const new_voice_connection = voice.joinVoiceChannel({
       channelId: voice_channel_id,
       guildId: guild_id,
       adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
-    }).on(voice.VoiceConnectionStatus.Disconnected, on_disconnect)
-      .on('stateChange', (oldState, newState) => {
-        Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
-        Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
-      });
-  } else {
-    conn.on('stateChange', (oldState, newState) => {
+    })
+
+    new_voice_connection.on(voice.VoiceConnectionStatus.Disconnected, on_disconnect);
+    new_voice_connection.on('stateChange', (oldState, newState) => {
       Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
       Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
     });
