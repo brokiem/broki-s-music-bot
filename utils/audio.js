@@ -152,6 +152,10 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
       });
   } else {
+    conn.on('stateChange', (oldState, newState) => {
+      Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
+      Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
+    });
   }
 }
 
