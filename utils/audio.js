@@ -62,7 +62,7 @@ export async function broadcast_audio(guild_id, stream) {
   client.streams[guild_id].resource = voice.createAudioResource(stream.stream, {
     inputType: stream.type,
   });
-  client.streams[guild_id].resource.playStream.on('error', error => {
+  client.streams[guild_id].resource.playStream.on("error", (error) => {
     console.error(error);
   });
 
@@ -98,7 +98,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     client.streams[guild_id].player = voice.createAudioPlayer({
       behaviors: {
         noSubscriber: voice.NoSubscriberBehavior.Pause,
-      }
+      },
     });
     client.streams[guild_id].player.on("error", (error) => {
       console.error(error);
@@ -113,7 +113,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     client.streams[guild_id].queue = [];
 
     client.streams[guild_id].player.on(voice.AudioPlayerStatus.Idle, async () => {
-      console.log("Player for guild " + guild_id + " is idling.")
+      console.log("Player for guild " + guild_id + " is idling.");
       client.streams[guild_id].resource = null;
       client.streams[guild_id].playing = false;
 
@@ -138,18 +138,18 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       channelId: voice_channel_id,
       guildId: guild_id,
       adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
-    })
+    });
 
     new_voice_connection.on(voice.VoiceConnectionStatus.Disconnected, on_disconnect);
-    new_voice_connection.on('stateChange', (oldState, newState) => {
-      Reflect.get(oldState, 'networking')?.off('stateChange', networkStateChangeHandler);
-      Reflect.get(newState, 'networking')?.on('stateChange', networkStateChangeHandler);
+    new_voice_connection.on("stateChange", (oldState, newState) => {
+      Reflect.get(oldState, "networking")?.off("stateChange", networkStateChangeHandler);
+      Reflect.get(newState, "networking")?.on("stateChange", networkStateChangeHandler);
     });
   }
 }
 
 const networkStateChangeHandler = (_, newNetworkState) => {
-  const newUdp = Reflect.get(newNetworkState, 'udp');
+  const newUdp = Reflect.get(newNetworkState, "udp");
   clearInterval(newUdp?.keepAliveInterval);
 };
 

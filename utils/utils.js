@@ -77,9 +77,9 @@ export function leave_voice_channel(guild_id) {
 }
 
 export function clean(text) {
-  if (typeof (text) === "string") {
-    return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203))
+  if (typeof text === "string") {
+    return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
   } else {
-    return text
+    return text;
   }
 }
