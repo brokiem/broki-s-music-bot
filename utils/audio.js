@@ -7,6 +7,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   prepare_voice_connection(guild_id, voice_channel_id);
 
   const options = {};
+  let video_info = null;
 
   if (input.startsWith("https")) {
     const url = new URL(input);
@@ -15,47 +16,38 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     if (timeSeconds) {
       options.seek = timeSeconds;
     }
+
+    if (playdl.yt_validate(input) === "video") {
+      video_info = await playdl.video_info(input);
+    }
   }
 
-  if (input.startsWith("https") && playdl.yt_validate(input) === "video") {
-    const result = await playdl.video_info(input);
+  if (video_info === null) {
+    const search_results = await playdl.search(input, { limit: 1 });
 
-    if (!is_queue && any_audio_playing(guild_id)) {
-      client.streams[guild_id].queue.push(input);
-      return result;
-    }
-
-    client.streams[guild_id].yt_title = result.video_details.title;
-    client.streams[guild_id].yt_url = result.video_details.url;
-    client.streams[guild_id].yt_thumbnail_url = result.video_details.thumbnails[0].url;
-
-    client.streams[guild_id].looped_url = result.video_details.url;
-
-    await broadcast_audio(guild_id, await playdl.stream_from_info(result, options));
-    return result;
-  } else {
-    const results = await playdl.search(input, { limit: 1 });
-
-    if (results.length <= 0) {
+    if (search_results.length <= 0) {
       return null;
     }
 
-    const res = await playdl.video_info(results[0].url);
-
-    if (!is_queue && any_audio_playing(guild_id)) {
-      client.streams[guild_id].queue.push(results[0].url);
-      return res;
-    }
-
-    client.streams[guild_id].yt_title = res.video_details.title;
-    client.streams[guild_id].yt_url = res.video_details.url;
-    client.streams[guild_id].yt_thumbnail_url = res.video_details.thumbnails[0].url;
-
-    client.streams[guild_id].looped_url = results[0].url;
-
-    await broadcast_audio(guild_id, await playdl.stream_from_info(res, options));
-    return res;
+    video_info = await playdl.video_info(search_results[0].url);
   }
+
+  if (video_info === null) {
+    return null;
+  }
+
+  if (!is_queue && any_audio_playing(guild_id)) {
+    client.streams[guild_id].queue.push(input);
+    return video_info;
+  }
+
+  client.streams[guild_id].yt_title = video_info.video_details.title;
+  client.streams[guild_id].yt_url = video_info.video_details.url;
+  client.streams[guild_id].yt_thumbnail_url = video_info.video_details.thumbnails[0].url;
+
+  client.streams[guild_id].looped_url = video_info.video_details.url;
+
+  await broadcast_audio(guild_id, await playdl.stream_from_info(video_info, options));
 }
 
 export async function seek_audio(guild_id, timeSeconds) {
