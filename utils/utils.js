@@ -18,19 +18,19 @@ export function convert_seconds_to_minutes(value) {
 }
 
 export async function is_same_vc_as(user_id, guild_id, initial = false) {
-  const guild = client.guilds.cache.get(guild_id);
-  const user = await guild.members.fetch(user_id);
-  const bot = await guild.members.fetch(client.user.id);
-
   if (initial) {
     return true;
   }
 
-  if (!user.voice.channel || !bot.voice.channel) {
+  const guild = client.guilds.cache.get(guild_id);
+  const bot = guild.members.cache.get(client.user.id);
+  const user = guild.members.cache.get(user_id);
+
+  if (!bot.voice.channel || !user.voice.channel) {
     return false;
   }
 
-  return user.voice.channel && bot.voice.channel && user.voice.channel.id === bot.voice.channel.id;
+  return bot.voice.channel.id === user.voice.channel.id;
 }
 
 export function make_simple_embed(string) {
