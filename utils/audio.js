@@ -98,7 +98,6 @@ export function stop_audio(guild_id) {
   guild_stream.looped_url = null;
   guild_stream.force_stop = true;
   guild_stream.player.stop(true);
-
 }
 
 export function pause_audio(guild_id) {

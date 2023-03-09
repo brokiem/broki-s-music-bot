@@ -22,7 +22,7 @@ export const client = new discord.Client({
 const rest = new REST({ version: "10" }).setToken(token);
 
 const prefix = "!";
-const commands = [];
+//const commands = [];
 
 client.streams = new discord.Collection();
 client.commands = new discord.Collection();
@@ -38,7 +38,7 @@ client.on("ready", async () => {
   for await (const file of command_files) {
     const { data, execute } = await import(`./commands/${file}`);
 
-    commands.push(data.toJSON());
+    //commands.push(data.toJSON());
     client.commands.set(data.name, execute);
     console.log("Loaded command: " + data.name);
   }
@@ -231,6 +231,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
+    const guild_stream = client.streams.get(interaction.guildId);
     let inter = null;
 
     switch (interaction.customId) {
@@ -270,13 +271,11 @@ client.on("interactionCreate", async (interaction) => {
         });
         break;
       case "loop":
-        client.streams.get(interaction.guildId).loop = !client.streams.get(interaction.guildId).loop;
+        guild_stream.loop = !guild_stream.loop;
         inter = await interaction.reply({
           embeds: [
             make_simple_embed(
-              client.streams.get(interaction.guildId).loop
-                ? "Loop successfully **enabled** for current audio"
-                : "Loop successfully **disabled** for current audio"
+              guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"
             ).setFooter({
               text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
               iconURL: interaction.user.displayAvatarURL({ size: 16 }),

@@ -28,7 +28,9 @@ export async function execute(interaction) {
     return;
   }
 
-  if (client.streams.get(interaction.guildId).queue.length <= 0) {
+  const guild_stream = client.streams.get(interaction.guildId);
+
+  if (guild_stream.queue.length <= 0) {
     await interaction.editReply({
       embeds: [make_simple_embed("No queue left, cannot skipping")],
       allowedMentions: { repliedUser: false },
@@ -36,7 +38,7 @@ export async function execute(interaction) {
     return;
   }
 
-  const url = client.streams.get(interaction.guildId).queue.shift();
+  const url = guild_stream.queue.shift();
   const yt_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
 
   await interaction.editReply({

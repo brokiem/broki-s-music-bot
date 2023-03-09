@@ -22,11 +22,11 @@ export async function execute(interaction) {
     return;
   }
 
-  const promises = client.streams.get(interaction.guildId).queue.map(url => playdl.video_info(url));
+  const promises = queue.map((url) => playdl.video_info(url));
   const results = await Promise.all(promises);
 
   let q = "";
-  results.forEach(result => {
+  results.forEach((result) => {
     q += `- [${result.video_details.title}](${result.video_details.url}) (${convert_seconds_to_minutes(result.video_details.durationInSec)})\n`;
   });
 

@@ -20,14 +20,11 @@ export async function execute(interaction) {
     return;
   }
 
-  client.streams.get(interaction.guildId).loop = !client.streams.get(interaction.guildId).loop;
+  const guild_stream = client.streams.get(interaction.guildId);
+  guild_stream.loop = !guild_stream.loop;
   await interaction.editReply({
     embeds: [
-      make_simple_embed(
-        client.streams.get(interaction.guildId).loop
-          ? "Loop successfully **enabled** for current audio"
-          : "Loop successfully **disabled** for current audio"
-      ),
+      make_simple_embed(guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"),
     ],
     allowedMentions: { repliedUser: false },
   });
