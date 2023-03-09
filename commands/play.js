@@ -29,7 +29,7 @@ export async function execute(interaction) {
   const query = interaction.options.getString("query");
 
   await interaction.editReply({
-    embeds: [await make_simple_embed(`<a:loading:1032708714605592596> Searching for ${query}...`)],
+    embeds: [await make_simple_embed(`<a:loading:1032708714605592596> Searching for \`${query}\`...`)],
     allowedMentions: { repliedUser: false },
   });
 
