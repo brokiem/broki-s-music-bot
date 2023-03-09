@@ -24,7 +24,7 @@ const rest = new REST({ version: "10" }).setToken(token);
 const prefix = "!";
 const commands = [];
 
-client.streams = [];
+client.streams = new discord.Collection();
 client.commands = new discord.Collection();
 
 client.login(token).catch((e) => {
@@ -270,11 +270,11 @@ client.on("interactionCreate", async (interaction) => {
         });
         break;
       case "loop":
-        client.streams[interaction.guildId].loop = !client.streams[interaction.guildId].loop;
+        client.streams.get(interaction.guildId).loop = !client.streams.get(interaction.guildId).loop;
         inter = await interaction.reply({
           embeds: [
             make_simple_embed(
-              client.streams[interaction.guildId].loop
+              client.streams.get(interaction.guildId).loop
                 ? "Loop successfully **enabled** for current audio"
                 : "Loop successfully **disabled** for current audio"
             ).setFooter({

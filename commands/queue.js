@@ -13,7 +13,7 @@ export async function execute(interaction) {
     return;
   }
 
-  const queue = client.streams[interaction.guildId].queue;
+  const queue = client.streams.get(interaction.guildId).queue;
 
   if (queue.length <= 0) {
     await interaction.editReply({
@@ -22,17 +22,13 @@ export async function execute(interaction) {
     return;
   }
 
-  let q = "";
-
-  const promises = [];
-  for (const url of client.streams[interaction.guildId].queue) {
-    promises.push(playdl.video_info(url));
-  }
-
+  const promises = client.streams.get(interaction.guildId).queue.map(url => playdl.video_info(url));
   const results = await Promise.all(promises);
-  for (const result of results) {
-    q = q + `- [${result.video_details.title}](${result.video_details.url}) (${convert_seconds_to_minutes(result.video_details.durationInSec)})\n`;
-  }
+
+  let q = "";
+  results.forEach(result => {
+    q += `- [${result.video_details.title}](${result.video_details.url}) (${convert_seconds_to_minutes(result.video_details.durationInSec)})\n`;
+  });
 
   await interaction.editReply({
     embeds: [

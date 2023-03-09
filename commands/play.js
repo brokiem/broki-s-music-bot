@@ -36,7 +36,7 @@ export async function execute(interaction) {
     return;
   }
 
-  if (client.streams[interaction.guildId].queue.length >= 1) {
+  if (client.streams.get(interaction.guildId).queue.length >= 1) {
     await interaction.editReply({
       embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
       allowedMentions: { repliedUser: false },
