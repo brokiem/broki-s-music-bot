@@ -83,3 +83,13 @@ export function clean(text) {
     return text;
   }
 }
+
+export function getUptime() {
+  let totalSeconds = (client.uptime / 1000)
+  let hours = Math.floor(totalSeconds / 3600)
+  totalSeconds %= 3600
+  let minutes = Math.floor(totalSeconds / 60)
+  let seconds = totalSeconds % 60
+
+  return hours + "h, " + minutes + "m and " + seconds.toFixed(0) + "s"
+}

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { make_simple_embed } from "../utils/utils.js";
+import { getUptime, make_simple_embed } from "../utils/utils.js";
 import os from "os";
 import { client } from "../index.js";
 import discord from "discord.js";
@@ -26,6 +26,9 @@ export async function execute(interaction) {
           "• RAM Usage: " +
           Math.round(process.memoryUsage().rss / 10485.76) / 100 +
           " MB\n" +
+          "\n" +
+          "• Uptime: " +
+          getUptime() +
           "\n" +
           "• Latency: " +
           client.ws.ping +
