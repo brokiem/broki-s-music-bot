@@ -27,7 +27,6 @@ export async function execute(interaction) {
     allowedMentions: { repliedUser: false },
   });
 
-  console.log(queue)
   const promises = queue.map((url) => playdl.video_info(url));
   const results = await Promise.all(promises);
 

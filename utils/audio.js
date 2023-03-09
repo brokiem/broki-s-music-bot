@@ -44,7 +44,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   }
 
   if (!is_queue && any_audio_playing(guild_id)) {
-    guild_stream.queue.push(input);
+    guild_stream.queue.push(video_info.video_details.url);
     return video_info;
   }
 
