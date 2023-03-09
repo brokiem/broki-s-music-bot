@@ -54,6 +54,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   client.streams[guild_id].looped_url = video_info.video_details.url;
 
   await broadcast_audio(guild_id, await playdl.stream_from_info(video_info, options));
+  return video_info;
 }
 
 export async function seek_audio(guild_id, timeSeconds = 0) {
