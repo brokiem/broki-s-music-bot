@@ -63,7 +63,7 @@ export function get_control_button_row() {
 }
 
 export function leave_voice_channel(guild_id) {
-  if (client.streams[guild_id] === undefined) {
+  if (!client.streams.has(guild_id)) {
     return false;
   }
 
@@ -71,7 +71,7 @@ export function leave_voice_channel(guild_id) {
   conn?.disconnect();
   conn?.destroy();
 
-  delete client.streams[guild_id];
+  client.streams.delete(guild_id);
   console.log("Left voice channel in guild " + guild_id + "");
   return true;
 }

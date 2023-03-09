@@ -6,7 +6,7 @@ import playdl from "play-dl";
 export const data = new SlashCommandBuilder().setName("queue").setDescription("Show queue");
 
 export async function execute(interaction) {
-  if (client.streams[interaction.guildId] === undefined) {
+  if (!client.streams.has(interaction.guildId)) {
     await interaction.editReply({
       embeds: [make_simple_embed("No queue, start playing audio with /play")],
     });

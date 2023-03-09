@@ -20,7 +20,7 @@ export async function execute(interaction) {
     return;
   }
 
-  const stream_data = client.streams[interaction.guildId];
+  const stream_data = client.streams.get(interaction.guildId);
   await interaction.editReply({
     embeds: [
       make_playing_embed(interaction.guildId, interaction.member, null, stream_data.yt_title, stream_data.yt_url, stream_data.yt_thumbnail_url, true),

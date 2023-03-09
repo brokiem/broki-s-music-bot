@@ -69,10 +69,10 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     // Check if the bot was kicked from a voice channel
     if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
       // Check if the bot is in a voice channel
-      if (client.streams[oldState.guild.id]) {
+      if (client.streams.has(oldState.guild.id)) {
         // Stop the audio
         stop_audio(oldState.guild.id);
-        delete client.streams[oldState.guild.id];
+        client.streams.delete(oldState.guild.id);
         console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
         return;
       }
