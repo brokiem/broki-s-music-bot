@@ -27,10 +27,8 @@ export async function execute(interaction) {
     allowedMentions: { repliedUser: false },
   });
 
-  const promises = [];
-  for (const url of queue) {
-    promises.push(playdl.video_info(url));
-  }
+  console.log(queue)
+  const promises = queue.map((url) => playdl.video_info(url));
   const results = await Promise.all(promises);
 
   let q = "";
