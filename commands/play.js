@@ -28,6 +28,11 @@ export async function execute(interaction) {
 
   const query = interaction.options.getString("query");
 
+  await interaction.editReply({
+    embeds: [await make_simple_embed(`<a:loading:1032708714605592596> Searching for ${query}...`)],
+    allowedMentions: { repliedUser: false },
+  });
+
   const yt_data = await play_audio(query, interaction.guildId, interaction.member.voice.channelId);
 
   if (yt_data === null) {
