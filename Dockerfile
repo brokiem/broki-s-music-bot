@@ -1,12 +1,14 @@
-FROM node:19-alpine3.16
+FROM node
 
 WORKDIR /app
 
 COPY package.json ./
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-    apk add --no-cache libsodium && \
-    yarn install --production=true
+RUN apt-get update && \
+    apt-get install -y libsodium-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN yarn install --production=true
 
 COPY . .
 
