@@ -24,15 +24,22 @@ export async function execute(interaction) {
 
   const seekTime = interaction.options.getNumber("time");
 
-  await seek_audio(interaction.guildId, seekTime);
+  const video_info = await seek_audio(interaction.guildId, seekTime);
 
-  await interaction.editReply({
-    embeds: [
-      make_simple_embed(`Audio successfully seeked to ${convert_seconds_to_minutes(seekTime)}!`).setFooter({
-        text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
-        iconURL: interaction.member.user.displayAvatarURL({ size: 16 }),
-      }),
-    ],
-    allowedMentions: { repliedUser: false },
-  });
+  if (seekTime > video_info.video_details.durationInSec || seekTime < 0) {
+    await interaction.editReply({
+      embeds: [make_simple_embed(`Seeking beyond limit. [ 0 - ${video_info.video_details.durationInSec - 1}]`)],
+      allowedMentions: { repliedUser: false },
+    });
+  } else {
+    await interaction.editReply({
+      embeds: [
+        make_simple_embed(`Audio successfully seeked to ${convert_seconds_to_minutes(seekTime)}!`).setFooter({
+          text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
+          iconURL: interaction.member.user.displayAvatarURL({ size: 16 }),
+        }),
+      ],
+      allowedMentions: { repliedUser: false },
+    });
+  }
 }

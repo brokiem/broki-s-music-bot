@@ -7,7 +7,7 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   prepare_voice_connection(guild_id, voice_channel_id);
 
   const options = {
-    quality: 1
+    quality: 1,
   };
   let video_info = null;
 
@@ -38,6 +38,10 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     return null;
   }
 
+  if (options.seek && (options.seek > video_info.video_details.durationInSec || options.seek < 0)) {
+    options.seek = 0;
+  }
+
   if (!is_queue && any_audio_playing(guild_id)) {
     client.streams[guild_id].queue.push(input);
     return video_info;
@@ -52,13 +56,21 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   await broadcast_audio(guild_id, await playdl.stream_from_info(video_info, options));
 }
 
-export async function seek_audio(guild_id, timeSeconds) {
-  const stream = await playdl.stream(client.streams[guild_id].yt_url, {
-    seek: timeSeconds,
-    quality: 1,
-  });
+export async function seek_audio(guild_id, timeSeconds = 0) {
+  const video_info = await playdl.video_info(client.streams[guild_id].yt_url);
 
-  await broadcast_audio(guild_id, stream);
+  if (timeSeconds > video_info.video_details.durationInSec || timeSeconds < 0) {
+    return video_info;
+  }
+
+  await broadcast_audio(
+    guild_id,
+    await playdl.stream_from_info(video_info, {
+      quality: 1,
+      seek: timeSeconds,
+    })
+  );
+  return video_info;
 }
 
 export async function broadcast_audio(guild_id, stream) {
