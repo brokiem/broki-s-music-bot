@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder().setName("skip").setDescription("Sk
 export async function execute(interaction) {
   if (!interaction.member.roles.cache.find((role) => role.name.toLowerCase() === "dj")) {
     await interaction.editReply({
-      embeds: [make_simple_embed("You dont have permission!")],
+      embeds: [make_simple_embed("You dont have permission! (You need `DJ` role to skip)")],
     });
     return;
   }
