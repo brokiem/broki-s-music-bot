@@ -38,6 +38,11 @@ export async function execute(interaction) {
     return;
   }
 
+  await interaction.editReply({
+    embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Skipping to next queue...`)],
+    allowedMentions: { repliedUser: false },
+  });
+
   const url = guild_stream.queue.shift();
   const yt_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
 

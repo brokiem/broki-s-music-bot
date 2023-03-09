@@ -22,7 +22,15 @@ export async function execute(interaction) {
     return;
   }
 
-  const promises = queue.map((url) => playdl.video_info(url));
+  await interaction.editReply({
+    embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Fetching queue...`)],
+    allowedMentions: { repliedUser: false },
+  });
+
+  const promises = [];
+  for (const url of queue) {
+    promises.push(playdl.video_info(url));
+  }
   const results = await Promise.all(promises);
 
   let q = "";
