@@ -9,8 +9,8 @@ export const data = new SlashCommandBuilder()
   .addStringOption((option) => option.setName("query").setDescription("Audio search query").setRequired(true));
 
 export async function execute(interaction) {
-  const guild_stream = client.streams.get(interaction.guildId);
   const initial = !any_audio_playing(interaction.guildId);
+  const guild_stream = client.streams.get(interaction.guildId);
 
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId, initial))) {
     await interaction.editReply({
@@ -37,7 +37,7 @@ export async function execute(interaction) {
     return;
   }
 
-  if (guild_stream.queue.length >= 1) {
+  if (guild_stream?.queue?.length >= 1) {
     await interaction.editReply({
       embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data).setTitle("Added to queue").setColor("#44DDBF")],
       allowedMentions: { repliedUser: false },
