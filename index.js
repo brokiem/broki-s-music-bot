@@ -139,6 +139,14 @@ client.on("messageCreate", async (message) => {
       }
 
       switch (args.shift().toLowerCase()) {
+        case "servers":
+          if (message.author.id === "548120702373593090") {
+            await message.reply({
+              embeds: [make_simple_embed("Servers: (" + client.guilds.cache.size + ")\n - " + [...client.guilds.cache].join("\n - "))],
+              allowedMentions: { repliedUser: false },
+            });
+          }
+          break;
         case "restart":
           if (message.author.id === "548120702373593090") {
             await message.reply({
