@@ -2,8 +2,6 @@
 
 import discord from "discord.js";
 import * as fs from "fs";
-import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v10";
 import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean } from "./utils/utils.js";
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
 import { inspect } from "util";
@@ -19,10 +17,8 @@ export const client = new discord.Client({
     discord.GatewayIntentBits.GuildVoiceStates,
   ],
 });
-const rest = new REST({ version: "10" }).setToken(token);
 
 const prefix = "!";
-//const commands = [];
 
 client.streams = new discord.Collection();
 client.commands = new discord.Collection();
@@ -38,30 +34,12 @@ client.on("ready", async () => {
   for await (const file of command_files) {
     const { data, execute } = await import(`./commands/${file}`);
 
-    //commands.push(data.toJSON());
     client.commands.set(data.name, execute);
     //console.log("Loaded command: " + data.name);
   }
   console.log("Loaded " + client.commands.size + " commands!\n");
 
-  //console.log(`Started refreshing application (/) commands.`);
-  const promises = [];
-  for await (const guild of client.guilds.cache.values()) {
-    const registered_cmds = await rest.get(Routes.applicationGuildCommands(client.user.id, guild.id));
-    for (const command of registered_cmds) {
-      // Delete all commands
-      promises.push(rest.delete(Routes.applicationGuildCommand(client.user.id, guild.id, command.id)));
-    }
-  }
-
-  if (promises.length > 0) {
-    Promise.all(promises).then(() => {
-      console.log("Deleted all commands from all guilds.");
-    });
-  }
-  //console.log('Successfully reloaded application (/) commands.');
-
-  console.log("\nBot is ready!\n");
+  console.log("Bot is ready!\n");
 });
 
 client.on("voiceStateUpdate", (oldState, newState) => {
@@ -94,14 +72,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     console.error(e);
   }
 });
-
-// client.on("guildCreate", async guild => {
-//     // Register commands
-//     console.log(`Registering ${commands.length} commands for guild with ID ${guild.id}...`)
-//
-//     await rest.put(Routes.applicationGuildCommands(client.user.id, guild.id), {body: commands})
-//     console.log(`Successfully registered ${commands.length} commands for guild with ID ${guild.id}`);
-// });
 
 client.on("messageCreate", async (message) => {
   try {
