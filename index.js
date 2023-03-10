@@ -40,7 +40,7 @@ client.on("ready", async () => {
 
     //commands.push(data.toJSON());
     client.commands.set(data.name, execute);
-    console.log("Loaded command: " + data.name);
+    //console.log("Loaded command: " + data.name);
   }
   console.log("Loaded " + client.commands.size + " commands!\n");
 
