@@ -93,3 +93,16 @@ export function getUptime() {
 
   return hours + "h, " + minutes + "m and " + seconds.toFixed(0) + "s";
 }
+
+export function is_voted(user_id) {
+  return client.topgg_api.hasVoted(user_id);
+}
+
+export function post_stats() {
+  console.log("Posting stats...");
+  client.topgg_api.postStats({
+    serverCount: client.guilds.cache.size,
+    shardCount: 1,
+  });
+  console.log("Stats posted successfully!\n");
+}

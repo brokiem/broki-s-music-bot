@@ -2,9 +2,10 @@
 
 import discord from "discord.js";
 import * as fs from "fs";
-import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean } from "./utils/utils.js";
+import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean, post_stats } from "./utils/utils.js";
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
 import { inspect } from "util";
+import topgg from "@top-gg/sdk";
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -22,6 +23,7 @@ const prefix = "!";
 
 client.streams = new discord.Collection();
 client.commands = new discord.Collection();
+client.topgg_api = new topgg.Api(process.env.TOPGG_TOKEN);
 
 client.login(token).catch((e) => {
   console.error("The bot token was incorrect.\n" + e);
@@ -38,6 +40,8 @@ client.on("ready", async () => {
     //console.log("Loaded command: " + data.name);
   }
   console.log("Loaded " + client.commands.size + " commands!\n");
+
+  post_stats();
 
   console.log("Bot is ready!\n");
 });
@@ -161,6 +165,14 @@ client.on("messageCreate", async (message) => {
       process.exit();
     }
   }
+});
+
+client.on("guildCreate", async () => {
+  post_stats();
+});
+
+client.on("guildDelete", async () => {
+  post_stats();
 });
 
 client.on("interactionCreate", async (interaction) => {

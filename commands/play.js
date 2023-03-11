@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row } from "../utils/utils.js";
+import { is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row, is_voted } from "../utils/utils.js";
 import { any_audio_playing, play_audio } from "../utils/audio.js";
 import { client } from "../index.js";
 
@@ -20,10 +20,23 @@ export async function execute(interaction) {
   }
 
   if (guild_stream?.queue?.length >= 5) {
-    await interaction.editReply({
-      embeds: [make_simple_embed("Queue is full (max 5)!")],
-    });
-    return;
+    if (!is_voted(interaction.member.id)) {
+      await interaction.editReply({
+        embeds: [
+          make_simple_embed(
+            "Queue is full (max 5)! However, you can unlock more queue slots by [voting for the bot](https://top.gg/bot/961240507894353970/vote)! (You can vote every 12 hours)"
+          ),
+        ],
+      });
+      return;
+    }
+
+    if (guild_stream?.queue?.length >= 15) {
+      await interaction.editReply({
+        embeds: [make_simple_embed("Queue is full (max 15)!")],
+      });
+      return;
+    }
   }
 
   const query = interaction.options.getString("query");
