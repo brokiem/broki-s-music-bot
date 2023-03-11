@@ -20,7 +20,7 @@ export async function execute(interaction) {
   }
 
   if (guild_stream?.queue?.length >= 5) {
-    if (!is_voted(interaction.member.id)) {
+    if (!(await is_voted(interaction.member.id))) {
       await interaction.editReply({
         embeds: [
           make_simple_embed(
