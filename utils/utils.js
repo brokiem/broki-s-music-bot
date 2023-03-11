@@ -121,7 +121,7 @@ export function post_stats() {
   client.topgg_api
     .postStats({
       serverCount: client.guilds.cache.size,
-      shardCount: client.shard?.count,
+      shardCount: client.shard?.count ?? 1,
     })
     .catch((e) => {
       console.log("Looks like the stats couldn't be posted! :(");
