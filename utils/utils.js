@@ -94,21 +94,26 @@ export function getUptime() {
   return hours + "h, " + minutes + "m and " + seconds.toFixed(0) + "s";
 }
 
-export function is_voted(user_id) {
+export async function is_voted(user_id) {
   return new Promise((resolve, reject) => {
-    client.topgg_api.hasVoted(user_id).then((voted) => {
-      resolve(voted);
-    }).catch(() => {
-      resolve(false);
-    });
+    client.topgg_api
+      .hasVoted(user_id)
+      .then((voted) => {
+        resolve(voted);
+      })
+      .catch(() => {
+        resolve(false);
+      });
   });
 }
 
 export function post_stats() {
   console.log("Posting stats...");
-  client.topgg_api.postStats({
-    serverCount: client.guilds.cache.size,
-    shardCount: client.shard?.count,
-  }).catch(() => {});
+  client.topgg_api
+    .postStats({
+      serverCount: client.guilds.cache.size,
+      shardCount: client.shard?.count,
+    })
+    .catch(() => {});
   console.log("Stats posted successfully!\n");
 }
