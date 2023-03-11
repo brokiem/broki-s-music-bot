@@ -68,7 +68,6 @@ export function leave_voice_channel(guild_id) {
   }
 
   const conn = voice.getVoiceConnection(guild_id);
-  conn?.disconnect();
   conn?.destroy();
 
   client.streams.delete(guild_id);
