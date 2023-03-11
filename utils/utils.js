@@ -96,14 +96,23 @@ export function getUptime() {
 
 export async function is_voted(user_id) {
   return new Promise((resolve, reject) => {
+    // Set a timeout for 5 seconds
+    const timeoutId = setTimeout(() => {
+      resolve(false);
+      console.log("API request timed out! :(");
+    }, 5000);
+
     client.topgg_api
       .hasVoted(user_id)
       .then((voted) => {
+        clearTimeout(timeoutId); // Clear the timeout if the request is successful
         resolve(voted);
       })
-      .catch(() => {
+      .catch((e) => {
+        clearTimeout(timeoutId); // Clear the timeout if the request fails
         resolve(false);
-        console.log("Failed to check if user has voted! :(")
+        console.log("Failed to check if user has voted! :(");
+        console.log(e);
       });
   });
 }
@@ -115,8 +124,9 @@ export function post_stats() {
       serverCount: client.guilds.cache.size,
       shardCount: client.shard?.count,
     })
-    .catch(() => {
-      console.log("Looks like the stats couldn't be posted! :(")
+    .catch((e) => {
+      console.log("Looks like the stats couldn't be posted! :(");
+      console.log(e);
     });
   console.log("Stats posted successfully!\n");
 }
