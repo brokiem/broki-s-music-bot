@@ -103,6 +103,7 @@ export async function is_voted(user_id) {
       })
       .catch(() => {
         resolve(false);
+        console.log("Failed to check if user has voted! :(")
       });
   });
 }
@@ -114,6 +115,8 @@ export function post_stats() {
       serverCount: client.guilds.cache.size,
       shardCount: client.shard?.count,
     })
-    .catch(() => {});
+    .catch(() => {
+      console.log("Looks like the stats couldn't be posted! :(")
+    });
   console.log("Stats posted successfully!\n");
 }
