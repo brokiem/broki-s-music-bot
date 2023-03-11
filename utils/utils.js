@@ -100,7 +100,7 @@ export async function is_voted(user_id) {
     const timeoutId = setTimeout(() => {
       resolve(false);
       console.log("API request timed out! :(");
-    }, 5000);
+    }, 2000);
 
     client.topgg_api
       .hasVoted(user_id)
