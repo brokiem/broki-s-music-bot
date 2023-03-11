@@ -81,9 +81,6 @@ export async function broadcast_audio(guild_id, stream) {
   guild_stream.resource = voice.createAudioResource(stream.stream, {
     inputType: stream.type,
   });
-  guild_stream.resource.playStream.on("error", (error) => {
-    console.error(error);
-  });
 
   guild_stream.player.play(guild_stream.resource);
   voice.getVoiceConnection(guild_id).subscribe(guild_stream.player);
