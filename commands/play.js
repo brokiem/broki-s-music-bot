@@ -11,6 +11,14 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const guild = client.guilds.cache.get(interaction.guildId);
   const bot = guild.members.cache.get(client.user.id);
+  const user = guild.members.cache.get(interaction.member.id);
+
+  if (!user.voice.channel) {
+    await interaction.editReply({
+      embeds: [make_simple_embed("You are not in a voice channel!")],
+    });
+    return;
+  }
 
   if (bot.voice.channel) {
     if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
