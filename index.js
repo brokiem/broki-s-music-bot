@@ -6,6 +6,7 @@ import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean, post_stat
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
 import { inspect } from "util";
 import topgg from "@top-gg/sdk";
+import * as voice from "@discordjs/voice";
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -55,6 +56,10 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         // Stop the audio
         stop_audio(oldState.guild.id);
         client.streams.delete(oldState.guild.id);
+
+        const conn = voice.getVoiceConnection(oldState.guild.id);
+        conn?.destroy();
+
         console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
         return;
       }
