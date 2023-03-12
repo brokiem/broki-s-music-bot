@@ -9,11 +9,16 @@ export const data = new SlashCommandBuilder()
   .addStringOption((option) => option.setName("query").setDescription("Audio search query").setRequired(true));
 
 export async function execute(interaction) {
-  if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.editReply({
-      embeds: [make_simple_embed("You are not in the same voice channel!")],
-    });
-    return;
+  const guild = client.guilds.cache.get(interaction.guildId);
+  const bot = guild.members.cache.get(client.user.id);
+
+  if (bot.voice.channel) {
+    if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
+      await interaction.editReply({
+        embeds: [make_simple_embed("You are not in the same voice channel!")],
+      });
+      return;
+    }
   }
 
   const guild_stream = client.streams.get(interaction.guildId);

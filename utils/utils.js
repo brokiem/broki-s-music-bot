@@ -1,7 +1,6 @@
 import { client } from "../index.js";
 import discord from "discord.js";
 import * as voice from "@discordjs/voice";
-import { any_audio_playing } from "./audio.js";
 
 export function convert_seconds_to_minutes(value) {
   const hrs = ~~(value / 3600);
@@ -23,11 +22,11 @@ export async function is_same_vc_as(user_id, guild_id) {
   const bot = guild.members.cache.get(client.user.id);
   const user = guild.members.cache.get(user_id);
 
-  if (bot.voice.channel) {
-    return bot.voice.channel.id === user.voice.channel.id;
+  if (!bot.voice.channel || !user.voice.channel) {
+    return false;
   }
 
-  return true;
+  return bot.voice.channel.id === user.voice.channel.id;
 }
 
 export function make_simple_embed(string) {
