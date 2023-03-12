@@ -23,10 +23,12 @@ export async function is_same_vc_as(user_id, guild_id) {
   const bot = guild.members.cache.get(client.user.id);
   const user = guild.members.cache.get(user_id);
 
-  if (!any_audio_playing(guild_id) && bot.voice.channel) {
-    if (bot.voice.channel.id === user.voice.channel.id) {
-      return true;
+  if (!any_audio_playing(guild_id)) {
+    if (bot.voice.channel) {
+      return bot.voice.channel.id === user.voice.channel.id;
     }
+
+    return true;
   }
 
   if (!bot.voice.channel || !user.voice.channel) {
