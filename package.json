@@ -12,7 +12,8 @@
     "discord.js": "^14.7.1",
     "play-dl": "^1.9.6",
     "prettier": "^2.8.4",
-    "sodium-native": "latest"
+    "sodium-native": "latest",
+    "ffmpeg-static": "^5.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
