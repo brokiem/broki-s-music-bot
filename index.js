@@ -192,9 +192,12 @@ client.on("interactionCreate", async (interaction) => {
       await execute(interaction);
     } catch (error) {
       console.error(error);
-      await interaction.editReply({
-        content: "There was an error while executing this command!",
-      });
+
+      setTimeout(async () => {
+        await interaction.editReply({
+          content: "There was an error while executing this command!",
+        });
+      }, 5);
 
       if (error.toString().includes("429")) {
         process.exit();
