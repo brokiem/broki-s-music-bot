@@ -49,6 +49,8 @@ export async function execute(interaction) {
       return;
     }
 
+    clearTimeout(timeoutId);
+
     if (guild_stream?.queue?.length >= 15) {
       await interaction.editReply({
         embeds: [make_simple_embed("Queue is full (max 15)!")],
