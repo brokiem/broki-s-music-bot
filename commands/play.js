@@ -31,7 +31,14 @@ export async function execute(interaction) {
 
   const guild_stream = client.streams.get(interaction.guildId);
   if (guild_stream?.queue?.length >= 5) {
+    const timeoutId = setTimeout(async () => {
+      await interaction.editReply({
+        embeds: [make_simple_embed("<a:loading:1032708714605592596>  Loading...")],
+      });
+    }, 1500);
+
     if (!(await is_voted(interaction.member.id))) {
+      clearTimeout(timeoutId);
       await interaction.editReply({
         embeds: [
           make_simple_embed(

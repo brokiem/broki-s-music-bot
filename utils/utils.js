@@ -91,11 +91,11 @@ export function getUptime() {
 
 export async function is_voted(user_id) {
   return new Promise((resolve, reject) => {
-    // Set a timeout for 5 seconds
+    // Set a timeout for 6 seconds
     const timeoutId = setTimeout(() => {
       resolve(false);
       console.log("API request timed out! :(");
-    }, 2000);
+    }, 6000);
 
     client.topgg_api
       .hasVoted(user_id)
