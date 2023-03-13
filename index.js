@@ -70,13 +70,15 @@ client.on("voiceStateUpdate", (oldState, newState) => {
       if (oldState.channel.members.size === 1 && oldState.channel.members.first().user.id === client.user.id) {
         const guild_stream = client.streams.get(oldState.guild.id);
 
-        clearTimeout(guild_stream.leave_timeout_id);
-        guild_stream.leave_timeout_id = setTimeout(async () => {
-          const channel = await client.channels.fetch(oldState.channel.id);
-          if (channel && channel.members.size === 1) {
-            leave_voice_channel(oldState.guild.id);
-          }
-        }, 30000);
+        if (guild_stream !== undefined) {
+          clearTimeout(guild_stream.leave_timeout_id);
+          guild_stream.leave_timeout_id = setTimeout(async () => {
+            const channel = await client.channels.fetch(oldState.channel.id);
+            if (channel && channel.members.size === 1) {
+              leave_voice_channel(oldState.guild.id);
+            }
+          }, 30000);
+        }
       }
     }
   } catch (e) {
