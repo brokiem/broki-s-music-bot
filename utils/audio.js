@@ -127,6 +127,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       yt_url: undefined,
       yt_thumbnail_url: undefined,
       queue: [],
+      leave_timeout_id: null,
     });
 
     const guild_stream = client.streams.get(guild_id);
