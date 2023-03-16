@@ -197,6 +197,8 @@ client.on("interactionCreate", async (interaction) => {
 
     const execute = client.commands.get(interaction.commandName);
 
+    console.log("Executing command " + interaction.commandName + " (ephemeral: " + interaction.options.getBoolean("ephemeral") + ")
+
     if (!execute) {
       await interaction.editReply({
         embeds: [make_simple_embed("There was an error while executing this command!")],
