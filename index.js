@@ -189,6 +189,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
     // Check if the interaction is valid
     if (interaction.replied || interaction.deferred || !interaction.channel) {
+      console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
       return;
     }
 
