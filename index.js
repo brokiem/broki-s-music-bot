@@ -196,7 +196,12 @@ client.on("interactionCreate", async (interaction) => {
 
     const execute = client.commands.get(interaction.commandName);
 
-    if (!execute) return;
+    if (!execute) {
+      await interaction.editReply({
+        embeds: [make_simple_embed("There was an error while executing this command!")],
+      });
+      return;
+    }
 
     try {
       await execute(interaction);
