@@ -161,17 +161,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     });
 
     new_voice_connection.on(voice.VoiceConnectionStatus.Disconnected, on_disconnect);
-    new_voice_connection.on("stateChange", (oldState, newState) => {
-      Reflect.get(oldState, "networking")?.off("stateChange", networkStateChangeHandler);
-      Reflect.get(newState, "networking")?.on("stateChange", networkStateChangeHandler);
-    });
   }
 }
-
-const networkStateChangeHandler = (_, newNetworkState) => {
-  const newUdp = Reflect.get(newNetworkState, "udp");
-  clearInterval(newUdp?.keepAliveInterval);
-};
 
 export function any_audio_playing(guild_id) {
   const guild_stream = client.streams.get(guild_id);
