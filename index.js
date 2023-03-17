@@ -191,12 +191,14 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    //await interaction.deferReply();
+    await interaction.reply({
+      embeds: [make_simple_embed("Loading...")],
+    });
 
     const execute = client.commands.get(interaction.commandName);
 
     if (interaction.commandName === "help") {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [make_simple_embed("Success")],
       });
       return;
