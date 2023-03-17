@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY package.json ./
 
-RUN sudo apt update && \
-    sudo apt install -y libsodium ffmpeg libssl-dev && \
+RUN apt update && \
+    apt install -y libsodium ffmpeg libssl-dev && \
     yarn install --production=true
 
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
