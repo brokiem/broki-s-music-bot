@@ -195,6 +195,13 @@ client.on("interactionCreate", async (interaction) => {
 
     const execute = client.commands.get(interaction.commandName);
 
+    if (interaction.commandName === "help") {
+      await interaction.editReply({
+        embeds: [make_simple_embed("Success")],
+      });
+      return;
+    }
+
     console.log("Executing command " + interaction.commandName);
 
     if (!execute) {
