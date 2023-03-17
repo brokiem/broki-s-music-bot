@@ -199,8 +199,9 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    await interaction.reply({content: "Loading...", ephemeral: true, fetchReply: true});
-    interaction.deleteReply();
+    interaction.reply({content: "Loading...", ephemeral: true, fetchReply: true}).then(async () => {
+      interaction.deleteReply().then(() => {});
+    });
 
     const execute = client.commands.get(interaction.commandName);
 
