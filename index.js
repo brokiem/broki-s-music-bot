@@ -194,7 +194,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    if (true) {
+    if (interaction.user.id !== "548120702373593090") {
       await interaction.reply({
         embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
       })
