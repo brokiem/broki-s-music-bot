@@ -193,7 +193,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply();
 
     const execute = client.commands.get(interaction.commandName);
 
