@@ -188,20 +188,20 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand()) {
     // Check if the interaction is valid
     if (interaction.replied || interaction.deferred || !interaction.channel) {
-      console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
+      console.log(
+        "Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")"
+      );
       return;
     }
 
-    if (is_maintenance && (interaction.user.id !== "548120702373593090")) {
+    if (is_maintenance && interaction.user.id !== "548120702373593090") {
       await interaction.reply({
         embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
-      })
+      });
       return;
     }
 
-    interaction.reply({content: "_ _", fetchReply: true}).then(async () => {
-      interaction.deleteReply().then(() => {});
-    });
+    interaction.reply({ content: "_ _", fetchReply: true });
 
     const execute = client.commands.get(interaction.commandName);
 
