@@ -42,6 +42,8 @@ client.on("ready", async () => {
   }
   console.log("Loaded " + client.commands.size + " commands!\n");
 
+  post_stats();
+
   console.log("Bot is ready!\n");
 });
 
@@ -191,23 +193,10 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    await interaction.reply({
-      embeds: [make_simple_embed("Loading...")],
-    });
-
     const execute = client.commands.get(interaction.commandName);
 
-    if (interaction.commandName === "help") {
-      await interaction.editReply({
-        embeds: [make_simple_embed("Success")],
-      });
-      return;
-    }
-
-    console.log("Executing command " + interaction.commandName);
-
     if (!execute) {
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [make_simple_embed("There was an error while executing this command!")],
       });
       return;

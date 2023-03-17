@@ -7,14 +7,14 @@ export const data = new SlashCommandBuilder().setName("loop").setDescription("Lo
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("No audio is currently playing")],
     });
     return;
@@ -22,7 +22,7 @@ export async function execute(interaction) {
 
   const guild_stream = client.streams.get(interaction.guildId);
   guild_stream.loop = !guild_stream.loop;
-  await interaction.editReply({
+  await interaction.reply({
     embeds: [
       make_simple_embed(guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"),
     ],
