@@ -191,20 +191,16 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    await interaction.reply({
-      embeds: [make_simple_embed("Loading...")],
-    });
-
-    const execute = client.commands.get(interaction.commandName);
-
-    if (interaction.commandName === "help") {
-      await interaction.editReply({
-        embeds: [make_simple_embed("Success")],
-      });
+    if (true) {
+      await interaction.reply({
+        embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
+      })
       return;
     }
 
-    console.log("Executing command " + interaction.commandName);
+    await interaction.deferReply();
+
+    const execute = client.commands.get(interaction.commandName);
 
     if (!execute) {
       await interaction.editReply({
