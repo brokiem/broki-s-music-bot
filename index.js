@@ -30,6 +30,9 @@ client.login(token).catch((e) => {
   console.error("The bot token was incorrect.\n" + e);
 });
 
+client.on('debug', console.log);
+client.on('warn', console.log);
+
 client.on("ready", async () => {
   console.log("Loading commands...");
 
