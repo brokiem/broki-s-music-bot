@@ -21,6 +21,7 @@ export const client = new discord.Client({
 });
 
 const prefix = "!";
+const is_maintenance = process.env.MAINTENANCE === "true" || false;
 
 client.streams = new discord.Collection();
 client.commands = new discord.Collection();
@@ -29,9 +30,6 @@ client.topgg_api = new topgg.Api(process.env.TOPGG_TOKEN);
 client.login(token).catch((e) => {
   console.error("The bot token was incorrect.\n" + e);
 });
-
-client.on('debug', console.log);
-client.on('warn', console.log);
 
 client.on("ready", async () => {
   console.log("Loading commands...");
@@ -194,7 +192,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    if (interaction.user.id !== "548120702373593090") {
+    if (is_maintenance && (interaction.user.id !== "548120702373593090")) {
       await interaction.reply({
         embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
       })
