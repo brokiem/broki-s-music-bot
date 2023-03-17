@@ -6,7 +6,7 @@ export const data = new SlashCommandBuilder().setName("leave").setDescription("L
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
@@ -14,7 +14,7 @@ export async function execute(interaction) {
 
   const voice_channel = client.guilds.cache.get(interaction.guildId).voiceStates.cache.find((vs) => vs.member.user.id === client.user.id)?.channel;
 
-  await interaction.editReply({
+  await interaction.channel.send({
     embeds: [make_simple_embed("Leaving voice channel <#" + voice_channel.id + ">")],
   });
 

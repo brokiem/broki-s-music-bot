@@ -14,7 +14,7 @@ export async function execute(interaction) {
   const user = guild.members.cache.get(interaction.member.id);
 
   if (!user.voice.channel) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("You are not in a voice channel!")],
     });
     return;
@@ -22,46 +22,59 @@ export async function execute(interaction) {
 
   if (bot.voice.channel) {
     if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-      await interaction.editReply({
+      await interaction.channel.send({
         embeds: [make_simple_embed("You are not in the same voice channel!")],
       });
       return;
     }
   }
 
+  let message = null;
   const guild_stream = client.streams.get(interaction.guildId);
   if (guild_stream?.queue?.length >= 5) {
     const timeoutId = setTimeout(async () => {
-      await interaction.editReply({
+      message = await interaction.channel.send({
         embeds: [make_simple_embed("<a:loading:1032708714605592596>  Loading...")],
       });
     }, 1500);
 
     if (!(await is_voted(interaction.member.id))) {
       clearTimeout(timeoutId);
-      await interaction.editReply({
+      const contents = {
         embeds: [
           make_simple_embed(
             "Queue is full (max 5)! However, you can unlock more queue slots by [voting for the bot](https://top.gg/bot/961240507894353970/vote)! (You can vote every 12 hours)"
           ),
         ],
-      });
+      };
+
+      if (message) {
+        await message.edit(contents);
+      } else {
+        await interaction.channel.send(contents);
+      }
       return;
     }
 
     clearTimeout(timeoutId);
 
     if (guild_stream?.queue?.length >= 10) {
-      await interaction.editReply({
+      const contents = {
         embeds: [make_simple_embed("Queue is full (max 10)!")],
-      });
+      };
+
+      if (message) {
+        await message.edit(contents);
+      } else {
+        await interaction.channel.send(contents);
+      }
       return;
     }
   }
 
   const query = interaction.options.getString("query");
 
-  await interaction.editReply({
+  message = await interaction.channel.send({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Searching for \`${query}\`...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -69,14 +82,14 @@ export async function execute(interaction) {
   const yt_data = await play_audio(query, interaction.guildId, interaction.member.voice.channelId);
 
   if (yt_data === null) {
-    await interaction.editReply({
+    await message.edit({
       embeds: [make_simple_embed("No results found!")],
     });
     return;
   }
 
   if (guild_stream?.queue?.length >= 1) {
-    await interaction.editReply({
+    await message.edit({
       embeds: [
         await make_playing_embed(interaction.guildId, interaction.member, yt_data)
           .setTitle(`Added to queue (${guild_stream?.queue?.length})`)
@@ -85,7 +98,7 @@ export async function execute(interaction) {
       allowedMentions: { repliedUser: false },
     });
   } else {
-    await interaction.editReply({
+    await message.edit({
       embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data)],
       components: [get_control_button_row()],
       allowedMentions: { repliedUser: false },

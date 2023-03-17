@@ -9,14 +9,14 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("No audio is currently playing")],
     });
     return;
@@ -24,7 +24,7 @@ export async function execute(interaction) {
 
   const seekTime = interaction.options.getNumber("time");
 
-  await interaction.editReply({
+  let message = await interaction.channel.send({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Seeking to ${convert_seconds_to_minutes(seekTime)}...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -32,12 +32,12 @@ export async function execute(interaction) {
   const video_info = await seek_audio(interaction.guildId, seekTime);
 
   if (seekTime > video_info.video_details.durationInSec || seekTime < 0) {
-    await interaction.editReply({
+    await message.edit({
       embeds: [make_simple_embed(`Seeking beyond limit. [ 0 - ${video_info.video_details.durationInSec - 1}]`)],
       allowedMentions: { repliedUser: false },
     });
   } else {
-    await interaction.editReply({
+    await message.edit({
       embeds: [
         make_simple_embed(`Audio successfully seeked to ${convert_seconds_to_minutes(seekTime)}!`).setFooter({
           text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
