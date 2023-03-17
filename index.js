@@ -199,7 +199,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    interaction.reply({content: "Loading...", ephemeral: true, fetchReply: true}).then(async () => {
+    interaction.reply({content: "Loading...", fetchReply: true}).then(async () => {
       interaction.deleteReply().then(() => {});
     });
 
