@@ -184,19 +184,19 @@ client.on("guildDelete", async () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (interaction.isCommand()) {
+  if (interaction.isChatInputCommand()) {
     // Check if the interaction is valid
     if (interaction.replied || interaction.deferred || !interaction.channel) {
       console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
       return;
     }
 
-    await interaction.deferReply();
+    //await interaction.deferReply();
 
     const execute = client.commands.get(interaction.commandName);
 
     if (interaction.commandName === "help") {
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [make_simple_embed("Success")],
       });
       return;
