@@ -201,7 +201,7 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    interaction.reply({ content: "_ _", fetchReply: true });
+    interaction.reply({ content: "Loading...", fetchReply: true });
 
     const execute = client.commands.get(interaction.commandName);
 
