@@ -6,14 +6,14 @@ export const data = new SlashCommandBuilder().setName("pause").setDescription("P
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [make_simple_embed("No audio is currently playing")],
     });
     return;
@@ -22,12 +22,12 @@ export async function execute(interaction) {
   // 0 = resumed
   // 1 = paused
   if (pause_audio(interaction.guildId) === 0) {
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [make_simple_embed("The currently playing audio has been successfully **resumed**")],
       allowedMentions: { repliedUser: false },
     });
   } else {
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [make_simple_embed("The currently playing audio has been successfully **paused**")],
       allowedMentions: { repliedUser: false },
     });

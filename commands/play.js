@@ -14,7 +14,7 @@ export async function execute(interaction) {
   const user = guild.members.cache.get(interaction.member.id);
 
   if (!user.voice.channel) {
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [make_simple_embed("You are not in a voice channel!")],
     });
     return;
@@ -22,7 +22,7 @@ export async function execute(interaction) {
 
   if (bot.voice.channel) {
     if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [make_simple_embed("You are not in the same voice channel!")],
       });
       return;
@@ -32,7 +32,7 @@ export async function execute(interaction) {
   const guild_stream = client.streams.get(interaction.guildId);
   if (guild_stream?.queue?.length >= 5) {
     const timeoutId = setTimeout(async () => {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [make_simple_embed("<a:loading:1032708714605592596>  Loading...")],
       });
     }, 1500);
