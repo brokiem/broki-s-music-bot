@@ -42,8 +42,6 @@ client.on("ready", async () => {
   }
   console.log("Loaded " + client.commands.size + " commands!\n");
 
-  post_stats();
-
   console.log("Bot is ready!\n");
 });
 
