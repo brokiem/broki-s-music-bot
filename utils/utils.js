@@ -67,7 +67,7 @@ export function leave_voice_channel(guild_id) {
   }
 
   client.streams.delete(guild_id);
-  console.log("Left voice channel in guild " + guild_id + "");
+  //console.log("Left voice channel in guild " + guild_id + "");
   return true;
 }
 
@@ -106,22 +106,22 @@ export async function is_voted(user_id) {
       .catch((e) => {
         clearTimeout(timeoutId); // Clear the timeout if the request fails
         resolve(false);
-        console.log("Failed to check if user has voted! :(");
+        //console.log("Failed to check if user has voted! :(");
         console.log(e);
       });
   });
 }
 
 export function post_stats() {
-  console.log("Posting stats...");
+  //console.log("Posting stats...");
   client.topgg_api
     .postStats({
       serverCount: client.guilds.cache.size,
       shardCount: client.shard?.count ?? 1,
     })
     .catch((e) => {
-      console.log("Looks like the stats couldn't be posted! :(");
+      //console.log("Looks like the stats couldn't be posted! :(");
       console.log(e);
     });
-  console.log("Stats posted successfully!\n");
+  //console.log("Stats posted successfully!\n");
 }

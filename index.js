@@ -59,7 +59,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         const conn = voice.getVoiceConnection(oldState.guild.id);
         conn?.destroy();
 
-        console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
+        //console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
         return;
       }
     }
@@ -81,7 +81,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
       }
     }
   } catch (e) {
-    console.log("An error occurred!");
+    //console.log("An error occurred!");
     console.error(e);
   }
 });
@@ -167,7 +167,7 @@ client.on("messageCreate", async (message) => {
     await message.reply({
       content: "There was an error while executing this command!",
     });
-    console.log("An error occurred!");
+    //console.log("An error occurred!");
     console.error(e);
 
     if (e.toString().includes("429")) {
