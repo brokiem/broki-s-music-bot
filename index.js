@@ -201,12 +201,12 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    interaction.reply({ content: "Loading...", fetchReply: true });
+    await interaction.deferReply();
 
     const execute = client.commands.get(interaction.commandName);
 
     if (!execute) {
-      await interaction.channel.send({
+      await interaction.editReply({
         embeds: [make_simple_embed("There was an error while executing this command!")],
       });
       return;
@@ -217,7 +217,7 @@ client.on("interactionCreate", async (interaction) => {
     } catch (error) {
       console.error(error);
 
-      await interaction.channel.send({
+      await interaction.editReply({
         embeds: [make_simple_embed("There was an error while executing this command!")],
       });
 
@@ -225,6 +225,8 @@ client.on("interactionCreate", async (interaction) => {
         process.exit();
       }
     }
+
+    return;
   }
 
   if (interaction.isButton()) {
