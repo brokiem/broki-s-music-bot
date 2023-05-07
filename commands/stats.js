@@ -13,7 +13,7 @@ export async function execute(interaction) {
     .setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=4331667456&scope=bot");
   const row = new discord.ActionRowBuilder().addComponents([loop]);
 
-  await interaction.editReply({
+  await interaction.channel.send({
     components: [row],
     embeds: [
       make_simple_embed(
