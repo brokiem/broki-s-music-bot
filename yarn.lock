@@ -42,7 +42,7 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@discordjs/opus@latest":
+"@discordjs/opus@^0.9.0":
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/@discordjs/opus/-/opus-0.9.0.tgz#bbd9f78bd6bc399885bcb48645c6d2b1f0efa0c5"
   integrity sha512-NEE76A96FtQ5YuoAVlOlB3ryMPrkXbUCTQICHGKb8ShtjXyubGicjRMouHtP1RpuDdm16cDa+oI3aAMo1zQRUQ==
@@ -450,7 +450,7 @@ node-fetch@^2.6.7:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-gyp-build@^4.3.0:
+node-gyp-build@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.6.0.tgz#0c52e4cbf54bbd28b709820ef7b6a3c2d6209055"
   integrity sha512-NTZVKn9IylLwUzaKjkas1e4u2DLNcV4rdYagA4PWdPwW87Bi7z+BznyKSRwS/761tV/lzCGXplWsiaMjLqP2zQ==
@@ -586,12 +586,12 @@ signal-exit@^3.0.0:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-sodium-native@latest:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/sodium-native/-/sodium-native-4.0.1.tgz#773201b0d7872da294b9b12cd90d4a913dc9a2dd"
-  integrity sha512-OQTaxrVLtMvrnfcwZVsOTHe58MfDApJiHJNoOwcmmrhwvlYkfaUt2WuzRio8PgEMOd96R5aDHY49DCtock1zsA==
+sodium-native@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/sodium-native/-/sodium-native-4.0.3.tgz#b47e3f1024c71db76ef0141343e1e7611df3d4e0"
+  integrity sha512-0zOjNag+0gIRe56O1TkTfltT+b+JhOpGV6u69MVoKy+BTH95viPPJ0exHHnmgRliWKDGyYsyNeyBamfcU7ZlgQ==
   dependencies:
-    node-gyp-build "^4.3.0"
+    node-gyp-build "^4.6.0"
 
 statuses@2.0.1:
   version "2.0.1"
