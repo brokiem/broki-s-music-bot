@@ -38,7 +38,7 @@ export async function execute(interaction) {
   await message.edit({
     embeds: [
       make_simple_embed(q)
-        .setTitle("Queue (" + queue.length + ")")
+        .setTitle("Queue (#" + queue.length + ")")
         .setFooter({
           text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
           iconURL: interaction.member.user.displayAvatarURL({ size: 16 }),
