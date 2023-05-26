@@ -222,7 +222,7 @@ client.on("interactionCreate", async (interaction) => {
       });
 
       if (error.toString().includes("429")) {
-        process.exit();
+        process.exit(1);
       }
     }
   }
