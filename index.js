@@ -164,9 +164,11 @@ client.on("messageCreate", async (message) => {
       }
     }
   } catch (e) {
-    await message.reply({
-      content: "There was an error while executing this command!",
-    });
+    try {
+      await message.reply({
+        content: "There was an error while executing this command!",
+      });
+    } catch (ignored) {}
     //console.log("An error occurred!");
     console.error(e);
 
@@ -206,9 +208,11 @@ client.on("interactionCreate", async (interaction) => {
     const execute = client.commands.get(interaction.commandName);
 
     if (!execute) {
-      await interaction.channel.send({
-        embeds: [make_simple_embed("There was an error while executing this command!")],
-      });
+      try {
+        await interaction.channel.send({
+          embeds: [make_simple_embed("There was an error while executing this command!")],
+        });
+      } catch (ignored) {}
       return;
     }
 
@@ -217,9 +221,11 @@ client.on("interactionCreate", async (interaction) => {
     } catch (error) {
       console.error(error);
 
-      await interaction.channel.send({
-        embeds: [make_simple_embed("There was an error while executing this command!")],
-      });
+      try {
+        await interaction.channel.send({
+          embeds: [make_simple_embed("There was an error while executing this command!")],
+        });
+      } catch (ignored) {}
 
       if (error.toString().includes("429")) {
         process.exit(1);
