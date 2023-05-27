@@ -22,7 +22,7 @@ export async function execute(interaction) {
     return;
   }
 
-  let message = await interaction.editReply({
+  await interaction.editReply({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Fetching queue...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -35,10 +35,10 @@ export async function execute(interaction) {
     q += `- [${result.video_details.title}](${result.video_details.url}) (${convert_seconds_to_minutes(result.video_details.durationInSec)})\n`;
   });
 
-  await message.edit({
+  await interaction.editReply({
     embeds: [
       make_simple_embed(q)
-        .setTitle("Queue (`#" + queue.length + "`)")
+        .setTitle("Queue (" + queue.length + ")")
         .setFooter({
           text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
           iconURL: interaction.member.user.displayAvatarURL({ size: 16 }),
