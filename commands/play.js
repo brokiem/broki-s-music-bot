@@ -74,7 +74,7 @@ export async function execute(interaction) {
     await interaction.editReply({
       embeds: [
         await make_playing_embed(interaction.guildId, interaction.member, yt_data)
-          .setTitle(`Added to queue (${guild_stream?.queue?.length})`)
+          .setTitle(`Added to queue (#${guild_stream?.queue?.length})`)
           .setColor("#44DDBF"),
       ],
       allowedMentions: { repliedUser: false },
