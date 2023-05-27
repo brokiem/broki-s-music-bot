@@ -203,16 +203,14 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    interaction.reply({ content: "Loading...", fetchReply: true });
+    await interaction.deferReply();
 
     const execute = client.commands.get(interaction.commandName);
 
     if (!execute) {
-      try {
-        await interaction.channel.send({
-          embeds: [make_simple_embed("There was an error while executing this command!")],
-        });
-      } catch (ignored) {}
+      await interaction.editReply({
+        embeds: [make_simple_embed("There was an error while executing this command!")],
+      });
       return;
     }
 
@@ -221,16 +219,16 @@ client.on("interactionCreate", async (interaction) => {
     } catch (error) {
       console.error(error);
 
-      try {
-        await interaction.channel.send({
-          embeds: [make_simple_embed("There was an error while executing this command!")],
-        });
-      } catch (ignored) {}
+      await interaction.editReply({
+        embeds: [make_simple_embed("There was an error while executing this command!")],
+      });
 
       if (error.toString().includes("429")) {
         process.exit(1);
       }
     }
+
+    return;
   }
 
   if (interaction.isButton()) {
