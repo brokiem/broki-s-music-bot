@@ -136,7 +136,7 @@ client.on("messageCreate", async (message) => {
               embeds: [make_simple_embed("Restarting...")],
               allowedMentions: { repliedUser: false },
             });
-            process.exit();
+            process.exit(1);
           }
           break;
         case "eval":
@@ -173,7 +173,7 @@ client.on("messageCreate", async (message) => {
     console.error(e);
 
     if (e.toString().includes("429")) {
-      process.exit();
+      process.exit(1);
     }
   }
 });
