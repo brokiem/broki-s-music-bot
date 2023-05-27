@@ -38,7 +38,7 @@ export async function execute(interaction) {
     return;
   }
 
-  let message = await interaction.editReply({
+  await interaction.editReply({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Skipping to next queue...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -46,7 +46,7 @@ export async function execute(interaction) {
   const url = guild_stream.queue.shift();
   const yt_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
 
-  await message.edit({
+  await interaction.editReply({
     embeds: [
       make_simple_embed("Audio skipped to next queue").setFooter({
         text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,
