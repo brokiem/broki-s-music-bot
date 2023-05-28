@@ -90,7 +90,7 @@ export function getUptime() {
 }
 
 export async function is_voted(user_id) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _) => {
     // Set a timeout for 6 seconds
     const timeoutId = setTimeout(() => {
       resolve(false);
