@@ -14,6 +14,9 @@ export async function execute(interaction) {
 
   await interaction.editReply({
     components: [row],
-    embeds: [make_simple_embed("Commands: \n/play: Play a audio\n/skip: Skip the currently playing audio\n/seek: Seek to a specific duration in the audio\n/queue: Display the current audio queue\n/control: Show the control of the currently playing audio\n/loop: Enable or disable audio looping\n/pause: Pause the currently playing audio\n/resume: Resume the paused audio\n/stop: Stop playing and clear the queue\n/leave: Make the bot leave the voice channel\n/stats: Show bot statistics")],
+    embeds: [
+      make_simple_embed("- /play: Play a audio\n- /skip: Skip the currently playing audio\n- /seek: Seek to a specific duration in the audio\n- /queue: Display the current audio queue\n- /control: Show the control of the currently playing audio\n- /loop: Enable or disable audio looping\n- /pause: Pause the currently playing audio\n- /resume: Resume the paused audio\n- /stop: Stop playing and clear the queue\n- /leave: Make the bot leave the voice channel\n- /stats: Show bot statistics")
+        .setTitle("Commands"),
+    ],
   });
 }
