@@ -130,37 +130,6 @@ client.on("messageCreate", async (message) => {
             });
           }
           break;
-        case "restart":
-          if (message.author.id === "548120702373593090") {
-            await message.reply({
-              embeds: [make_simple_embed("Restarting...")],
-              allowedMentions: { repliedUser: false },
-            });
-            process.exit(1);
-          }
-          break;
-        case "eval":
-          if (message.author.id === "548120702373593090") {
-            try {
-              const code = args.join(" ");
-              let evaled = eval(code);
-
-              if (typeof evaled !== "string") {
-                evaled = inspect(evaled);
-              }
-
-              await message.reply({
-                content: `\`\`\`${clean(evaled)}\`\`\``,
-                allowedMentions: { repliedUser: false },
-              });
-            } catch (e) {
-              await message.reply({
-                content: `Error: \`\`\`xl\n${clean(e)}\n\`\`\``,
-                allowedMentions: { repliedUser: false },
-              });
-            }
-          }
-          break;
       }
     }
   } catch (e) {
