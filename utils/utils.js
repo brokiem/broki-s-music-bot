@@ -59,12 +59,12 @@ export function get_control_button_row() {
 }
 
 export function leave_voice_channel(guild_id) {
+  if (client.streams.has(guild_id)) {
+    client.streams.get(guild_id).player.stop();
+  }
+
   const conn = voice.getVoiceConnection(guild_id);
   conn?.destroy();
-
-  if (!client.streams.has(guild_id)) {
-    return false;
-  }
 
   client.streams.delete(guild_id);
   //console.log("Left voice channel in guild " + guild_id + "");
