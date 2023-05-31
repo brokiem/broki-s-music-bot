@@ -60,7 +60,7 @@ export function get_control_button_row() {
 
 export function leave_voice_channel(guild_id) {
   if (client.streams.has(guild_id)) {
-    client.streams.get(guild_id).player.stop();
+    client.streams.get(guild_id).player.stop(true);
   }
 
   const conn = voice.getVoiceConnection(guild_id);
