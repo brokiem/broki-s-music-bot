@@ -83,8 +83,6 @@ export async function broadcast_audio(guild_id, stream) {
   });
 
   guild_stream.player.play(guild_stream.resource);
-  voice.getVoiceConnection(guild_id).subscribe(guild_stream.player);
-
   guild_stream.playing = true;
 }
 
@@ -112,13 +110,24 @@ export function pause_audio(guild_id) {
 }
 
 export function prepare_voice_connection(guild_id, voice_channel_id) {
+  const audio_player = voice.createAudioPlayer({
+    behaviors: { noSubscriber: voice.NoSubscriberBehavior.Pause },
+  });
+
+  const voice_connection = voice.getVoiceConnection(guild_id);
+  if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
+    voice.joinVoiceChannel({
+      channelId: voice_channel_id,
+      guildId: guild_id,
+      adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
+    })
+      .on(voice.VoiceConnectionStatus.Disconnected, on_disconnect)
+      .subscribe(audio_player);
+  }
+
   if (!client.streams.has(guild_id)) {
     client.streams.set(guild_id, {
-      player: voice.createAudioPlayer({
-        behaviors: {
-          noSubscriber: voice.NoSubscriberBehavior.Pause,
-        },
-      }),
+      player: audio_player,
       resource: null,
       playing: false,
       looped_url: null,
@@ -151,17 +160,6 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
   }
 
   client.streams.get(guild_id).force_stop = false;
-
-  const voice_connection = voice.getVoiceConnection(guild_id);
-  if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-    const new_voice_connection = voice.joinVoiceChannel({
-      channelId: voice_channel_id,
-      guildId: guild_id,
-      adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
-    });
-
-    new_voice_connection.on(voice.VoiceConnectionStatus.Disconnected, on_disconnect);
-  }
 }
 
 export function any_audio_playing(guild_id) {
