@@ -72,6 +72,10 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         if (guild_stream !== undefined) {
           clearTimeout(guild_stream.leave_timeout_id);
           guild_stream.leave_timeout_id = setTimeout(async () => {
+            if (!oldState?.channel?.id || !oldState?.guild?.id) {
+              return;
+            }
+
             const channel = await client.channels.fetch(oldState.channel.id);
             if (channel && channel.members.size === 1) {
               leave_voice_channel(oldState.guild.id);
