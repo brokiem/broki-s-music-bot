@@ -44,7 +44,12 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
   }
 
   if (!is_queue && any_audio_playing(guild_id)) {
-    guild_stream.queue.push(video_info.video_details.url);
+    guild_stream.queue.push({
+      url: video_info.video_details.url,
+      title: video_info.video_details.title,
+      thumbnail_url: video_info.video_details.thumbnails[0].url,
+      duration: video_info.video_details.durationInSec
+    });
     return video_info;
   }
 
@@ -153,7 +158,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       }
 
       if (!guild_stream.force_stop && guild_stream.queue.length >= 1) {
-        const url = guild_stream.queue.shift();
+        const url = guild_stream.queue.shift()?.url;
         await play_audio(url, guild_id, voice_channel_id, true);
       }
     });

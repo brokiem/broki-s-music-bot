@@ -43,7 +43,7 @@ export async function execute(interaction) {
     allowedMentions: { repliedUser: false },
   });
 
-  const url = guild_stream.queue.shift();
+  const url = guild_stream.queue.shift()?.url;
   const yt_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
 
   await interaction.editReply({

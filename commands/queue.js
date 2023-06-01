@@ -22,17 +22,9 @@ export async function execute(interaction) {
     return;
   }
 
-  await interaction.editReply({
-    embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Fetching queue...`)],
-    allowedMentions: { repliedUser: false },
-  });
-
-  const promises = queue.map((url) => playdl.video_info(url));
-  const results = await Promise.all(promises);
-
   let q = "";
-  results.forEach((result) => {
-    q += `- [${result.video_details.title}](${result.video_details.url}) (${convert_seconds_to_minutes(result.video_details.durationInSec)})\n`;
+  queue.forEach(({url, title, thumbnail_url, duration}) => {
+    q += `- [${title}](${url}) (${convert_seconds_to_minutes(duration)})\n`;
   });
 
   await interaction.editReply({
