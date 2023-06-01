@@ -82,6 +82,9 @@ export async function seek_audio(guild_id, timeSeconds = 0) {
 
 export async function broadcast_audio(guild_id, stream) {
   const guild_stream = client.streams.get(guild_id);
+  if (!guild_stream) {
+    return;
+  }
 
   guild_stream.resource = voice.createAudioResource(stream.stream, {
     inputType: stream.type,
@@ -93,6 +96,10 @@ export async function broadcast_audio(guild_id, stream) {
 
 export function stop_audio(guild_id) {
   const guild_stream = client.streams.get(guild_id);
+  if (!guild_stream) {
+    return;
+  }
+
   guild_stream.queue = [];
   guild_stream.loop = false;
   guild_stream.looped_url = null;
@@ -102,6 +109,9 @@ export function stop_audio(guild_id) {
 
 export function pause_audio(guild_id) {
   const guild_stream = client.streams.get(guild_id);
+  if (!guild_stream) {
+    return 1;
+  }
 
   guild_stream.playing = !guild_stream.playing;
 
@@ -169,10 +179,10 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
 export function any_audio_playing(guild_id) {
   const guild_stream = client.streams.get(guild_id);
-
   if (!guild_stream) {
     return false;
   }
+
   return guild_stream.resource === null ? false : true;
 }
 
