@@ -43,7 +43,7 @@ export function make_playing_embed(guild_id, member, yt_data, title = null, url 
   return new discord.EmbedBuilder()
     .setColor("#35cf7d")
     .setTitle("Now Playing")
-    .setDescription("[" + title + "](" + url + ")")
+    .setDescription("[" + title + "](" + url + ") `(" + convert_seconds_to_minutes(yt_data.video_details.durationInSec) + ")`")
     .setThumbnail(thumbnail_url)
     .setFooter({
       text: "by " + member.user.username + "#" + member.user.discriminator,
