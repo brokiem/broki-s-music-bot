@@ -20,21 +20,18 @@ export async function execute(interaction) {
         "" +
           "**❯  broki's music bot**" +
           "\n\n" +
-          "• RAM Usage: " +
-          Math.round(process.memoryUsage().rss / 10485.76) / 100 +
-          " MB\n" +
-          "\n" +
           "• Uptime: " +
           getUptime() +
           "\n" +
+          "\n" +
+          "• RAM Usage: " +
+          Math.round(process.memoryUsage().rss / 10485.76) / 100 +
+          " MB\n" +
           "• Latency: " +
           client.ws.ping +
           "ms\n" +
           "• Guilds: " +
-          client.guilds.cache.size +
-          "\n" +
-          "\n" +
-          "• Developer: [brokiem](https://github.com/brokiem)"
+          client.guilds.cache.size
       ),
     ],
     allowedMentions: { repliedUser: false },
