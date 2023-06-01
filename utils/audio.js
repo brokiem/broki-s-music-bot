@@ -165,7 +165,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 export function any_audio_playing(guild_id) {
   const guild_stream = client.streams.get(guild_id);
 
-  if (guild_stream === undefined) {
+  if (!guild_stream) {
     return false;
   }
   return guild_stream.resource === null ? false : true;
