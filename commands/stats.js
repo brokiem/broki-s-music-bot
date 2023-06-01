@@ -18,11 +18,8 @@ export async function execute(interaction) {
     embeds: [
       make_simple_embed(
         "" +
-          "**❯  broki's music bot** - v3.1.0" +
+          "**❯  broki's music bot**" +
           "\n\n" +
-          "• CPU Usage: " +
-          os.loadavg().toString().split(",")[0] +
-          "%\n" +
           "• RAM Usage: " +
           Math.round(process.memoryUsage().rss / 10485.76) / 100 +
           " MB\n" +
@@ -37,9 +34,7 @@ export async function execute(interaction) {
           client.guilds.cache.size +
           "\n" +
           "\n" +
-          "• Developer: [brokiem](https://github.com/brokiem)\n" +
-          "• Library: discord.js\n" +
-          "• Github: [broki's music bot](https://github.com/brokiem/broki-s-music-bot)"
+          "• Developer: [brokiem](https://github.com/brokiem)"
       ),
     ],
     allowedMentions: { repliedUser: false },
