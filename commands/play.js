@@ -5,7 +5,7 @@ import { client } from "../index.js";
 
 export const data = new SlashCommandBuilder()
   .setName("play")
-  .setDescription("Play a audio")
+  .setDescription("Play an audio")
   .addStringOption((option) => option.setName("query").setDescription("Audio search query").setRequired(true));
 
 export async function execute(interaction) {
