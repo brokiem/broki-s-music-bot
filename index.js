@@ -15,6 +15,7 @@ export const client = new discord.Client({
     discord.GatewayIntentBits.GuildVoiceStates,
   ],
 });
+const webhook_client = new discord.WebhookClient({ url: process.env.WEBHOOK_URL });
 
 const prefix = "!";
 const is_maintenance = process.env.MAINTENANCE === "true" || false;
@@ -109,11 +110,25 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-client.on("guildCreate", async () => {
+client.on("guildCreate", async (guild) => {
+  await webhook_client.send({
+    username: 'broki\'s music bot',
+    embeds: [
+      make_simple_embed("I was added to a new server: **" + guild.name + "**! (total servers: " + client.guilds.cache.size + ")")
+    ],
+  });
+
   post_stats();
 });
 
-client.on("guildDelete", async () => {
+client.on("guildDelete", async (guild) => {
+  await webhook_client.send({
+    username: 'broki\'s music bot',
+    embeds: [
+      make_simple_embed("I was removed from a server: **" + guild.name + "**! (total servers: " + client.guilds.cache.size + ")")
+    ],
+  });
+
   post_stats();
 });
 
