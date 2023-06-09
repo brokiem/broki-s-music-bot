@@ -164,7 +164,7 @@ async function handleChatInputCommand(interaction) {
     console.error(error);
 
     await interaction.editReply({
-      embeds: [make_simple_embed("There was an error while executing this command!")],
+      embeds: [make_simple_embed("There was an error while executing this command: " + error.message + "\nPlease try again later.")],
     });
 
     if (error.toString().includes("429")) {
