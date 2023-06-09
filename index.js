@@ -2,7 +2,7 @@
 
 import discord from "discord.js";
 import * as fs from "fs";
-import { make_simple_embed, is_same_vc_as, leave_voice_channel, clean, post_stats } from "./utils/utils.js";
+import { make_simple_embed, is_same_vc_as, leave_voice_channel, post_stats } from "./utils/utils.js";
 import { any_audio_playing, stop_audio, pause_audio } from "./utils/audio.js";
 import topgg from "@top-gg/sdk";
 import * as voice from "@discordjs/voice";
@@ -93,34 +93,6 @@ client.on("messageCreate", async (message) => {
     if (message.content.startsWith(prefix)) {
       const args = message.content.slice(prefix.length).trim().split(/ +/);
 
-      const migrated_commands = [
-        "help",
-        "play",
-        "p",
-        "skip",
-        "next",
-        "queue",
-        "q",
-        "stop",
-        "s",
-        "loop",
-        "pause",
-        "resume",
-        "control",
-        "c",
-        "leave",
-        "l",
-        "stats",
-      ];
-
-      if (migrated_commands.includes(args[0].toLowerCase())) {
-        await message.reply({
-          embeds: [make_simple_embed("This command has been migrated to slash commands. Please use `/` to use it.")],
-          allowedMentions: { repliedUser: false },
-        });
-        return;
-      }
-
       switch (args.shift().toLowerCase()) {
         case "servers":
           if (message.author.id === "548120702373593090") {
@@ -133,17 +105,7 @@ client.on("messageCreate", async (message) => {
       }
     }
   } catch (e) {
-    try {
-      await message.reply({
-        content: "There was an error while executing this command!",
-      });
-    } catch (ignored) {}
-    //console.log("An error occurred!");
     console.error(e);
-
-    if (e.toString().includes("429")) {
-      process.exit(1);
-    }
   }
 });
 
@@ -156,128 +118,126 @@ client.on("guildDelete", async () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (interaction.isChatInputCommand()) {
-    // Check if the interaction is valid
-    if (interaction.replied || interaction.deferred || !interaction.channel) {
-      console.log(
-        "Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")"
-      );
-      return;
-    }
-
-    if (is_maintenance && interaction.user.id !== "548120702373593090") {
-      await interaction.reply({
-        embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
-      });
-      return;
-    }
-
-    await interaction.deferReply();
-
-    const execute = client.commands.get(interaction.commandName);
-
-    if (!execute) {
-      await interaction.editReply({
-        embeds: [make_simple_embed("There was an error while executing this command!")],
-      });
-      return;
-    }
-
-    try {
-      await execute(interaction);
-    } catch (error) {
-      console.error(error);
-
-      await interaction.editReply({
-        embeds: [make_simple_embed("There was an error while executing this command!")],
-      });
-
-      if (error.toString().includes("429")) {
-        process.exit(1);
-      }
-    }
-
+  // Check if the interaction is valid
+  if (interaction.replied || interaction.deferred) {
+    console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
     return;
   }
 
-  if (interaction.isButton()) {
-    if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-      await interaction.reply({
-        embeds: [make_simple_embed("You are not in the same voice channel!")],
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    if (!any_audio_playing(interaction.guildId)) {
-      await interaction.reply({
-        embeds: [make_simple_embed("No audio is currently playing")],
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    const guild_stream = client.streams.get(interaction.guildId);
-    let inter = null;
-
-    switch (interaction.customId) {
-      case "pause":
-        if (pause_audio(interaction.guildId) === 0) {
-          inter = await interaction.reply({
-            embeds: [
-              make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
-                text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                iconURL: interaction.user.displayAvatarURL({ size: 16 }),
-              }),
-            ],
-            fetchReply: true,
-          });
-        } else {
-          inter = await interaction.reply({
-            embeds: [
-              make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
-                text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-                iconURL: interaction.user.displayAvatarURL({ size: 16 }),
-              }),
-            ],
-            fetchReply: true,
-          });
-        }
-        break;
-      case "stop":
-        stop_audio(interaction.guildId);
-        interaction.reply({
-          embeds: [
-            make_simple_embed("YouTube audio successfully stopped!").setFooter({
-              text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-              iconURL: interaction.user.displayAvatarURL({ size: 16 }),
-            }),
-          ],
-          fetchReply: true,
-        });
-        break;
-      case "loop":
-        guild_stream.loop = !guild_stream.loop;
-        inter = await interaction.reply({
-          embeds: [
-            make_simple_embed(
-              guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"
-            ).setFooter({
-              text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
-              iconURL: interaction.user.displayAvatarURL({ size: 16 }),
-            }),
-          ],
-          fetchReply: true,
-        });
-        break;
-    }
-
-    if (inter !== null) {
-      setTimeout(function () {
-        inter.delete();
-      }, 10000);
-    }
+  if (interaction.isChatInputCommand()) {
+    await handleChatInputCommand(interaction);
+  } else if (interaction.isButton()) {
+    await handleButton(interaction);
   }
 });
+
+async function handleChatInputCommand(interaction) {
+  await interaction.deferReply();
+
+  if (!interaction.channel) {
+    await interaction.editReply({
+      embeds: [make_simple_embed("You must be in a server to use this command!")],
+      ephemeral: true,
+    });
+    return;
+  }
+
+  if (is_maintenance && interaction.user.id !== "548120702373593090") {
+    await interaction.editReply({
+      embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
+    });
+    return;
+  }
+
+
+  const execute = client.commands.get(interaction.commandName);
+  if (!execute) {
+    await interaction.editReply({
+      embeds: [make_simple_embed("There was an error while executing this command!")],
+    });
+    return;
+  }
+
+  try {
+    await execute(interaction);
+  } catch (error) {
+    console.error(error);
+
+    await interaction.editReply({
+      embeds: [make_simple_embed("There was an error while executing this command!")],
+    });
+
+    if (error.toString().includes("429")) {
+      process.exit(1);
+    }
+  }
+}
+
+async function handleButton(interaction) {
+  await interaction.deferReply();
+
+  if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
+    await interaction.editReply({
+      embeds: [make_simple_embed("You are not in the same voice channel!")],
+      ephemeral: true
+    });
+    return;
+  }
+
+  if (!any_audio_playing(interaction.guildId)) {
+    await interaction.editReply({
+      embeds: [make_simple_embed("No audio is currently playing")],
+      ephemeral: true,
+    });
+    return;
+  }
+
+  switch (interaction.customId) {
+    case "pause":
+      if (pause_audio(interaction.guildId) === 0) {
+        await interaction.editReply({
+          embeds: [
+            make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
+              text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+              iconURL: interaction.user.displayAvatarURL({ size: 16 }),
+            }),
+          ],
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
+              text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+              iconURL: interaction.user.displayAvatarURL({ size: 16 }),
+            }),
+          ]
+        });
+      }
+      break;
+    case "stop":
+      stop_audio(interaction.guildId);
+      await interaction.editReply({
+        embeds: [
+          make_simple_embed("YouTube audio successfully stopped!").setFooter({
+            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+            iconURL: interaction.user.displayAvatarURL({ size: 16 }),
+          }),
+        ]
+      });
+      break;
+    case "loop":
+      const guild_stream = client.streams.get(interaction.guildId);
+      guild_stream.loop = !guild_stream.loop;
+      await interaction.editReply({
+        embeds: [
+          make_simple_embed(
+            guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"
+          ).setFooter({
+            text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
+            iconURL: interaction.user.displayAvatarURL({ size: 16 }),
+          }),
+        ]
+      });
+      break;
+  }
+}
