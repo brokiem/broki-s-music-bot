@@ -125,9 +125,7 @@ export function pause_audio(guild_id) {
 }
 
 export function prepare_voice_connection(guild_id, voice_channel_id) {
-  const audio_player = voice.createAudioPlayer({
-    behaviors: { noSubscriber: voice.NoSubscriberBehavior.Pause },
-  });
+  const audio_player = voice.createAudioPlayer();
 
   const voice_connection = voice.getVoiceConnection(guild_id);
   if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
