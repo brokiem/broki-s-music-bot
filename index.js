@@ -161,7 +161,7 @@ async function handleChatInputCommand(interaction) {
   try {
     await execute(interaction);
   } catch (error) {
-    console.error(error);
+    console.log(error);
 
     await interaction.editReply({
       embeds: [make_simple_embed("There was an error while executing this command: " + error.message + "\nPlease try again later.")],
