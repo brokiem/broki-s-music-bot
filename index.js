@@ -83,7 +83,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     }
   } catch (e) {
     //console.log("An error occurred!");
-    console.error(e);
+    console.log(e);
   }
 });
 
@@ -106,7 +106,7 @@ client.on("messageCreate", async (message) => {
       }
     }
   } catch (e) {
-    console.error(e);
+    console.log(e);
   }
 });
 
@@ -133,16 +133,20 @@ client.on("guildDelete", async (guild) => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  // Check if the interaction is valid
-  if (interaction.replied || interaction.deferred) {
-    console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
-    return;
-  }
+  try {
+    // Check if the interaction is valid
+    if (interaction.replied || interaction.deferred) {
+      console.log("Invalid interaction! (replied: " + interaction.replied + ", deferred: " + interaction.deferred + ", channel: " + interaction.channel + ")");
+      return;
+    }
 
-  if (interaction.isChatInputCommand()) {
-    await handleChatInputCommand(interaction);
-  } else if (interaction.isButton()) {
-    await handleButton(interaction);
+    if (interaction.isChatInputCommand()) {
+      await handleChatInputCommand(interaction);
+    } else if (interaction.isButton()) {
+      await handleButton(interaction);
+    }
+  } catch (e) {
+    console.log(e);
   }
 });
 
