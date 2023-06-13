@@ -28,7 +28,7 @@ client.login(token).catch((e) => {
   console.error("The bot token was incorrect.\n" + e);
 });
 
-client.on("ready", async () => {
+client.once(discord.Events.ClientReady, async () => {
   console.log("Loading commands...");
 
   const command_files = fs.readdirSync("./commands").filter((file) => file.endsWith(".js"));
@@ -43,7 +43,7 @@ client.on("ready", async () => {
   console.log("Bot is ready!\n");
 });
 
-client.on("voiceStateUpdate", (oldState, newState) => {
+client.on(discord.Events.VoiceStateUpdate, (oldState, newState) => {
   try {
     // Check if the bot was kicked from a voice channel
     if (oldState.member.user.id === client.user.id && oldState.channel && !newState.channel) {
@@ -84,7 +84,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
   }
 });
 
-client.on("messageCreate", async (message) => {
+client.on(discord.Events.MessageCreate, async (message) => {
   try {
     if (message.author.bot) return;
 
@@ -107,7 +107,7 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-client.on("guildCreate", async (guild) => {
+client.on(discord.Events.GuildCreate, async (guild) => {
   await webhook_client.send({
     username: 'broki\'s music bot',
     embeds: [
@@ -118,7 +118,7 @@ client.on("guildCreate", async (guild) => {
   post_stats();
 });
 
-client.on("guildDelete", async (guild) => {
+client.on(discord.Events.GuildDelete, async (guild) => {
   await webhook_client.send({
     username: 'broki\'s music bot',
     embeds: [
@@ -129,7 +129,7 @@ client.on("guildDelete", async (guild) => {
   post_stats();
 });
 
-client.on("interactionCreate", async (interaction) => {
+client.on(discord.Events.InteractionCreate, async (interaction) => {
   try {
     // Check if the interaction is valid
     if (interaction.replied || interaction.deferred) {
