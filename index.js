@@ -53,9 +53,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         stop_audio(oldState.guild.id);
         client.streams.delete(oldState.guild.id);
 
-        const conn = voice.getVoiceConnection(oldState.guild.id);
-        conn?.destroy();
-
         //console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
         return;
       }
