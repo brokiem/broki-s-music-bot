@@ -185,10 +185,6 @@ async function handleChatInputCommand(interaction) {
     await interaction.editReply({
       embeds: [make_simple_embed("There was an error while executing this command: " + error.message)],
     });
-
-    if (error.toString().includes("429")) {
-      process.exit(1);
-    }
   }
 }
 
