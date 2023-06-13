@@ -129,13 +129,35 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
 
   const voice_connection = voice.getVoiceConnection(guild_id);
   if (!voice_connection || voice_connection?.state.status === voice.VoiceConnectionStatus.Disconnected) {
-    voice.joinVoiceChannel({
+    const connection = voice.joinVoiceChannel({
       channelId: voice_channel_id,
       guildId: guild_id,
       adapterCreator: client.guilds.cache.get(guild_id).voiceAdapterCreator,
-    })
-      .on(voice.VoiceConnectionStatus.Disconnected, on_disconnect)
-      .subscribe(audio_player);
+    });
+
+    const subscription = connection.subscribe(audio_player);
+    connection.on(voice.VoiceConnectionStatus.Disconnected, async () => {
+      try {
+        await Promise.race([
+          voice.entersState(connection, voice.VoiceConnectionStatus.Signalling, 5_000),
+          voice.entersState(connection, voice.VoiceConnectionStatus.Connecting, 5_000),
+        ]);
+        // Seems to be reconnecting to a new channel - ignore disconnect
+      } catch (error) {
+        // Seems to be a real disconnect which SHOULDN'T be recovered from
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+
+        if (client.streams.has(guild_id)) {
+          client.streams.get(guild_id).player.stop(true);
+        }
+
+        connection.destroy();
+
+        client.streams.delete(guild_id);
+      }
+    });
   }
 
   if (!client.streams.has(guild_id)) {
