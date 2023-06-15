@@ -240,10 +240,10 @@ detect-libc@^2.0.0:
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.1.tgz#e1897aa88fa6ad197862937fbc0441ef352ee0cd"
   integrity sha512-463v3ZeIrcWtdgIg6vI6XUncguvr2TnGl4SzDXinkt9mSLpBJKXT3mW6xT3VQdDN11+WVs29pgvivTc4Lp8v+w==
 
-discord-api-types@^0.37.37, discord-api-types@^0.37.41, discord-api-types@^0.37.42:
-  version "0.37.42"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.42.tgz#3c196267ed31e9ea249e6880c15e2af1c6428629"
-  integrity sha512-1Huaj9cQ1W7/uryS8MZs/tZemnoKB94thM1cE40lep3rpU3q7WHqkdjN/veX0prTkYlPhcyLd/DeF/pBO8X8oQ==
+discord-api-types@^0.37.37, discord-api-types@^0.37.41, discord-api-types@^0.37.45:
+  version "0.37.45"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.45.tgz#83f91accfdf339658c60191108b9648d24a4eaf8"
+  integrity sha512-r9m/g+YQfo7XWMrl645jvMlYoWF8lvns/ch4NCxsz/FbingrECu97LFSD2zKOvgHaSc90BHP8wgshaMcA2/c6Q==
 
 discord.js@^14.11.0:
   version "14.11.0"
