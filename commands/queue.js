@@ -7,7 +7,7 @@ export const data = new SlashCommandBuilder().setName("queue").setDescription("S
 
 export async function execute(interaction) {
   if (!client.streams.has(interaction.guildId)) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("No queue, start playing audio with /play")],
     });
     return;
@@ -16,18 +16,18 @@ export async function execute(interaction) {
   const queue = client.streams.get(interaction.guildId).queue;
 
   if (queue.length <= 0) {
-    await interaction.editReply({
+    await interaction.channel.send({
       embeds: [make_simple_embed("No queue, start playing audio with /play")],
     });
     return;
   }
 
   let q = "";
-  queue.forEach(({url, title, thumbnail_url, duration}) => {
+  queue.forEach(({ url, title, thumbnail_url, duration }) => {
     q += `- [${title}](${url}) (${convert_seconds_to_minutes(duration)})\n`;
   });
 
-  await interaction.editReply({
+  await interaction.channel.send({
     embeds: [
       make_simple_embed(q)
         .setTitle("Queue (" + queue.length + ")")

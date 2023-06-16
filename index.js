@@ -148,10 +148,8 @@ client.on(discord.Events.InteractionCreate, async (interaction) => {
 });
 
 async function handleChatInputCommand(interaction) {
-  await interaction.deferReply();
-
   if (!interaction.channel) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("You must be in a server to use this command!")],
       ephemeral: true,
     });
@@ -159,29 +157,33 @@ async function handleChatInputCommand(interaction) {
   }
 
   if (is_maintenance && interaction.user.id !== "548120702373593090") {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
     });
     return;
   }
 
-
   const execute = client.commands.get(interaction.commandName);
   if (!execute) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("There was an error while executing this command!")],
     });
     return;
   }
 
+  await interaction.reply({ content: "Loading..." });
+
   try {
     await execute(interaction);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
-    await interaction.editReply({
-      embeds: [make_simple_embed("There was an error while executing this command: " + error.message)],
-    });
+    try {
+      await interaction.channel.send({
+        embeds: [make_simple_embed("There was an error while executing this command!")],
+      });
+    } catch (ignored) {
+    }
   }
 }
 
