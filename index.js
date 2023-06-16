@@ -187,10 +187,8 @@ async function handleChatInputCommand(interaction) {
 }
 
 async function handleButton(interaction) {
-  await interaction.deferReply();
-
   if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
       ephemeral: true
     });
@@ -198,7 +196,7 @@ async function handleButton(interaction) {
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [make_simple_embed("No audio is currently playing")],
       ephemeral: true,
     });
@@ -208,7 +206,7 @@ async function handleButton(interaction) {
   switch (interaction.customId) {
     case "pause":
       if (pause_audio(interaction.guildId) === 0) {
-        await interaction.editReply({
+        await interaction.reply({
           embeds: [
             make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
               text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -217,7 +215,7 @@ async function handleButton(interaction) {
           ],
         });
       } else {
-        await interaction.editReply({
+        await interaction.reply({
           embeds: [
             make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
               text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -229,7 +227,7 @@ async function handleButton(interaction) {
       break;
     case "stop":
       stop_audio(interaction.guildId);
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [
           make_simple_embed("YouTube audio successfully stopped!").setFooter({
             text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -241,7 +239,7 @@ async function handleButton(interaction) {
     case "loop":
       const guild_stream = client.streams.get(interaction.guildId);
       guild_stream.loop = !guild_stream.loop;
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [
           make_simple_embed(
             guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"
