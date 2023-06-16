@@ -1,5 +1,11 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row } from "../utils/utils.js";
+import {
+  is_same_vc_as,
+  make_simple_embed,
+  make_playing_embed,
+  get_control_button_row,
+  create_yt_data_from_playdl_data
+} from "../utils/utils.js";
 import { any_audio_playing } from "../utils/audio.js";
 import { client } from "../index.js";
 
@@ -21,9 +27,10 @@ export async function execute(interaction) {
   }
 
   const stream_data = client.streams.get(interaction.guildId);
+  const yt_data = create_yt_data_from_playdl_data(stream_data)
   await interaction.channel.send({
     embeds: [
-      make_playing_embed(interaction.guildId, interaction.member, null, stream_data.yt_title, stream_data.yt_url, stream_data.yt_thumbnail_url, true),
+      make_playing_embed(interaction.guildId, interaction.member, yt_data),
     ],
     components: [get_control_button_row()],
     allowedMentions: { repliedUser: false },

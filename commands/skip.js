@@ -1,5 +1,11 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { get_control_button_row, is_same_vc_as, make_playing_embed, make_simple_embed } from "../utils/utils.js";
+import {
+  create_yt_data_from_playdl_data,
+  get_control_button_row,
+  is_same_vc_as,
+  make_playing_embed,
+  make_simple_embed
+} from "../utils/utils.js";
 import { any_audio_playing, play_audio } from "../utils/audio.js";
 import { client } from "../index.js";
 
@@ -44,7 +50,8 @@ export async function execute(interaction) {
   });
 
   const url = guild_stream.queue.shift()?.url;
-  const yt_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
+  const stream_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
+  const yt_data = create_yt_data_from_playdl_data(stream_data);
 
   await message.edit({
     embeds: [

@@ -33,18 +33,12 @@ export function make_simple_embed(string) {
   return new discord.EmbedBuilder().setDescription(string);
 }
 
-export function make_playing_embed(guild_id, member, yt_data, title = null, url = null, thumbnail_url = null, isControl = false) {
-  if (yt_data !== null) {
-    title = yt_data.video_details.title;
-    url = yt_data.video_details.url;
-    thumbnail_url = yt_data.video_details.thumbnails[0].url;
-  }
-
+export function make_playing_embed(guild_id, member, yt_data) {
   return new discord.EmbedBuilder()
     .setColor("#35cf7d")
     .setTitle("Now Playing")
-    .setDescription("[" + title + "](" + url + ") `(" + convert_seconds_to_minutes(yt_data.video_details.durationInSec) + ")`")
-    .setThumbnail(thumbnail_url)
+    .setDescription("[" + yt_data.title + "](" + yt_data.url + ") `(" + convert_seconds_to_minutes(yt_data.duration) + ")`")
+    .setThumbnail(yt_data.thumbnail_url)
     .setFooter({
       text: "by " + member.user.username + "#" + member.user.discriminator,
       iconURL: member.user.displayAvatarURL({ size: 16 }),
@@ -124,4 +118,13 @@ export function post_stats() {
       console.log(e);
     });
   //console.log("Stats posted successfully!\n");
+}
+
+export function create_yt_data_from_playdl_data(playdl_data) {
+  return {
+    title: playdl_data.video_details.title,
+    url: playdl_data.video_details.url,
+    thumbnail_url: playdl_data.video_details.thumbnails[0].url,
+    duration: playdl_data.video_details.durationInSec,
+  }
 }

@@ -1,5 +1,12 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row, is_voted } from "../utils/utils.js";
+import {
+  is_same_vc_as,
+  make_simple_embed,
+  make_playing_embed,
+  get_control_button_row,
+  is_voted,
+  create_yt_data_from_playdl_data
+} from "../utils/utils.js";
 import { play_audio } from "../utils/audio.js";
 import { client } from "../index.js";
 
@@ -79,14 +86,16 @@ export async function execute(interaction) {
     allowedMentions: { repliedUser: false },
   });
 
-  const yt_data = await play_audio(query, interaction.guildId, interaction.member.voice.channelId);
+  const stream_data = await play_audio(query, interaction.guildId, interaction.member.voice.channelId);
 
-  if (yt_data === null) {
+  if (stream_data === null) {
     await message.edit({
       embeds: [make_simple_embed("No results found!")],
     });
     return;
   }
+
+  const yt_data = create_yt_data_from_playdl_data(stream_data)
 
   if (guild_stream?.queue?.length >= 1) {
     await message.edit({
