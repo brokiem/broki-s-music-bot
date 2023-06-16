@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { is_same_vc_as, make_simple_embed, make_playing_embed, get_control_button_row, is_voted } from "../utils/utils.js";
-import { any_audio_playing, play_audio } from "../utils/audio.js";
+import { play_audio } from "../utils/audio.js";
 import { client } from "../index.js";
 
 export const data = new SlashCommandBuilder()

@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { getUptime, make_simple_embed } from "../utils/utils.js";
-import os from "os";
 import { client } from "../index.js";
 import discord from "discord.js";
 

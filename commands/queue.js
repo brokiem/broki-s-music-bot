@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { make_simple_embed, convert_seconds_to_minutes } from "../utils/utils.js";
 import { client } from "../index.js";
-import playdl from "play-dl";
 
 export const data = new SlashCommandBuilder().setName("queue").setDescription("Show queue");
 
