@@ -188,7 +188,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       }
 
       if (!guild_stream.force_stop && guild_stream.queue.length >= 1) {
-        const url = guild_stream.queue[0].url;
+        const url = guild_stream.queue.shift()?.url;
         await play_audio(url, guild_id, voice_channel_id, true);
       }
     });
