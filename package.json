@@ -12,7 +12,7 @@
     "discord-api-types": "^0.37.42",
     "discord.js": "^14.11.0",
     "play-dl": "^1.9.6",
-    "prettier": "^2.8.4",
+    "prettier": "^3.0.0",
     "sodium-native": "^4.0.4"
   },
   "scripts": {
