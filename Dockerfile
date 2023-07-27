@@ -1,16 +1,18 @@
-FROM node:18-alpine3.17
+# Use the official Golang image as the base image
+FROM golang:1.20-alpine3.17
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY package.json ./
+# Copy go.mod and go.sum to the container and install dependencies
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN apk update && \
-    apk add --no-cache libsodium ffmpeg && \
-    apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main libcrypto1.1 && \
-    yarn install --production=true
-
-ENV FFMPEG_PATH=/usr/bin/ffmpeg
-
+# Copy the rest of the source code to the container
 COPY . .
 
-CMD ["yarn", "start"]
+# Build the Golang application inside the container
+RUN go build -o app
+
+# Set the entry point for the container (the command to run when the container starts)
+ENTRYPOINT ["./app"]
