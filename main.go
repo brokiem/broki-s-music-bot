@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.TextFormatter{ForceColors: true, FullTimestamp: true})
+	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 	log.Infof("Starting broki's music bot...")
 
 	// Create a new bot instance
