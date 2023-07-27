@@ -273,6 +273,10 @@ func (b *Bot) pause(event *events.ApplicationCommandInteractionCreate, data disc
 
 // This is the handler for the /loop command
 func (b *Bot) loop(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{CreateSimpleEmbed("Looping feature is currently disabled!").Build()},
+	})
+
 	queue := b.Queues.Get(*event.GuildID())
 	player := b.Lavalink.ExistingPlayer(*event.GuildID())
 	if player == nil {
