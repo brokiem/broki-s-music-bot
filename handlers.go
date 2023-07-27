@@ -166,6 +166,10 @@ func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data disco
 
 // This is the handler for the /seek command
 func (b *Bot) seek(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{CreateSimpleEmbed("Seeking feature is currently disabled!").Build()},
+	})
+
 	player := b.Lavalink.ExistingPlayer(*event.GuildID())
 	if player == nil {
 		return event.CreateMessage(discord.MessageCreate{
