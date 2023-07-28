@@ -98,7 +98,7 @@ func (b *Bot) stopTrack(guildID snowflake.ID, user discord.User) *discord.Messag
 		return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("You need to be in a voice channel to use this command").Build())
 	}
 
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build())
 	}
 
@@ -121,7 +121,7 @@ func (b *Bot) pauseTrack(guildID snowflake.ID, user discord.User) *discord.Messa
 		return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("You need to be in a voice channel to use this command").Build())
 	}
 
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build())
 	}
 
@@ -155,7 +155,7 @@ func (b *Bot) loopTrack(guildID snowflake.ID, user discord.User) *discord.Messag
 	}
 
 	// Check if the user is in the same voice channel as the bot
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build())
 	}
 

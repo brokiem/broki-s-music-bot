@@ -31,12 +31,10 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	if player != nil {
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if player != nil && voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
 	event.CreateMessage(discord.MessageCreate{
@@ -129,7 +127,7 @@ func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
@@ -175,7 +173,7 @@ func (b *Bot) seek(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
@@ -252,7 +250,7 @@ func (b *Bot) disconnect(event *events.ApplicationCommandInteractionCreate, data
 		})
 	}
 
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
+	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
