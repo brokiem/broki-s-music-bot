@@ -140,6 +140,8 @@ func (b *Bot) pauseTrack(guildID snowflake.ID, user discord.User) *discord.Messa
 
 // loopTrack loops the current track
 func (b *Bot) loopTrack(guildID snowflake.ID, user discord.User) *discord.MessageCreateBuilder {
+	return discord.NewMessageCreateBuilder().SetEmbeds(CreateSimpleEmbed("Looping feature is currently disabled!").Build())
+
 	queue := b.Queues.Get(guildID)
 	player := b.Lavalink.ExistingPlayer(guildID)
 	if player == nil {

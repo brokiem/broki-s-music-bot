@@ -25,7 +25,11 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		nextTrack, ok = queue.Next()
 
 	case QueueTypeRepeatTrack:
+<<<<<<< HEAD
 		nextTrack, ok = *player.Track(), true
+=======
+		nextTrack = *player.Track()
+>>>>>>> parent of 8252306 (fix: track looping)
 
 	case QueueTypeRepeatQueue:
 		lastTrack, _ := b.Lavalink.BestNode().DecodeTrack(context.TODO(), event.EncodedTrack)
