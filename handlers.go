@@ -43,6 +43,14 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		Content: "...",
 	})
 
+	// If the player is paused, resume it to start playing the track
+	if b.Lavalink.Player(*event.GuildID()).Paused() {
+		b.pauseTrack(*event.GuildID(), event.User())
+		event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("Resuming track").Build()},
+		})
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -99,17 +107,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		return err
 	}
 
-	b.Lavalink.Player(*event.GuildID()).Update(context.TODO(), lavalink.WithTrack(*toPlay))
-
-	// If the player is paused, resume it to start playing the track
-	if b.Lavalink.Player(*event.GuildID()).Paused() {
-		b.pauseTrack(*event.GuildID(), event.User())
-		event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("Resuming track").Build()},
-		})
-	}
-
-	return nil
+	return b.Lavalink.Player(*event.GuildID()).Update(context.TODO(), lavalink.WithTrack(*toPlay))
 }
 
 // This is the handler for the /skip command
