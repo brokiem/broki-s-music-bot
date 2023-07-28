@@ -46,9 +46,9 @@ func (b *Bot) onTrackException(player disgolink.Player, event lavalink.TrackExce
 }
 
 func (b *Bot) onTrackStuck(player disgolink.Player, event lavalink.TrackStuckEvent) {
-	log.Fatalf("onTrackStuck: %v\n", event)
+	log.Infof("onTrackStuck: %v\n", event)
 }
 
 func (b *Bot) onWebSocketClosed(player disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	log.Fatalf("onWebSocketClosed: %v\n", event)
+	log.Infof("onWebSocketClosed: %v\n", event)
 }
