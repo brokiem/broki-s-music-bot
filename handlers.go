@@ -101,7 +101,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		return nil
 	}
 
-	if err := b.Client.UpdateVoiceState(context.TODO(), *event.GuildID(), voiceState.ChannelID, false, false); err != nil {
+	if err := b.Client.UpdateVoiceState(context.TODO(), *event.GuildID(), voiceState.ChannelID, false, true); err != nil {
 		return err
 	}
 
