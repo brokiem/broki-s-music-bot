@@ -47,6 +47,7 @@ func main() {
 		bot.WithEventListenerFunc(b.onApplicationCommand),
 		bot.WithEventListenerFunc(b.onVoiceStateUpdate),
 		bot.WithEventListenerFunc(b.onVoiceServerUpdate),
+		bot.WithEventListenerFunc(b.onComponentInteractionCreate),
 	)
 
 	b.Client = client

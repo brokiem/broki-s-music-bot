@@ -57,9 +57,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 				return
 			}
 
-			event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-				Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).Build()},
-			})
+			event.Client().Rest().CreateMessage(event.Channel().ID(), GetControlButtonsMessageBuilder().AddEmbeds(CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).Build()).Build())
 			toPlay = &track
 		},
 		func(playlist lavalink.Playlist) {
@@ -78,11 +76,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 				return
 			}
 
-			event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-				Embeds: []discord.Embed{
-					CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).Build(),
-				},
-			})
+			event.Client().Rest().CreateMessage(event.Channel().ID(), GetControlButtonsMessageBuilder().AddEmbeds(CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).Build()).Build())
 			toPlay = &track
 		},
 		func() {
@@ -214,118 +208,22 @@ func (b *Bot) queue(event *events.ApplicationCommandInteractionCreate, data disc
 // This is the handler for the /pause command
 func (b *Bot) pause(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	guildID := *event.GuildID()
-
-	player := b.Lavalink.ExistingPlayer(guildID)
-	if player == nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
-		})
-	}
-
-	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
-	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
-		})
-	}
-
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-		})
-	}
-
-	isPaused := !player.Paused()
-	if err := player.Update(context.Background(), lavalink.WithPaused(isPaused)); err != nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while pausing: `%s`", err)).Build()},
-		})
-	}
-
-	status := "playing"
-	if isPaused {
-		status = "paused"
-	}
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Player is now %s", status)).Build()},
-	})
+	messageBuilder := b.pauseTrack(guildID, event.User())
+	return event.CreateMessage(messageBuilder.Build())
 }
 
 // This is the handler for the /loop command
 func (b *Bot) loop(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed("Looping feature is currently disabled!").Build()},
-	})
-
-	queue := b.Queues.Get(*event.GuildID())
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	if player == nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
-		})
-	}
-
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
-	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
-		})
-	}
-
-	// Check if the user is in the same voice channel as the bot
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-		})
-	}
-
-	if (queue.Type == QueueTypeRepeatTrack) || (queue.Type == QueueTypeRepeatQueue) {
-		queue.Type = QueueTypeNormal
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("Loop successfully **disabled** for current track").Build()},
-		})
-	}
-
-	queue.Type = QueueTypeRepeatTrack
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed("Loop successfully **enabled** for current track").Build()},
-	})
+	guildID := *event.GuildID()
+	messageBuilder := b.loopTrack(guildID, event.User())
+	return event.CreateMessage(messageBuilder.Build())
 }
 
 // This is the handler for the /stop command
 func (b *Bot) stop(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	guildID := *event.GuildID()
-
-	player := b.Lavalink.ExistingPlayer(guildID)
-	if player == nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
-		})
-	}
-
-	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
-	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
-		})
-	}
-
-	if voiceState.ChannelID.String() != player.ChannelID().String() {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-		})
-	}
-
-	if err := player.Update(context.Background(), lavalink.WithNullTrack()); err != nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while stopping: `%s`", err)).Build()},
-		})
-	}
-
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed("Track successfully stopped and queue are cleared!").Build()},
-	})
+	messageBuilder := b.stopTrack(guildID, event.User())
+	return event.CreateMessage(messageBuilder.Build())
 }
 
 // This is the handler for the /leave command
@@ -375,9 +273,7 @@ func (b *Bot) nowPlaying(event *events.ApplicationCommandInteractionCreate, data
 	}
 
 	track := player.Track()
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, event.User().Username, *event.User().AvatarURL()).Build()},
-	})
+	return event.CreateMessage(GetControlButtonsMessageBuilder().AddEmbeds(CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, event.User().Username, *event.User().AvatarURL()).Build()).Build())
 }
 
 // This is the handler for the /stats command

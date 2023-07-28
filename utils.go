@@ -72,3 +72,10 @@ func GetUptime(startTime time.Time) string {
 
 	return fmt.Sprintf("%dh, %dm and %ds", hours, minutes, seconds)
 }
+
+func GetControlButtonsMessageBuilder() *discord.MessageCreateBuilder {
+	stopButton := discord.NewSecondaryButton("Stop", "stop")
+	pauseButton := discord.NewSecondaryButton("Pause/Resume", "pause")
+	loopButton := discord.NewSecondaryButton("Loop", "loop")
+	return discord.NewMessageCreateBuilder().AddActionRow(stopButton, pauseButton, loopButton)
+}
