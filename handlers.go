@@ -391,8 +391,7 @@ func (b *Bot) stats(event *events.ApplicationCommandInteractionCreate, data disc
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
 			CreateSimpleEmbed(fmt.Sprintf(
-				"• Guilds: %d\n\n• Uptime: %s\n• RAM Usage: %d MB",
-				event.Client().Caches().GuildsLen(),
+				"• Uptime: %s\n• RAM Usage: %d MB",
 				GetUptime(b.StartTime),
 				allocMB,
 			)).Build(),
