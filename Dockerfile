@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the Golang application inside the container
-RUN go build -o app
+RUN go build -ldflags "-s -w" -o app
 
 # Set the entry point for the container (the command to run when the container starts)
 ENTRYPOINT ["./app"]
