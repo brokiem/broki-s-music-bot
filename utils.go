@@ -79,3 +79,14 @@ func GetControlButtonsMessageBuilder() *discord.MessageCreateBuilder {
 	loopButton := discord.NewSecondaryButton("Loop", "loop")
 	return discord.NewMessageCreateBuilder().AddActionRow(stopButton, pauseButton, loopButton)
 }
+
+func GetUserAvatarUrl(user discord.User) *string {
+	avatarURL := user.AvatarURL()
+
+	if avatarURL == nil {
+		defaultAvatarUrl := fmt.Sprintf("https://cdn.discordapp.com/embed/avatars/%d.png", ((user.ID >> 22) % 6))
+		avatarURL = &defaultAvatarUrl
+	}
+
+	return avatarURL
+}
