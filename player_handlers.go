@@ -25,7 +25,8 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		nextTrack, ok = queue.Next()
 
 	case QueueTypeRepeatTrack:
-		nextTrack = *player.Track()
+		lastTrack, _ := b.Lavalink.BestNode().DecodeTrack(context.TODO(), event.EncodedTrack)
+		nextTrack = *lastTrack
 
 	case QueueTypeRepeatQueue:
 		lastTrack, _ := b.Lavalink.BestNode().DecodeTrack(context.TODO(), event.EncodedTrack)
