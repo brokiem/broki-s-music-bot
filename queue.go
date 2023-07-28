@@ -3,9 +3,8 @@ package main
 import (
 	"math/rand"
 
-	"github.com/disgoorg/snowflake/v2"
-
 	"github.com/disgoorg/disgolink/v2/lavalink"
+	"github.com/disgoorg/snowflake/v2"
 )
 
 type QueueType string
@@ -35,37 +34,37 @@ type Queue struct {
 }
 
 func (q *Queue) Shuffle() {
-	rand.Shuffle(len(q.Tracks), func(i, j int) {
-		q.Tracks[i], q.Tracks[j] = q.Tracks[j], q.Tracks[i]
-	})
+	indices := rand.Perm(len(q.Tracks))
+	for i, newIndex := range indices {
+		q.Tracks[i], q.Tracks[newIndex] = q.Tracks[newIndex], q.Tracks[i]
+	}
 }
 
 func (q *Queue) Add(track ...lavalink.Track) {
 	q.Tracks = append(q.Tracks, track...)
 }
 
-func (q *Queue) Next() (lavalink.Track, bool) {
+func (q *Queue) Next() (track lavalink.Track, ok bool) {
 	if len(q.Tracks) == 0 {
 		return lavalink.Track{}, false
 	}
-	track := q.Tracks[0]
-	q.Tracks = q.Tracks[1:]
+	track, q.Tracks = q.Tracks[0], q.Tracks[1:]
 	return track, true
 }
 
-func (q *Queue) Skip(amount int) (lavalink.Track, bool) {
+func (q *Queue) Skip(amount int) (track lavalink.Track, ok bool) {
 	if len(q.Tracks) == 0 {
 		return lavalink.Track{}, false
 	}
 	if amount > len(q.Tracks) {
 		amount = len(q.Tracks)
 	}
-	q.Tracks = q.Tracks[amount:]
-	return q.Tracks[0], true
+	track, q.Tracks = q.Tracks[amount-1], q.Tracks[amount:]
+	return track, true
 }
 
 func (q *Queue) Clear() {
-	q.Tracks = make([]lavalink.Track, 0)
+	q.Tracks = []lavalink.Track{}
 }
 
 type QueueManager struct {

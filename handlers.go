@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
@@ -20,9 +21,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 	username := event.User().Username
 	userAvatar := "https://cdn.discordapp.com/embed/avatars/0.png"
 
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
 	queue := b.Queues.Get(*event.GuildID())
-
 	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
 
 	if !ok {
@@ -31,14 +30,10 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != b.Lavalink.ExistingPlayer(*event.GuildID()).ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
 	event.CreateMessage(discord.MessageCreate{
@@ -51,15 +46,12 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 	var toPlay *lavalink.Track
 	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
 		func(track lavalink.Track) {
-			if player != nil {
-				if player.Track() != nil {
-					queue.Add(track)
-
-					event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-						Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
-					})
-					return
-				}
+			if player := b.Lavalink.ExistingPlayer(*event.GuildID()); player != nil && player.Track() != nil {
+				queue.Add(track)
+				event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
+					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
+				})
+				return
 			}
 
 			event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
@@ -75,15 +67,12 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		func(tracks []lavalink.Track) {
 			track := tracks[0]
 
-			if player != nil {
-				if player.Track() != nil {
-					queue.Add(track)
-
-					event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-						Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
-					})
-					return
-				}
+			if player := b.Lavalink.ExistingPlayer(*event.GuildID()); player != nil && player.Track() != nil {
+				queue.Add(track)
+				event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
+					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
+				})
+				return
 			}
 
 			event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
@@ -118,33 +107,30 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 
 // This is the handler for the /skip command
 func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	queue := b.Queues.Get(*event.GuildID())
+	guildID := *event.GuildID()
+
+	player := b.Lavalink.ExistingPlayer(guildID)
+	queue := b.Queues.Get(guildID)
 	if player == nil || queue == nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
 		})
 	}
 
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
+	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
-	// TODO: check if the user have dj role
+	// TODO: check if the user has DJ role
 
 	track, ok := queue.Next()
 	if !ok {
@@ -153,7 +139,7 @@ func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
+	if err := player.Update(context.Background(), lavalink.WithTrack(track)); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while skipping: `%s`", err)).Build()},
 		})
@@ -178,21 +164,16 @@ func (b *Bot) seek(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
 	seconds := data.Int("time")
@@ -211,63 +192,55 @@ func (b *Bot) seek(event *events.ApplicationCommandInteractionCreate, data disco
 // This is the handler for the /queue command
 func (b *Bot) queue(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	queue := b.Queues.Get(*event.GuildID())
-	if queue == nil {
+	if queue == nil || len(queue.Tracks) == 0 {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("Queue is empty").Build()},
 		})
 	}
 
-	if len(queue.Tracks) == 0 {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("Queue is empty").Build()},
-		})
-	}
-
-	var tracks string
+	var tracks strings.Builder
 	for i, track := range queue.Tracks {
-		tracks += fmt.Sprintf("%d. [`%s`](<%s>) (%s:%s)\n", i+1, track.Info.Title, *track.Info.URI, strconv.FormatInt(track.Info.Length.Minutes(), 10), strconv.FormatInt(track.Info.Length.SecondsPart(), 10))
+		tracks.WriteString(fmt.Sprintf("%d. [`%s`](<%s>) (%s:%s)\n", i+1, track.Info.Title, *track.Info.URI, strconv.FormatInt(track.Info.Length.Minutes(), 10), strconv.FormatInt(track.Info.Length.SecondsPart(), 10)))
 	}
 
 	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed(tracks).SetTitlef("Queue (%d)", len(queue.Tracks)).Build()},
+		Embeds: []discord.Embed{CreateSimpleEmbed(tracks.String()).SetTitlef("Queue (%d)", len(queue.Tracks)).Build()},
 	})
 }
 
 // This is the handler for the /pause command
 func (b *Bot) pause(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
+	guildID := *event.GuildID()
+
+	player := b.Lavalink.ExistingPlayer(guildID)
 	if player == nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
 		})
 	}
 
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
+	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
-	if err := player.Update(context.TODO(), lavalink.WithPaused(!player.Paused())); err != nil {
+	isPaused := !player.Paused()
+	if err := player.Update(context.Background(), lavalink.WithPaused(isPaused)); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while pausing: `%s`", err)).Build()},
 		})
 	}
 
 	status := "playing"
-	if player.Paused() {
+	if isPaused {
 		status = "paused"
 	}
 	return event.CreateMessage(discord.MessageCreate{
@@ -297,14 +270,11 @@ func (b *Bot) loop(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	// Check if the user is in the same voice channel as the bot
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
 	if (queue.Type == QueueTypeRepeatTrack) || (queue.Type == QueueTypeRepeatQueue) {
@@ -322,32 +292,29 @@ func (b *Bot) loop(event *events.ApplicationCommandInteractionCreate, data disco
 
 // This is the handler for the /stop command
 func (b *Bot) stop(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
+	guildID := *event.GuildID()
+
+	player := b.Lavalink.ExistingPlayer(guildID)
 	if player == nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
 		})
 	}
 
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
+	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
-	if err := player.Update(context.TODO(), lavalink.WithNullTrack()); err != nil {
+	if err := player.Update(context.Background(), lavalink.WithNullTrack()); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while stopping: `%s`", err)).Build()},
 		})
@@ -360,58 +327,51 @@ func (b *Bot) stop(event *events.ApplicationCommandInteractionCreate, data disco
 
 // This is the handler for the /leave command
 func (b *Bot) disconnect(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
+	guildID := *event.GuildID()
+
+	player := b.Lavalink.ExistingPlayer(guildID)
 	if player == nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
 		})
 	}
 
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
-
+	voiceState, ok := b.Client.Caches().VoiceState(guildID, event.User().ID)
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in a voice channel to use this command").Build()},
 		})
 	}
 
-	// Check if player is nil
-	if player != nil {
-		// Check if the user is in the same voice channel as the bot
-		if voiceState.ChannelID.String() != player.ChannelID().String() {
-			return event.CreateMessage(discord.MessageCreate{
-				Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
-			})
-		}
+	if voiceState.ChannelID.String() != player.ChannelID().String() {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
+		})
 	}
 
-	if err := b.Client.UpdateVoiceState(context.TODO(), *event.GuildID(), nil, false, false); err != nil {
+	if err := b.Client.UpdateVoiceState(context.Background(), guildID, nil, false, false); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed(fmt.Sprintf("Error while disconnecting: `%s`", err)).Build()},
 		})
 	}
 
 	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreateSimpleEmbed("Disconnected from voice channel").Build()},
+		Embeds: []discord.Embed{CreateSimpleEmbed("Disconnected from the voice channel").Build()},
 	})
 }
 
 // This is the handler for the /control command
 func (b *Bot) nowPlaying(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	if player == nil {
+	guildID := *event.GuildID()
+
+	player := b.Lavalink.ExistingPlayer(guildID)
+	if player == nil || player.Track() == nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
 		})
 	}
 
 	track := player.Track()
-	if track == nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{CreateSimpleEmbed("No track is currently playing").Build()},
-		})
-	}
-
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, event.User().Username, *event.User().AvatarURL()).Build()},
 	})
@@ -422,15 +382,16 @@ func (b *Bot) stats(event *events.ApplicationCommandInteractionCreate, data disc
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
 
-	alloc := memStats.Alloc / (1024 * 1024)
+	// Calculate RAM usage in MB using the total allocated memory (Alloc) and converting to MB.
+	allocMB := memStats.Alloc >> 20
 
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
 			CreateSimpleEmbed(fmt.Sprintf(
-				"• Uptime: %s\n• RAM Usage: %d MB",
-				GetUptime(event.CreatedAt()),
-				alloc,
-			)).Build()},
+				"• RAM Usage: %d MB",
+				allocMB,
+			)).Build(),
+		},
 	})
 }
 
