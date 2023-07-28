@@ -54,7 +54,6 @@ func main() {
 		disgolink.WithListenerFunc(b.onTrackEnd),
 		disgolink.WithListenerFunc(b.onTrackException),
 		disgolink.WithListenerFunc(b.onTrackStuck),
-		disgolink.WithListenerFunc(b.onWebSocketClosed),
 	)
 
 	// Setup command handlers

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/discord"
@@ -13,15 +14,17 @@ import (
 )
 
 type Bot struct {
-	Client   bot.Client
-	Lavalink disgolink.Client
-	Handlers map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error
-	Queues   *QueueManager
+	Client    bot.Client
+	Lavalink  disgolink.Client
+	Handlers  map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error
+	Queues    *QueueManager
+	StartTime time.Time
 }
 
 // createBot creates a new Bot instance
 func createBot() *Bot {
 	return &Bot{
+		StartTime: time.Now(),
 		Queues: &QueueManager{
 			queues: make(map[snowflake.ID]*Queue),
 		},
