@@ -20,8 +20,6 @@ import (
 // This is the handler for the /play command
 func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	identifier := lavalink.SearchTypeYoutube.Apply(data.String("query"))
-	username := event.User().Username
-	userAvatar := *GetUserAvatarUrl(event.User())
 
 	queue := b.Queues.Get(*event.GuildID())
 	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
@@ -55,6 +53,9 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	username := event.User().Username
+	userAvatar := *GetUserAvatarUrl(event.User())
 
 	var toPlay *lavalink.Track
 	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
@@ -152,9 +153,10 @@ func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, event.User().Username, *GetUserAvatarUrl(event.User())).Build()},
-	})
+	username := event.User().Username
+	userAvatar := *GetUserAvatarUrl(event.User())
+
+	return event.CreateMessage(GetControlButtonsMessageBuilder().AddEmbeds(CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).Build()).Build())
 }
 
 // This is the handler for the /seek command
