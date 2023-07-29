@@ -49,6 +49,9 @@ func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCr
 	}
 	if err := handler(event, data); err != nil {
 		log.Error("error handling command: ", err)
+		event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
+			Embeds: []discord.Embed{CreateSimpleEmbed("There was an error executing your command!").Build()},
+		})
 	}
 }
 
