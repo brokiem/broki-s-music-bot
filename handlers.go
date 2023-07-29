@@ -13,6 +13,8 @@ import (
 
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // This is the handler for the /play command
@@ -35,6 +37,11 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
+	}
+
+	guild, ok := event.Guild()
+	if ok {
+		log.Debugf("User %s used /play in guild %s (%s) in channel %s (%s) with query %s\n", event.User().Username, guild.Name, guild.ID, event.Channel().Name(), event.Channel().ID(), data.String("query"))
 	}
 
 	event.CreateMessage(discord.MessageCreate{
