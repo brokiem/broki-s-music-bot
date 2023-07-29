@@ -31,7 +31,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	if player != nil && player.ChannelID() != nil && voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
+	if player != nil && player.Track() != nil && !b.IsSameVoiceChannel(*event.GuildID(), &voiceState) {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
@@ -127,7 +127,7 @@ func (b *Bot) skip(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
+	if !b.IsSameVoiceChannel(guildID, &voiceState) {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
@@ -173,7 +173,7 @@ func (b *Bot) seek(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
+	if !b.IsSameVoiceChannel(*event.GuildID(), &voiceState) {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
@@ -250,7 +250,7 @@ func (b *Bot) disconnect(event *events.ApplicationCommandInteractionCreate, data
 		})
 	}
 
-	if voiceState.ChannelID != nil && voiceState.ChannelID.String() != player.ChannelID().String() {
+	if !b.IsSameVoiceChannel(guildID, &voiceState) {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{CreateSimpleEmbed("You need to be in the same voice channel as the bot to use this command").Build()},
 		})
