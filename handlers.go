@@ -58,7 +58,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 			if player := b.Lavalink.ExistingPlayer(*event.GuildID()); player != nil && player.Track() != nil {
 				queue.Add(track)
 				event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
+					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").SetColor(0x44DDBF).Build()},
 				})
 				return
 			}
@@ -77,7 +77,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 			if player := b.Lavalink.ExistingPlayer(*event.GuildID()); player != nil && player.Track() != nil {
 				queue.Add(track)
 				event.Client().Rest().CreateMessage(event.Channel().ID(), discord.MessageCreate{
-					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").Build()},
+					Embeds: []discord.Embed{CreatePlayingEmbed(track.Info.Title, *track.Info.URI, track.Info.Length, username, userAvatar).SetTitle("Added to queue").SetColor(0x44DDBF).Build()},
 				})
 				return
 			}

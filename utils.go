@@ -26,6 +26,7 @@ func CreatePlayingEmbed(title string, url string, duration lavalink.Duration, us
 	}
 	embed.SetFooterTextf("by %v", username)
 	embed.SetFooterIcon(userAvatar)
+	embed.SetColor(0x35cf7d)
 
 	return embed
 }
