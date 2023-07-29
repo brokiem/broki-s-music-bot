@@ -21,7 +21,7 @@ func CreatePlayingEmbed(title string, url string, duration lavalink.Duration, us
 	embed.SetTitle("Now Playing")
 	embed.SetDescriptionf("[%s](%s) (%s:%s)", title, url, strconv.FormatInt(duration.Minutes(), 10), strconv.FormatInt(duration.SecondsPart(), 10))
 	videoId, err := ExtractVideoID(url)
-	if err != nil {
+	if err == nil {
 		embed.SetThumbnailf("https://img.youtube.com/vi/%s/0.jpg", videoId)
 	}
 	embed.SetFooterTextf("by %v", username)
