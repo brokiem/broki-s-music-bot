@@ -43,6 +43,8 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 
 func (b *Bot) onTrackException(player disgolink.Player, event lavalink.TrackExceptionEvent) {
 	log.Errorf("onTrackException: %v\n", event)
+
+	b.Client.UpdateVoiceState(context.Background(), event.GuildID(), nil, false, false)
 }
 
 func (b *Bot) onTrackStuck(player disgolink.Player, event lavalink.TrackStuckEvent) {
