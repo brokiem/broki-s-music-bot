@@ -97,18 +97,19 @@ func (b *Bot) onVoiceServerUpdate(event *events.VoiceServerUpdate) {
 
 // onComponentInteractionCreate is called when a button is clicked
 func (b *Bot) onComponentInteractionCreate(event *events.ComponentInteractionCreate) {
-	if event.ButtonInteractionData().CustomID() == "stop" {
-		messageBuilder := b.stopTrack(*event.GuildID(), event.User())
-		event.CreateMessage(messageBuilder.Build())
+	// TODO: Check if the interaction is a button interaction.
+	customID := event.ButtonInteractionData().CustomID()
+
+	// Define a map to store custom IDs and their corresponding functions.
+	actions := map[string]func(snowflake.ID, discord.User) *discord.MessageCreateBuilder{
+		"stop":  b.stopTrack,
+		"pause": b.pauseTrack,
+		"loop":  b.loopTrack,
 	}
 
-	if event.ButtonInteractionData().CustomID() == "pause" {
-		messageBuilder := b.pauseTrack(*event.GuildID(), event.User())
-		event.CreateMessage(messageBuilder.Build())
-	}
-
-	if event.ButtonInteractionData().CustomID() == "loop" {
-		messageBuilder := b.loopTrack(*event.GuildID(), event.User())
+	// Check if the customID exists in the map and execute the corresponding function.
+	if actionFunc, ok := actions[customID]; ok {
+		messageBuilder := actionFunc(*event.GuildID(), event.User())
 		event.CreateMessage(messageBuilder.Build())
 	}
 }
