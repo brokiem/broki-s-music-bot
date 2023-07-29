@@ -39,10 +39,7 @@ func (b *Bot) play(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	}
 
-	guild, ok := event.Guild()
-	if ok {
-		log.Debugf("User %s used /play in guild %s (%s) in channel %s (%s) with query %s\n", event.User().Username, guild.Name, guild.ID, event.Channel().Name(), event.Channel().ID(), data.String("query"))
-	}
+	log.Debugf("User %s used /play with query %s\n", event.User().Username, data.String("query"))
 
 	event.CreateMessage(discord.MessageCreate{
 		Content: "...",
