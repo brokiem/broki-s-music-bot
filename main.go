@@ -21,6 +21,7 @@ import (
 )
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 	log.Infof("Starting broki's music bot...")
 
