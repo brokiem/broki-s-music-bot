@@ -58,12 +58,35 @@ func (b *Bot) onApplicationCommand(event *events.ApplicationCommandInteractionCr
 
 // onVoiceStateUpdate is called when a user joins or leaves a voice channel
 func (b *Bot) onVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
-	if event.VoiceState.UserID != b.Client.ApplicationID() {
+	voiceState := event.VoiceState
+
+	if voiceState.UserID.String() != b.Client.ApplicationID().String() {
 		return
 	}
-	b.Lavalink.OnVoiceStateUpdate(context.TODO(), event.VoiceState.GuildID, event.VoiceState.ChannelID, event.VoiceState.SessionID)
-	if event.VoiceState.ChannelID == nil {
-		b.Queues.Delete(event.VoiceState.GuildID)
+
+	b.Lavalink.OnVoiceStateUpdate(context.TODO(), voiceState.GuildID, voiceState.ChannelID, voiceState.SessionID)
+	if voiceState.ChannelID == nil {
+		b.Queues.Delete(voiceState.GuildID)
+	} else {
+		// Count the number of members in the voice channel.
+		memberCount := 0
+		botInChannel := false
+		b.Client.Caches().MembersForEach(voiceState.GuildID, func(member discord.Member) {
+			memberVoiceState, ok := b.Client.Caches().VoiceState(voiceState.GuildID, member.User.ID)
+			if ok && memberVoiceState.ChannelID != nil && *memberVoiceState.ChannelID == *voiceState.ChannelID {
+				memberCount++
+				if member.User.ID.String() == b.Client.ApplicationID().String() {
+					botInChannel = true
+				}
+			}
+		})
+
+		// Check if the bot is the only one in the voice channel.
+		if memberCount == 1 && botInChannel {
+			// Leave the voice channel.
+			b.Client.UpdateVoiceState(context.Background(), event.VoiceState.GuildID, nil, false, false)
+			b.Queues.Delete(voiceState.GuildID)
+		}
 	}
 }
 
