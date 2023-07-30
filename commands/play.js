@@ -50,7 +50,7 @@ export async function execute(interaction) {
       const contents = {
         embeds: [
           make_simple_embed(
-            "Queue is full (max 5)! However, you can unlock more queue slots by [voting for the bot](https://top.gg/bot/961240507894353970/vote)! (You can vote every 12 hours)"
+            "Queue is full (max 5)! However, you can unlock more queue slots by [voting for the bot](https://top.gg/bot/961240507894353970/vote)! (You can vote every 12 hours and make sure to use ad-blocker on the site)"
           ),
         ],
       };
