@@ -266,6 +266,10 @@ async function handleButton(interaction) {
       break;
     default:
       if (interaction.customId.startsWith("replay:")) {
+        await interaction.reply({
+          content: "..."
+        });
+
         const replay_url = interaction.customId.replaceAll("replay:", "");
 
         const guild = client.guilds.cache.get(interaction.guildId);
