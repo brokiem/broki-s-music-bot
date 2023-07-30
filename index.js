@@ -177,7 +177,7 @@ async function handleChatInputCommand(interaction) {
     return;
   }
 
-  await interaction.reply({ content: "Loading..." });
+  await interaction.reply({ content: "..." });
 
   try {
     await execute(interaction);
