@@ -37,7 +37,7 @@ export async function execute(interaction) {
     embeds: [
       make_playing_embed(interaction.guildId, interaction.member, yt_data),
     ],
-    components: [get_control_button_row()],
+    components: [get_control_button_row(stream_data.yt_url)],
     allowedMentions: { repliedUser: false },
   });
 }

@@ -45,11 +45,12 @@ export function make_playing_embed(guild_id, member, yt_data) {
     });
 }
 
-export function get_control_button_row() {
+export function get_control_button_row(url) {
   const play = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("stop").setLabel("Stop");
   const pause = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("pause").setLabel("Pause/Resume");
   const loop = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId("loop").setLabel("Loop");
-  return new discord.ActionRowBuilder().addComponents([play, pause, loop]);
+  const replay = new discord.ButtonBuilder().setStyle(discord.ButtonStyle.Secondary).setCustomId(`replay:${url}`).setLabel("Replay");
+  return new discord.ActionRowBuilder().addComponents([play, pause, loop, replay]);
 }
 
 export function leave_voice_channel(guild_id) {

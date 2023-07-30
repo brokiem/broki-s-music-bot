@@ -109,7 +109,7 @@ export async function execute(interaction) {
   } else {
     await message.edit({
       embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data)],
-      components: [get_control_button_row()],
+      components: [get_control_button_row(yt_data.url)],
       allowedMentions: { repliedUser: false },
     });
   }
