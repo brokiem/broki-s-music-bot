@@ -266,7 +266,7 @@ async function handleButton(interaction) {
       break;
     default:
       if (interaction.customId.startsWith("replay:")) {
-        const replay_url = interaction.customId.split(":")[1];
+        const replay_url = interaction.customId.replaceAll("replay:", "");
 
         const guild = client.guilds.cache.get(interaction.guildId);
         const bot = guild.members.cache.get(client.user.id);
