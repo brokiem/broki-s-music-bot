@@ -201,24 +201,24 @@ async function handleChatInputCommand(interaction) {
 }
 
 async function handleButton(interaction) {
-  if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-    await interaction.reply({
-      embeds: [make_simple_embed("You are not in the same voice channel!")],
-      ephemeral: true
-    });
-    return;
-  }
-
-  if (!any_audio_playing(interaction.guildId)) {
-    await interaction.reply({
-      embeds: [make_simple_embed("No audio is currently playing")],
-      ephemeral: true,
-    });
-    return;
-  }
-
   switch (interaction.customId) {
     case "pause":
+      if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
+        await interaction.reply({
+          embeds: [make_simple_embed("You are not in the same voice channel!")],
+          ephemeral: true
+        });
+        return;
+      }
+
+      if (!any_audio_playing(interaction.guildId)) {
+        await interaction.reply({
+          embeds: [make_simple_embed("No audio is currently playing")],
+          ephemeral: true,
+        });
+        return;
+      }
+
       if (pause_audio(interaction.guildId) === 0) {
         await interaction.reply({
           embeds: [
@@ -240,6 +240,22 @@ async function handleButton(interaction) {
       }
       break;
     case "stop":
+      if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
+        await interaction.reply({
+          embeds: [make_simple_embed("You are not in the same voice channel!")],
+          ephemeral: true
+        });
+        return;
+      }
+
+      if (!any_audio_playing(interaction.guildId)) {
+        await interaction.reply({
+          embeds: [make_simple_embed("No audio is currently playing")],
+          ephemeral: true,
+        });
+        return;
+      }
+
       stop_audio(interaction.guildId);
       await interaction.reply({
         embeds: [
@@ -251,6 +267,22 @@ async function handleButton(interaction) {
       });
       break;
     case "loop":
+      if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
+        await interaction.reply({
+          embeds: [make_simple_embed("You are not in the same voice channel!")],
+          ephemeral: true
+        });
+        return;
+      }
+
+      if (!any_audio_playing(interaction.guildId)) {
+        await interaction.reply({
+          embeds: [make_simple_embed("No audio is currently playing")],
+          ephemeral: true,
+        });
+        return;
+      }
+
       const guild_stream = client.streams.get(interaction.guildId);
       guild_stream.loop = !guild_stream.loop;
       await interaction.reply({
