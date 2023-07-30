@@ -132,6 +132,9 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     const guild = client.guilds.cache.get(guild_id);
     let connection;
     if (!hasStream && voice_connection) {
+      if (voice_connection.state.status === voice.VoiceConnectionStatus.Disconnected) {
+        voice_connection.rejoin();
+      }
       connection = voice_connection;
     } else {
       connection = voice.joinVoiceChannel({
