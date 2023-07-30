@@ -298,10 +298,6 @@ async function handleButton(interaction) {
       break;
     default:
       if (interaction.customId.startsWith("replay:")) {
-        await interaction.reply({
-          content: "..."
-        });
-
         const replay_url = interaction.customId.replaceAll("replay:", "");
 
         const guild = client.guilds.cache.get(interaction.guildId);
@@ -309,20 +305,26 @@ async function handleButton(interaction) {
         const user = guild.members.cache.get(interaction.member.id);
 
         if (!user.voice.channel) {
-          await interaction.channel.send({
+          await interaction.reply({
             embeds: [make_simple_embed("You are not in a voice channel!")],
+            ephemeral: true,
           });
           return;
         }
 
         if (bot.voice.channel) {
           if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-            await interaction.channel.send({
+            await interaction.reply({
               embeds: [make_simple_embed("You are not in the same voice channel!")],
+              ephemeral: true
             });
             return;
           }
         }
+
+        await interaction.reply({
+          content: "..."
+        });
 
         let message = null;
         const guild_stream = client.streams.get(interaction.guildId);
