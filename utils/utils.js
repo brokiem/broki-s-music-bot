@@ -68,7 +68,6 @@ export function leave_voice_channel(guild_id) {
 
   client.streams.delete(guild_id);
   //console.log("Left voice channel in guild " + guild_id + "");
-  return true;
 }
 
 export function clean(text) {
