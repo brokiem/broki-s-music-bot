@@ -126,17 +126,26 @@ export function pause_audio(guild_id) {
 
 export function prepare_voice_connection(guild_id, voice_channel_id) {
   const voice_connection = voice.getVoiceConnection(guild_id);
+  const hasStream = client.streams.has(guild_id);
 
-  if (!voice_connection || voice_connection.state.status === voice.VoiceConnectionStatus.Disconnected) {
+  if (!voice_connection || voice_connection.state.status === voice.VoiceConnectionStatus.Disconnected || !hasStream) {
+    if (!hasStream && voice_connection) {
+      // There are no way to check if the connection is destroyed or not
+      // so we just try to destroy it and ignore any errors
+      try {
+        voice_connection.destroy();
+      } catch (e) {}
+    }
+
     const audio_player = voice.createAudioPlayer();
     const guild = client.guilds.cache.get(guild_id);
-
     const connection = voice.joinVoiceChannel({
       channelId: voice_channel_id,
       guildId: guild_id,
       adapterCreator: guild.voiceAdapterCreator,
     });
 
+    const subscription = connection.subscribe(audio_player);
     connection.on(voice.VoiceConnectionStatus.Disconnected, async () => {
       try {
         await Promise.race([
@@ -146,21 +155,25 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         // Seems to be reconnecting to a new channel - ignore disconnect
       } catch (error) {
         // Seems to be a real disconnect which SHOULDN'T be recovered from
-        const guild_stream = client.streams.get(guild_id);
-
-        if (guild_stream) {
-          guild_stream.player.stop(true);
-          // There are no way to check if the connection is destroyed or not
-          // so we just try to destroy it and ignore any errors
-          try {
-            connection.destroy();
-          } catch (e) {}
-          client.streams.delete(guild_id);
+        if (subscription) {
+          subscription.unsubscribe();
         }
+
+        if (client.streams.has(guild_id)) {
+          client.streams.get(guild_id).player.stop(true);
+        }
+
+        // There are no way to check if the connection is destroyed or not
+        // so we just try to destroy it and ignore any errors
+        try {
+          connection.destroy();
+        } catch (e) {}
+
+        client.streams.delete(guild_id);
       }
     });
 
-    const guild_stream = {
+    client.streams.set(guild_id, {
       player: audio_player,
       resource: null,
       playing: false,
@@ -172,7 +185,9 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       queue: [],
       leave_timeout_id: null,
       force_stop: false,
-    };
+    });
+
+    const guild_stream = client.streams.get(guild_id);
 
     guild_stream.player.on(voice.AudioPlayerStatus.Idle, async () => {
       //console.log("Player for guild " + guild_id + " is idling.");
@@ -190,12 +205,9 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         await play_audio(url, guild_id, voice_channel_id, true);
       }
     });
-
-    client.streams.set(guild_id, guild_stream);
-  } else {
-    // If voice connection exists, update the force_stop to false
-    client.streams.get(guild_id).force_stop = false;
   }
+
+  client.streams.get(guild_id).force_stop = false;
 }
 
 export function any_audio_playing(guild_id) {
