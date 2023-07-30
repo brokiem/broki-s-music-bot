@@ -185,7 +185,7 @@ async function handleChatInputCommand(interaction) {
   }
 
   // check if the bot has permission to send message to the channel
-  if (!interaction.guild.me.permissionsIn(interaction.channel).has(discord.PermissionsBitField.Flags.SendMessages)) {
+  if (!interaction.guild.members.me?.permissionsIn(interaction.channel).has(discord.PermissionsBitField.Flags.SendMessages)) {
     await interaction.reply({
       embeds: [make_simple_embed("I don't have permission to send message to this channel!")],
       ephemeral: true,
