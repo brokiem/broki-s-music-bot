@@ -102,7 +102,7 @@ export async function execute(interaction) {
       embeds: [
         await make_playing_embed(interaction.guildId, interaction.member, yt_data)
           .setTitle(`Added to queue (#${guild_stream?.queue?.length})`)
-          .setColor("#44DDBF"),
+          .setColor(0x44DDBF),
       ],
       allowedMentions: { repliedUser: false },
     });

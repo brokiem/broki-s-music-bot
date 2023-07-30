@@ -35,7 +35,7 @@ export function make_simple_embed(string) {
 
 export function make_playing_embed(guild_id, member, yt_data) {
   return new discord.EmbedBuilder()
-    .setColor("#35cf7d")
+    .setColor(0x35cf7d)
     .setTitle("Now Playing")
     .setDescription("[" + yt_data.title + "](" + yt_data.url + ") `(" + convert_seconds_to_minutes(yt_data.duration) + ")`")
     .setThumbnail(yt_data.thumbnail_url)
