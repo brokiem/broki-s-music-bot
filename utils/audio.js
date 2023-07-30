@@ -129,22 +129,19 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
   const hasStream = client.streams.has(guild_id);
 
   if (!voice_connection || voice_connection.state.status === voice.VoiceConnectionStatus.Disconnected || !hasStream) {
+    const guild = client.guilds.cache.get(guild_id);
+    let connection;
     if (!hasStream && voice_connection) {
-      // There are no way to check if the connection is destroyed or not
-      // so we just try to destroy it and ignore any errors
-      try {
-        voice_connection.destroy();
-      } catch (e) {}
+      connection = voice_connection;
+    } else {
+      connection = voice.joinVoiceChannel({
+        channelId: voice_channel_id,
+        guildId: guild_id,
+        adapterCreator: guild.voiceAdapterCreator,
+      });
     }
 
     const audio_player = voice.createAudioPlayer();
-    const guild = client.guilds.cache.get(guild_id);
-    const connection = voice.joinVoiceChannel({
-      channelId: voice_channel_id,
-      guildId: guild_id,
-      adapterCreator: guild.voiceAdapterCreator,
-    });
-
     const subscription = connection.subscribe(audio_player);
     connection.on(voice.VoiceConnectionStatus.Disconnected, async () => {
       try {
