@@ -31,6 +31,14 @@ export async function execute(interaction) {
 
   const video_info = await seek_audio(interaction.guildId, seekTime);
 
+  if (video_info === null) {
+    await message.edit({
+      embeds: [make_simple_embed("An error occured while seeking!")],
+      allowedMentions: { repliedUser: false },
+    });
+    return;
+  }
+
   if (seekTime > video_info.video_details.durationInSec || seekTime < 0) {
     await message.edit({
       embeds: [make_simple_embed(`Seeking beyond limit. [ 0 - ${video_info.video_details.durationInSec - 1}]`)],
