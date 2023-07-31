@@ -187,9 +187,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       force_stop: false,
     });
 
-    const guild_stream = client.streams.get(guild_id);
-
-    guild_stream.player.on(voice.AudioPlayerStatus.Idle, async () => {
+    audio_player.on(voice.AudioPlayerStatus.Idle, async () => {
+      const guild_stream = client.streams.get(guild_id);
       //console.log("Player for guild " + guild_id + " is idling.");
       guild_stream.resource = null;
       guild_stream.playing = false;
