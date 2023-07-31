@@ -173,20 +173,6 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       }
     });
 
-    client.streams.set(guild_id, {
-      player: audio_player,
-      resource: null,
-      playing: false,
-      looped_url: null,
-      loop: false,
-      yt_title: undefined,
-      yt_url: undefined,
-      yt_thumbnail_url: undefined,
-      queue: [],
-      leave_timeout_id: null,
-      force_stop: false,
-    });
-
     audio_player.on(voice.AudioPlayerStatus.Idle, async () => {
       const guild_stream = client.streams.get(guild_id);
       //console.log("Player for guild " + guild_id + " is idling.");
@@ -203,6 +189,20 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         const url = guild_stream.queue.shift()?.url;
         await play_audio(url, guild_id, voice_channel_id, true);
       }
+    });
+
+    client.streams.set(guild_id, {
+      player: audio_player,
+      resource: null,
+      playing: false,
+      looped_url: null,
+      loop: false,
+      yt_title: undefined,
+      yt_url: undefined,
+      yt_thumbnail_url: undefined,
+      queue: [],
+      leave_timeout_id: null,
+      force_stop: false,
     });
   }
 
