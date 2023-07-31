@@ -21,7 +21,9 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
     }
 
     if (playdl.yt_validate(input) === "video") {
-      video_info = await playdl.video_info(input);
+      try {
+        video_info = await playdl.video_info(input);
+      } catch (e) {}
     }
   }
 
@@ -32,7 +34,9 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
       return null;
     }
 
-    video_info = await playdl.video_info(search_results[0].url);
+    try {
+      video_info = await playdl.video_info(search_results[0].url);
+    } catch (e) {}
   }
 
   if (video_info === null) {
@@ -64,7 +68,24 @@ export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
 }
 
 export async function seek_audio(guild_id, timeSeconds = 0) {
-  const video_info = await playdl.video_info(client.streams.get(guild_id).yt_url);
+  let video_info;
+
+  const play = async (retry_count = 0) => {
+    try {
+      video_info = await playdl.video_info(client.streams.get(guild_id).yt_url);
+    } catch (e) {
+      if (retry_count >= 3) {
+        return;
+      }
+
+      await play(++retry_count);
+    }
+  }
+  await play();
+
+  if (!video_info) {
+    return null;
+  }
 
   if (timeSeconds > video_info.video_details.durationInSec || timeSeconds < 0) {
     return video_info;
@@ -180,8 +201,20 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       guild_stream.playing = false;
 
       if (guild_stream.loop) {
-        const result = await playdl.video_info(guild_stream.looped_url);
-        await broadcast_audio(guild_id, await playdl.stream_from_info(result, {}));
+        const play = async (retry_count = 0) => {
+          try {
+            const result = await playdl.video_info(guild_stream.looped_url);
+            await broadcast_audio(guild_id, await playdl.stream_from_info(result, {}));
+          } catch (e) {
+            if (retry_count >= 3) {
+              return;
+            }
+
+            await play(++retry_count);
+          }
+        }
+
+        await play();
         return;
       }
 
