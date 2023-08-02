@@ -166,7 +166,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     });
 
     const audio_player = voice.createAudioPlayer();
-    const subscription = connection.subscribe(audio_player);
+    connection.subscribe(audio_player);
+
     connection.on(voice.VoiceConnectionStatus.Disconnected, async () => {
       try {
         await Promise.race([
@@ -176,8 +177,8 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         // Seems to be reconnecting to a new channel - ignore disconnect
       } catch (error) {
         // Seems to be a real disconnect which SHOULDN'T be recovered from
-        if (subscription) {
-          subscription.unsubscribe();
+        if (voice_connection.state.subscription) {
+          voice_connection.state.subscription.unsubscribe();
         }
 
         if (client.streams.has(guild_id)) {
