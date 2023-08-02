@@ -107,7 +107,7 @@ export async function broadcast_audio(guild_id, stream) {
     return;
   }
 
-  stream.stream.setMaxListeners(1);
+  stream.stream.setMaxListeners(2);
 
   guild_stream.resource = voice.createAudioResource(stream.stream, {
     inputType: stream.type,
