@@ -184,11 +184,9 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
           client.streams.get(guild_id).player.stop(true);
         }
 
-        // There are no way to check if the connection is destroyed or not
-        // so we just try to destroy it and ignore any errors
-        try {
+        if (voice_connection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
           connection.destroy();
-        } catch (e) {}
+        }
 
         client.streams.delete(guild_id);
       }

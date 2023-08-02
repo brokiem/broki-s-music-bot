@@ -59,12 +59,11 @@ client.on(discord.Events.VoiceStateUpdate, (oldState, newState) => {
         // Stop the audio
         stop_audio(oldState.guild.id);
         client.streams.delete(oldState.guild.id);
-        // There are no way to check if the connection is destroyed or not
-        // so we just try to destroy it and ignore any errors
-        try {
-          const conn = voice.getVoiceConnection(oldState.guild.id);
+
+        const conn = voice.getVoiceConnection(oldState.guild.id);
+        if (conn?.state.status !== voice.VoiceConnectionStatus.Destroyed) {
           conn?.destroy();
-        } catch (e) {}
+        }
 
         //console.log("Stopped audio in guild with ID " + oldState.guild.id + " because I was kicked from the voice channel.");
         return;

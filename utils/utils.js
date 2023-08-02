@@ -60,11 +60,10 @@ export function leave_voice_channel(guild_id) {
 
   const conn = voice.getVoiceConnection(guild_id);
   conn?.disconnect();
-  // There are no way to check if the connection is destroyed or not
-  // so we just try to destroy it and ignore any errors
-  try {
+
+  if (conn?.state.status !== voice.VoiceConnectionStatus.Destroyed) {
     conn?.destroy();
-  } catch (e) {}
+  }
 
   client.streams.delete(guild_id);
   //console.log("Left voice channel in guild " + guild_id + "");
