@@ -225,6 +225,19 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       }
     });
 
+    audio_player.on("stateChange", async (oldState, newState) => {
+      if (newState.resource !== oldState.resource) {
+        if (oldState.resource) {
+          // Explicitly remove all event listeners from the old resource's stream
+          oldState.resource.playStream.removeAllListeners('end');
+          oldState.resource.playStream.removeAllListeners('close');
+          oldState.resource.playStream.removeAllListeners('finish');
+          oldState.resource.playStream.removeAllListeners('readable');
+          oldState.resource.playStream.removeAllListeners('error');
+        }
+      }
+    })
+
     client.streams.set(guild_id, {
       player: audio_player,
       resource: null,
