@@ -179,15 +179,15 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
         // Seems to be reconnecting to a new channel - ignore disconnect
       } catch (error) {
         // Seems to be a real disconnect which SHOULDN'T be recovered from
-        if (voice_connection.state.subscription) {
-          voice_connection.state.subscription.unsubscribe();
+        if (connection.state.subscription) {
+          connection.state.subscription.unsubscribe();
         }
 
         if (client.streams.has(guild_id)) {
           client.streams.get(guild_id).player.stop(true);
         }
 
-        if (voice_connection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
+        if (connection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
           connection.destroy();
         }
 
