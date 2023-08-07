@@ -3,7 +3,7 @@ module github.com/brokiem/broki-s-music-bot
 go 1.20
 
 require (
-	github.com/disgoorg/disgo v0.16.7
+	github.com/disgoorg/disgo v0.16.8
 	github.com/disgoorg/disgolink/v2 v2.0.1
 	github.com/disgoorg/snowflake/v2 v2.0.1
 	github.com/sirupsen/logrus v1.9.3
