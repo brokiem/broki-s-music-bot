@@ -167,6 +167,19 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
       adapterCreator: guild.voiceAdapterCreator,
     });
 
+    const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+      const newUdp = Reflect.get(newNetworkState, 'udp');
+      clearInterval(newUdp?.keepAliveInterval);
+    }
+
+    connection.on('stateChange', (oldState, newState) => {
+      const oldNetworking = Reflect.get(oldState, 'networking');
+      const newNetworking = Reflect.get(newState, 'networking');
+
+      oldNetworking?.off('stateChange', networkStateChangeHandler);
+      newNetworking?.on('stateChange', networkStateChangeHandler);
+    });
+
     const audio_player = voice.createAudioPlayer();
     connection.subscribe(audio_player);
 
