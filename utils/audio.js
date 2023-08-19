@@ -168,7 +168,7 @@ export function prepare_voice_connection(guild_id, voice_channel_id) {
     });
 
     connection.on('stateChange', (oldState, newState) => {
-      if (oldState.status === VoiceConnectionStatus.Ready && newState.status === VoiceConnectionStatus.Connecting) {
+      if (oldState.status === voice.VoiceConnectionStatus.Ready && newState.status === voice.VoiceConnectionStatus.Connecting) {
         connection.configureNetworking();
       }
     });
