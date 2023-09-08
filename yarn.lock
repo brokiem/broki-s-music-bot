@@ -159,13 +159,13 @@
   resolved "https://registry.yarnpkg.com/@sapphire/snowflake/-/snowflake-3.5.1.tgz#254521c188b49e8b2d4cc048b475fb2b38737fec"
   integrity sha512-BxcYGzgEsdlG0dKAyOm0ehLGm2CafIrfQTZGWgkfKYbj+pNNsorZ7EotuZukc2MT70E0UbppVbtpBrqpzVzjNA==
 
-"@top-gg/sdk@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@top-gg/sdk/-/sdk-3.1.5.tgz#7c4f598cfa9bf49420c9f6e65c492834fd395496"
-  integrity sha512-eIqyqKDuC/F8nXRDrUWwuvmcBgnJ65EhI8xQQPcBJL9QNpBf0IeggHjyzuNiDE2MnMDEoJHYJKeCI4bf7b811g==
+"@top-gg/sdk@^3.1.6":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/@top-gg/sdk/-/sdk-3.1.6.tgz#e41c166b2b92466c8fcaff0cc2b260507d9d00f6"
+  integrity sha512-qWWYDKAwJHaKaA/5EyLYMzfR76MwCbmKVMSXTPMd9FZFPHuLWJHO+m7Q8dWpWtcnunHa6evRAwlB3p83cht7Ww==
   dependencies:
     raw-body "^2.5.2"
-    undici "^5.21.0"
+    undici "^5.23.0"
 
 "@types/node@*":
   version "20.1.0"
@@ -707,17 +707,17 @@ tslib@^2.6.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.1.tgz#fd8c9a0ff42590b25703c0acb3de3d3f4ede0410"
   integrity sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==
 
-undici@5.22.1, undici@^5.22.1:
+undici@5.22.1:
   version "5.22.1"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.22.1.tgz#877d512effef2ac8be65e695f3586922e1a57d7b"
   integrity sha512-Ji2IJhFXZY0x/0tVBXeQwgPlLWw13GVzpsWPQ3rV50IFMMof2I55PZZxtm4P6iNq+L5znYN9nSTAq0ZyE6lSJw==
   dependencies:
     busboy "^1.6.0"
 
-undici@^5.21.0:
-  version "5.22.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.22.0.tgz#5e205d82a5aecc003fc4388ccd3d2c6e8674a0ad"
-  integrity sha512-fR9RXCc+6Dxav4P9VV/sp5w3eFiSdOjJYsbtWfd4s5L5C4ogyuVpdKIVHeW0vV1MloM65/f7W45nR9ZxwVdyiA==
+undici@^5.22.1, undici@^5.23.0:
+  version "5.24.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.24.0.tgz#6133630372894cfeb3c3dab13b4c23866bd344b5"
+  integrity sha512-OKlckxBjFl0oXxcj9FU6oB8fDAaiRUq+D8jrFWGmOfI/gIyjk/IeS75LMzgYKUaeHzLUcYvf9bbJGSrUwTfwwQ==
   dependencies:
     busboy "^1.6.0"
 
