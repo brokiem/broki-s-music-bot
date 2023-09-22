@@ -10,6 +10,10 @@ RUN apk update && \
     apk add --repository https://dl-cdn.alpinelinux.org/alpine/edge/main libcrypto1.1 && \
     yarn install --production=true
 
+RUN cd node_modules/play-dl && \
+    yarn install --production=true && \
+    yarn build
+
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
 
 COPY . .
