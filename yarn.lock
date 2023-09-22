@@ -300,15 +300,10 @@ discord-api-types@0.37.50:
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.50.tgz#6059eb8c0b784ad8194655a8b8b7f540fcfac428"
   integrity sha512-X4CDiMnDbA3s3RaUXWXmgAIbY1uxab3fqe3qwzg5XutR3wjqi7M3IkgQbsIBzpqBN2YWr/Qdv7JrFRqSgb4TFg==
 
-discord-api-types@^0.37.37, discord-api-types@^0.37.41:
-  version "0.37.42"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.42.tgz#3c196267ed31e9ea249e6880c15e2af1c6428629"
-  integrity sha512-1Huaj9cQ1W7/uryS8MZs/tZemnoKB94thM1cE40lep3rpU3q7WHqkdjN/veX0prTkYlPhcyLd/DeF/pBO8X8oQ==
-
-discord-api-types@^0.37.50:
-  version "0.37.51"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.51.tgz#a9fe2ceddde1c9c2e4d29987d45241cd746b9319"
-  integrity sha512-tdmdH98t3zgjQF6zwOHl0OB/PCBiE4aVsNTuN7m0PfU2jOLx3lNoU6xTeFALntUtlIxN80GTr9RPQR4t7msjSg==
+discord-api-types@^0.37.37, discord-api-types@^0.37.41, discord-api-types@^0.37.50, discord-api-types@^0.37.57:
+  version "0.37.57"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.57.tgz#7a32d7bda77085cc85c8eef9a2b499de89b7eefc"
+  integrity sha512-EGZgYrNVFVYux2tWZNMnemNgZh6sjQmKj1d9PS7++fYzHx7ksXtO5e++PqOZXzXkQ38z2uJ2tRlPFS8iKHl7qw==
 
 discord.js@^14.13.0:
   version "14.13.0"
@@ -550,9 +545,10 @@ play-audio@^0.5.2:
   resolved "https://registry.yarnpkg.com/play-audio/-/play-audio-0.5.2.tgz#191dd45b95ff64ae20bbd718671da4e987d4edd1"
   integrity sha512-ZAqHUKkQLix2Iga7pPbsf1LpUoBjcpwU93F1l3qBIfxYddQLhxS6GKmS0d3jV8kSVaUbr6NnOEcEMFvuX93SWQ==
 
-"play-dl@https://github.com/juliand665/play-dl":
+"play-dl@https://github.com/brokiem/play-dl":
   version "1.9.6"
-  resolved "https://github.com/juliand665/play-dl#b7805e3ae03758a5c34894bc74a81459e84f856f"
+  uid c8278ca6dc751fdf33c5ea5734e9706bda758f23
+  resolved "https://github.com/brokiem/play-dl#c8278ca6dc751fdf33c5ea5734e9706bda758f23"
   dependencies:
     play-audio "^0.5.2"
 
