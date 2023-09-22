@@ -12,7 +12,7 @@
     "bufferutil": "^4.0.7",
     "discord-api-types": "^0.37.50",
     "discord.js": "^14.13.0",
-    "play-dl": "juliand665/play-dl",
+    "play-dl": "https://github.com/juliand665/play-dl",
     "prettier": "^2.8.4",
     "sodium-native": "^4.0.4",
     "utf-8-validate": "^6.0.3"

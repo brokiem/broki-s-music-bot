@@ -550,10 +550,9 @@ play-audio@^0.5.2:
   resolved "https://registry.yarnpkg.com/play-audio/-/play-audio-0.5.2.tgz#191dd45b95ff64ae20bbd718671da4e987d4edd1"
   integrity sha512-ZAqHUKkQLix2Iga7pPbsf1LpUoBjcpwU93F1l3qBIfxYddQLhxS6GKmS0d3jV8kSVaUbr6NnOEcEMFvuX93SWQ==
 
-play-dl@^1.9.6:
+"play-dl@https://github.com/juliand665/play-dl":
   version "1.9.6"
-  resolved "https://registry.yarnpkg.com/play-dl/-/play-dl-1.9.6.tgz#32722bfe5b71e298e47faa8dcf098730ad9da56a"
-  integrity sha512-JW44bQbME9fNfGhGXQ/rdcsHr4BfgJabVlSgpS9QY/NscfprFH1asv+q9atrZThP3+hHIpgtFNABccg9rFWlwg==
+  resolved "https://github.com/juliand665/play-dl#b7805e3ae03758a5c34894bc74a81459e84f856f"
   dependencies:
     play-audio "^0.5.2"
 
