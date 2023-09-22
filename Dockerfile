@@ -5,8 +5,9 @@ WORKDIR /app
 COPY package.json ./
 
 RUN apk update && \
-    apk add --no-cache libsodium ffmpeg && \
-    apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main libcrypto1.1 && \
+    apk add git && \
+    apk add libsodium ffmpeg && \
+    apk add --repository https://dl-cdn.alpinelinux.org/alpine/edge/main libcrypto1.1 && \
     yarn install --production=true
 
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
