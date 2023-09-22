@@ -11,8 +11,8 @@ RUN apk update && \
     yarn install --production=true
 
 RUN cd node_modules/play-dl && \
-    yarn install --production=true && \
-    yarn build
+    yarn build && \
+    cd ../..
 
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
 

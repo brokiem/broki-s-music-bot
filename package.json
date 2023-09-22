@@ -15,7 +15,17 @@
     "play-dl": "https://github.com/juliand665/play-dl",
     "prettier": "^2.8.4",
     "sodium-native": "^4.0.4",
-    "utf-8-validate": "^6.0.3"
+    "utf-8-validate": "^6.0.3",
+    "play-audio": "^0.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.23",
+    "prettier": "^2.3.1",
+    "tsup": "^6.0.1",
+    "typedoc": "^0.22.11",
+    "typedoc-plugin-extras": "^2.2.1",
+    "typedoc-plugin-missing-exports": "^1.0.0",
+    "typescript": "^4.7.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
