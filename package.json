@@ -10,7 +10,7 @@
     "@discordjs/voice": "^0.16.1",
     "@top-gg/sdk": "^3.1.5",
     "bufferutil": "^4.0.8",
-    "discord-api-types": "^0.37.63",
+    "discord-api-types": "^0.37.76",
     "discord.js": "^14.14.1",
     "play-dl": "^1.9.7",
     "prettier": "^3.1.0",
