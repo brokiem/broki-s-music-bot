@@ -14,7 +14,7 @@
     "discord.js": "^14.14.1",
     "play-dl": "^1.9.7",
     "prettier": "^3.1.0",
-    "sodium-native": "^4.1.1",
+    "sodium-native": "^4.2.1",
     "utf-8-validate": "^6.0.3"
   },
   "scripts": {
