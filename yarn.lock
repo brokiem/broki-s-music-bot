@@ -576,10 +576,10 @@ signal-exit@^3.0.0:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-sodium-native@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/sodium-native/-/sodium-native-4.1.1.tgz#109bc924dd55c13db87c6dd30da047487595723c"
-  integrity sha512-LXkAfRd4FHtkQS4X6g+nRcVaN7mWVNepV06phIsC6+IZFvGh1voW5TNQiQp2twVaMf05gZqQjuS+uWLM6gHhNQ==
+sodium-native@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/sodium-native/-/sodium-native-4.3.1.tgz#221a11b10876259b85ccd288dd28f07ed4dbf35f"
+  integrity sha512-YdP64gAdpIKHfL4ttuX4aIfjeunh9f+hNeQJpE9C8UMndB3zkgZ7YmmGT4J2+v6Ibyp6Wem8D1TcSrtdW0bqtg==
   dependencies:
     node-gyp-build "^4.8.0"
 
