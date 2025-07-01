@@ -61,6 +61,7 @@ export async function leave_voice_channel(guild_id) {
       // Use Lavalink player to properly disconnect
       if (voice) {
         const player = voice.players.get(guild_id);
+        await player.leave();
         await player.destroy();
       }
     } catch (e) {
