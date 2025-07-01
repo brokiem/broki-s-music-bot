@@ -136,7 +136,7 @@ client.on(discord.Events.MessageCreate, async (message) => {
                 case "servers":
                     if (message.author.id === "548120702373593090") {
                         await message.reply({
-                            embeds: [make_simple_embed("Servers: (" + client.guilds.cache.size + ")\n - " + [...client.guilds.cache].join("\n - "))],
+                            embeds: [make_simple_embed("Servers: (" + (await client.shard.fetchClientValues('guilds.cache.size')).reduce((acc, guildCount) => acc + guildCount, 0) + ")\n - " + [...client.guilds.cache].join("\n - "))],
                             allowedMentions: {repliedUser: false},
                         });
                     }
@@ -152,7 +152,7 @@ client.on(discord.Events.GuildCreate, async (guild) => {
     await webhook_client.send({
         username: 'broki\'s music bot',
         embeds: [
-            make_simple_embed("I was added to a new server: **" + guild.name + "**! (total servers: " + client.guilds.cache.size + ")")
+            make_simple_embed("I was added to a new server: **" + guild.name + "**! (total servers: " + (await client.shard.fetchClientValues('guilds.cache.size')).reduce((acc, guildCount) => acc + guildCount, 0) + ")")
         ],
     });
 
@@ -163,7 +163,7 @@ client.on(discord.Events.GuildDelete, async (guild) => {
     await webhook_client.send({
         username: 'broki\'s music bot',
         embeds: [
-            make_simple_embed("I was removed from a server: **" + guild.name + "**! (total servers: " + client.guilds.cache.size + ")")
+            make_simple_embed("I was removed from a server: **" + guild.name + "**! (total servers: " + (await client.shard.fetchClientValues('guilds.cache.size')).reduce((acc, guildCount) => acc + guildCount, 0) + ")")
         ],
     });
 
