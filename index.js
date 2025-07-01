@@ -113,7 +113,7 @@ client.on(discord.Events.VoiceStateUpdate, (oldState, newState) => {
 
                         const channel = await client.channels.fetch(oldState.channel.id);
                         if (channel && channel.members.size === 1) {
-                            leave_voice_channel(oldState.guild.id);
+                            await leave_voice_channel(oldState.guild.id);
                         }
                     }, 30000);
                 }

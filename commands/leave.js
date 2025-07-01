@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { is_same_vc_as, make_simple_embed, leave_voice_channel } from "../utils/utils.js";
-import { client } from "../index.js";
+import {SlashCommandBuilder} from "@discordjs/builders";
+import {is_same_vc_as, leave_voice_channel, make_simple_embed} from "../utils/utils.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder().setName("leave").setDescription("Leave the voice channel");
 
@@ -18,5 +18,5 @@ export async function execute(interaction) {
     embeds: [make_simple_embed("Leaving voice channel <#" + voice_channel.id + ">")],
   });
 
-  leave_voice_channel(interaction.guildId);
+  await leave_voice_channel(interaction.guildId);
 }

@@ -1,5 +1,6 @@
-import {client} from "../index.js";
+import {client, voice} from "../index.js";
 import discord from "discord.js";
+import {getVoiceConnection} from "@discordjs/voice";
 
 export function convert_seconds_to_minutes(value) {
   const hrs = ~~(value / 3600);
@@ -58,7 +59,6 @@ export async function leave_voice_channel(guild_id) {
   if (guild_stream) {
     try {
       // Use Lavalink player to properly disconnect
-      const {voice} = await import("../index.js");
       if (voice) {
         const player = voice.players.get(guild_id);
         await player.destroy();
@@ -69,6 +69,11 @@ export async function leave_voice_channel(guild_id) {
   }
 
   client.streams.delete(guild_id);
+
+  const connection = getVoiceConnection(guild_id);
+  if (connection) {
+    connection.destroy();
+  }
 }
 
 export function clean(text) {
