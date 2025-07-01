@@ -35,7 +35,7 @@ export async function execute(interaction) {
                 client.ws.ping +
                 "ms\n" +
                 "• Guilds: " +
-                (await client.shard.fetchClientValues('guilds.cache.size')).reduce((acc, guildCount) => acc + guildCount, 0)
+                client.guilds.cache.size
             ),
         ],
         allowedMentions: {repliedUser: false},
