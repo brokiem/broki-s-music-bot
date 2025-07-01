@@ -1,13 +1,7 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  is_same_vc_as,
-  make_simple_embed,
-  make_playing_embed,
-  get_control_button_row,
-  create_yt_data_from_playdl_data
-} from "../utils/utils.js";
-import { any_audio_playing } from "../utils/audio.js";
-import { client } from "../index.js";
+import {SlashCommandBuilder} from "@discordjs/builders";
+import {get_control_button_row, is_same_vc_as, make_playing_embed, make_simple_embed} from "../utils/utils.js";
+import {any_audio_playing} from "../utils/audio.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder().setName("control").setDescription("Control current audio");
 

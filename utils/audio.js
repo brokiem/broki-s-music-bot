@@ -1,272 +1,271 @@
-import playdl from "play-dl";
-import * as voice from "@discordjs/voice";
-import { client } from "./../index.js";
-import { leave_voice_channel } from "./utils.js";
+import {client, voice as lavalink} from "./../index.js";
 
-export async function play_audio(input, guild_id, voice_channel_id, is_queue) {
-  prepare_voice_connection(guild_id, voice_channel_id);
+const trackCache = new Map();
 
-  const guild_stream = client.streams.get(guild_id);
-  const options = {
-    quality: 1,
-  };
-  let video_info = null;
+export async function play_audio(input, guild_id, voice_channel_id, is_queue = false) {
+    prepare_voice_connection(guild_id, voice_channel_id);
 
-  if (input.startsWith("https")) {
-    const url = new URL(input);
-    const timeSeconds = url.searchParams.get("t");
+    const guild_stream = client.streams.get(guild_id);
+    let track_data = null;
+    let search_query = input;
 
-    if (timeSeconds) {
-      options.seek = timeSeconds;
+    // Handle URL with timestamp
+    if (input.startsWith("https")) {
+        const url = new URL(input);
+        const timeSeconds = url.searchParams.get("t");
+
+        if (timeSeconds) {
+            guild_stream.seek_time = parseInt(timeSeconds);
+        }
+
+        search_query = input;
+    } else {
+        search_query = `ytsearch:${input}`;
     }
 
-    if (playdl.yt_validate(input) === "video") {
-      try {
-        video_info = await playdl.video_info(input);
-      } catch (e) {}
-    }
-  }
+    // Check cache first for performance
+    if (trackCache.has(search_query)) {
+        track_data = trackCache.get(search_query);
+    } else {
+        try {
+            const res = await lavalink.load(search_query);
 
-  if (video_info === null) {
-    const search_results = await playdl.search(input, { limit: 1 });
+            if (res.loadType === 'NO_MATCHES' || res.tracks.length === 0) {
+                return null;
+            }
 
-    if (search_results.length <= 0) {
-      return null;
+            track_data = res.tracks[0];
+
+            // Cache the track for 5 minutes
+            trackCache.set(search_query, track_data);
+            setTimeout(() => trackCache.delete(search_query), 5 * 60 * 1000);
+
+        } catch (e) {
+            console.error('Failed to load track:', e);
+            return null;
+        }
     }
+
+    if (!track_data) {
+        return null;
+    }
+
+    // If audio is already playing and this isn't from queue, add to queue
+    if (!is_queue && any_audio_playing(guild_id)) {
+        const queue_item = {
+            url: track_data.info.uri,
+            title: track_data.info.title,
+            thumbnail_url: `https://img.youtube.com/vi/${track_data.info.identifier}/maxresdefault.jpg`,
+            duration: Math.floor(track_data.info.length / 1000),
+            track: track_data.track
+        };
+
+        guild_stream.queue.push(queue_item);
+
+        return createCompatibleTrackData(track_data);
+    }
+
+    // Store track info in guild_stream
+    guild_stream.yt_title = track_data.info.title;
+    guild_stream.yt_url = track_data.info.uri;
+    guild_stream.yt_thumbnail_url = `https://img.youtube.com/vi/${track_data.info.identifier}/maxresdefault.jpg`;
+    guild_stream.duration = Math.floor(track_data.info.length / 1000);
+    guild_stream.looped_url = track_data.info.uri;
+    guild_stream.current_track = track_data.track;
 
     try {
-      video_info = await playdl.video_info(search_results[0].url);
-    } catch (e) {}
-  }
+        // Play the track using Lavalink
+        const player = lavalink.players.get(guild_id);
+        await player.join(voice_channel_id);
 
-  if (video_info === null) {
-    return null;
-  }
+        const play_options = {};
+        if (guild_stream.seek_time) {
+            play_options.start = guild_stream.seek_time * 1000;
+            guild_stream.seek_time = null;
+        }
 
-  if (options.seek && (options.seek > video_info.video_details.durationInSec || options.seek < 0)) {
-    options.seek = 0;
-  }
+        await player.play(track_data.track, play_options);
+        guild_stream.playing = true;
 
-  if (!is_queue && any_audio_playing(guild_id)) {
-    guild_stream.queue.push({
-      url: video_info.video_details.url,
-      title: video_info.video_details.title,
-      thumbnail_url: video_info.video_details.thumbnails[0].url,
-      duration: video_info.video_details.durationInSec
-    });
-    return video_info;
-  }
+        return createCompatibleTrackData(track_data);
 
-  guild_stream.yt_title = video_info.video_details.title;
-  guild_stream.yt_url = video_info.video_details.url;
-  guild_stream.yt_thumbnail_url = video_info.video_details.thumbnails[0].url;
+    } catch (e) {
+        console.error('Failed to play track:', e);
+        return null;
+    }
+}
 
-  guild_stream.looped_url = video_info.video_details.url;
-
-  await broadcast_audio(guild_id, await playdl.stream_from_info(video_info, options));
-  return video_info;
+// Helper function to create compatible track data format
+function createCompatibleTrackData(track_data) {
+    return {
+        video_details: {
+            title: track_data.info.title,
+            url: track_data.info.uri,
+            thumbnails: [{url: `https://img.youtube.com/vi/${track_data.info.identifier}/maxresdefault.jpg`}],
+            durationInSec: Math.floor(track_data.info.length / 1000)
+        }
+    };
 }
 
 export async function seek_audio(guild_id, timeSeconds = 0) {
-  let video_info;
-
-  const play = async (retry_count = 0) => {
-    try {
-      video_info = await playdl.video_info(client.streams.get(guild_id).yt_url);
-    } catch (e) {
-      if (retry_count >= 3) {
-        return;
-      }
-
-      await play(++retry_count);
+    const guild_stream = client.streams.get(guild_id);
+    if (!guild_stream?.current_track) {
+        return null;
     }
-  }
-  await play();
 
-  if (!video_info) {
-    return null;
-  }
+    try {
+        const player = lavalink.players.get(guild_id);
+        await player.seek(timeSeconds * 1000);
 
-  if (timeSeconds > video_info.video_details.durationInSec || timeSeconds < 0) {
-    return video_info;
-  }
-
-  await broadcast_audio(
-    guild_id,
-    await playdl.stream_from_info(video_info, {
-      quality: 1,
-      seek: timeSeconds,
-    })
-  );
-  return video_info;
-}
-
-export async function broadcast_audio(guild_id, stream) {
-  const guild_stream = client.streams.get(guild_id);
-  if (!guild_stream) {
-    return;
-  }
-
-  stream.stream.setMaxListeners(5);
-
-  guild_stream.resource = voice.createAudioResource(stream.stream, {
-    inputType: stream.type,
-  });
-
-  guild_stream.player.play(guild_stream.resource);
-  guild_stream.playing = true;
+        return {
+            video_details: {
+                title: guild_stream.yt_title,
+                url: guild_stream.yt_url,
+                durationInSec: Math.floor(guild_stream.duration || 0)
+            }
+        };
+    } catch (e) {
+        console.error('Failed to seek:', e);
+        return null;
+    }
 }
 
 export function stop_audio(guild_id) {
-  const guild_stream = client.streams.get(guild_id);
-  if (!guild_stream) {
-    return;
-  }
+    const guild_stream = client.streams.get(guild_id);
+    if (!guild_stream) {
+        return;
+    }
 
-  guild_stream.queue = [];
-  guild_stream.loop = false;
-  guild_stream.looped_url = null;
-  guild_stream.force_stop = true;
-  guild_stream.player.stop(true);
+    // Clear queue and reset state
+    guild_stream.queue = [];
+    guild_stream.loop = false;
+    guild_stream.looped_url = null;
+    guild_stream.force_stop = true;
+    guild_stream.playing = false;
+
+    try {
+        const player = lavalink.players.get(guild_id);
+        player.stop();
+    } catch (e) {
+        console.error('Failed to stop player:', e);
+    }
 }
 
 export function pause_audio(guild_id) {
-  const guild_stream = client.streams.get(guild_id);
-  if (!guild_stream) {
-    return 1;
-  }
+    const guild_stream = client.streams.get(guild_id);
+    if (!guild_stream) {
+        return 1;
+    }
 
-  guild_stream.playing = !guild_stream.playing;
+    try {
+        const player = lavalink.players.get(guild_id);
 
-  if (guild_stream.playing) {
-    guild_stream.player.unpause();
-    return 0;
-  } else {
-    guild_stream.player.pause();
-    return 1;
-  }
+        if (!guild_stream.paused) {
+            player.pause(true);
+            guild_stream.paused = true;
+            return 1; // Paused
+        } else {
+            player.pause(false);
+            guild_stream.paused = false;
+            return 0; // Resumed
+        }
+    } catch (e) {
+        console.error('Failed to pause/resume player:', e);
+        return 1;
+    }
 }
 
 export function prepare_voice_connection(guild_id, voice_channel_id) {
-  const voice_connection = voice.getVoiceConnection(guild_id);
-  const hasStream = client.streams.has(guild_id);
+    if (!client.streams.has(guild_id)) {
+        const player = lavalink.players.get(guild_id);
 
-  if (!voice_connection || voice_connection.state.status === voice.VoiceConnectionStatus.Disconnected || !hasStream) {
-    // Clean up the existing connection if it exists
-    if (voice_connection) {
-      try {
-        voice_connection.disconnect();
-        voice_connection.destroy();
-      } catch (e) {}
+        // Set up optimized event handlers
+        player.on('event', async (data) => {
+            if (data.type === 'TrackEndEvent' && data.reason !== 'REPLACED') {
+                await handleTrackEnd(guild_id, voice_channel_id);
+            }
+        });
+
+        player.on('error', (error) => {
+            console.error('Lavalink player error:', error);
+            const guild_stream = client.streams.get(guild_id);
+            if (guild_stream) {
+                guild_stream.playing = false;
+            }
+        });
+
+        // Initialize guild stream with optimized structure
+        client.streams.set(guild_id, {
+            player: player,
+            playing: false,
+            paused: false,
+            loop: false,
+            yt_title: undefined,
+            yt_url: undefined,
+            yt_thumbnail_url: undefined,
+            queue: [],
+            leave_timeout_id: null,
+            force_stop: false,
+            current_track: null,
+            seek_time: null,
+            looped_url: null
+        });
     }
 
-    const guild = client.guilds.cache.get(guild_id);
-    const connection = voice.joinVoiceChannel({
-      channelId: voice_channel_id,
-      guildId: guild_id,
-      adapterCreator: guild.voiceAdapterCreator,
-    });
+    client.streams.get(guild_id).force_stop = false;
+}
 
-    connection.on('stateChange', (oldState, newState) => {
-      if (oldState.status === voice.VoiceConnectionStatus.Ready && newState.status === voice.VoiceConnectionStatus.Connecting) {
-        connection.configureNetworking();
-      }
-    });
+// Optimized track end handler
+async function handleTrackEnd(guild_id, voice_channel_id) {
+    const guild_stream = client.streams.get(guild_id);
+    if (!guild_stream) return;
 
-    const audio_player = voice.createAudioPlayer();
-    connection.subscribe(audio_player);
+    guild_stream.playing = false;
 
-    connection.on(voice.VoiceConnectionStatus.Disconnected, async () => {
-      try {
-        await Promise.race([
-          voice.entersState(connection, voice.VoiceConnectionStatus.Signalling, 5_000),
-          voice.entersState(connection, voice.VoiceConnectionStatus.Connecting, 5_000),
-        ]);
-        // Seems to be reconnecting to a new channel - ignore disconnect
-      } catch (error) {
-        // Seems to be a real disconnect which SHOULDN'T be recovered from
-        if (connection.state.subscription) {
-          connection.state.subscription.unsubscribe();
+    if (guild_stream.loop && guild_stream.current_track) {
+        try {
+            const player = lavalink.players.get(guild_id);
+            await player.play(guild_stream.current_track);
+            guild_stream.playing = true;
+        } catch (e) {
+            console.error('Failed to loop track:', e);
         }
-
-        if (client.streams.has(guild_id)) {
-          client.streams.get(guild_id).player.stop(true);
-        }
-
-        if (connection.state.status !== voice.VoiceConnectionStatus.Destroyed) {
-          connection.destroy();
-        }
-
-        client.streams.delete(guild_id);
-      }
-    });
-
-    audio_player.on(voice.AudioPlayerStatus.Idle, async () => {
-      const guild_stream = client.streams.get(guild_id);
-      //console.log("Player for guild " + guild_id + " is idling.");
-      guild_stream.resource = null;
-      guild_stream.playing = false;
-
-      if (guild_stream.loop) {
-        const play = async (retry_count = 0) => {
-          try {
-            const result = await playdl.video_info(guild_stream.looped_url);
-            await broadcast_audio(guild_id, await playdl.stream_from_info(result, {}));
-          } catch (e) {
-            if (retry_count >= 3) {
-              return;
-            }
-
-            await play(++retry_count);
-          }
-        }
-
-        await play();
         return;
-      }
+    }
 
-      if (!guild_stream.force_stop && guild_stream.queue.length >= 1) {
-        const url = guild_stream.queue.shift()?.url;
-        await play_audio(url, guild_id, voice_channel_id, true);
-      }
-    });
+    if (!guild_stream.force_stop && guild_stream.queue.length > 0) {
+        const next_item = guild_stream.queue.shift();
+        try {
+            if (next_item.track) {
+                const player = lavalink.players.get(guild_id);
+                await player.play(next_item.track);
 
-    audio_player.on("stateChange", async (oldState, newState) => {
-      if (newState.resource !== oldState.resource) {
-        if (oldState.resource) {
-          // Explicitly remove all event listeners from the old resource's stream
-          oldState.resource.playStream.removeAllListeners('end');
-          oldState.resource.playStream.removeAllListeners('close');
-          oldState.resource.playStream.removeAllListeners('finish');
-          oldState.resource.playStream.removeAllListeners('readable');
-          oldState.resource.playStream.removeAllListeners('error');
+                // Update guild stream efficiently
+                Object.assign(guild_stream, {
+                    yt_title: next_item.title,
+                    yt_url: next_item.url,
+                    yt_thumbnail_url: next_item.thumbnail_url,
+                    current_track: next_item.track,
+                    playing: true
+                });
+            } else {
+                // Fallback to URL-based play
+                await play_audio(next_item.url, guild_id, voice_channel_id, true);
+            }
+        } catch (e) {
+            console.error('Failed to play next track from queue:', e);
         }
-      }
-    })
-
-    client.streams.set(guild_id, {
-      player: audio_player,
-      resource: null,
-      playing: false,
-      looped_url: null,
-      loop: false,
-      yt_title: undefined,
-      yt_url: undefined,
-      yt_thumbnail_url: undefined,
-      queue: [],
-      leave_timeout_id: null,
-      force_stop: false,
-    });
-  }
-
-  client.streams.get(guild_id).force_stop = false;
+    }
 }
 
 export function any_audio_playing(guild_id) {
-  const guild_stream = client.streams.get(guild_id);
-  if (!guild_stream) {
-    return false;
-  }
+    const guild_stream = client.streams.get(guild_id);
+    if (!guild_stream) {
+        console.log(`No stream found for guild ${guild_id}`);
+        return false;
+    }
 
-  return guild_stream.resource === null ? false : true;
+    return guild_stream.playing;
 }
+
+

@@ -1,14 +1,14 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import {SlashCommandBuilder} from "@discordjs/builders";
 import {
-  is_same_vc_as,
-  make_simple_embed,
-  make_playing_embed,
+  create_yt_data_from_lavalink_data,
   get_control_button_row,
+  is_same_vc_as,
   is_voted,
-  create_yt_data_from_playdl_data
+  make_playing_embed,
+  make_simple_embed
 } from "../utils/utils.js";
-import { play_audio } from "../utils/audio.js";
-import { client } from "../index.js";
+import {play_audio} from "../utils/audio.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder()
   .setName("play")
@@ -95,7 +95,7 @@ export async function execute(interaction) {
     return;
   }
 
-  const yt_data = create_yt_data_from_playdl_data(stream_data)
+  const yt_data = create_yt_data_from_lavalink_data(stream_data)
 
   if (guild_stream?.queue?.length >= 1) {
     await message.edit({

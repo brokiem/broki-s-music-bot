@@ -1,6 +1,5 @@
-import { client } from "../index.js";
+import {client} from "../index.js";
 import discord from "discord.js";
-import * as voice from "@discordjs/voice";
 
 export function convert_seconds_to_minutes(value) {
   const hrs = ~~(value / 3600);
@@ -53,20 +52,23 @@ export function get_control_button_row(url) {
   return new discord.ActionRowBuilder().addComponents([play, pause, loop, replay]);
 }
 
-export function leave_voice_channel(guild_id) {
-  if (client.streams.has(guild_id)) {
-    client.streams.get(guild_id).player.stop(true);
-  }
+export async function leave_voice_channel(guild_id) {
+  const guild_stream = client.streams.get(guild_id);
 
-  const conn = voice.getVoiceConnection(guild_id);
-  conn?.disconnect();
-
-  if (conn?.state.status !== voice.VoiceConnectionStatus.Destroyed) {
-    conn?.destroy();
+  if (guild_stream) {
+    try {
+      // Use Lavalink player to properly disconnect
+      const {voice} = await import("../index.js");
+      if (voice) {
+        const player = voice.players.get(guild_id);
+        await player.destroy();
+      }
+    } catch (e) {
+      console.error('Failed to destroy Lavalink player:', e);
+    }
   }
 
   client.streams.delete(guild_id);
-  //console.log("Left voice channel in guild " + guild_id + "");
 }
 
 export function clean(text) {
@@ -124,11 +126,11 @@ export function post_stats() {
   //console.log("Stats posted successfully!\n");
 }
 
-export function create_yt_data_from_playdl_data(playdl_data) {
+export function create_yt_data_from_lavalink_data(lavalink_data) {
   return {
-    title: playdl_data.video_details.title,
-    url: playdl_data.video_details.url,
-    thumbnail_url: playdl_data.video_details.thumbnails[0].url,
-    duration: playdl_data.video_details.durationInSec,
+    title: lavalink_data.video_details.title,
+    url: lavalink_data.video_details.url,
+    thumbnail_url: lavalink_data.video_details.thumbnails[0].url,
+    duration: lavalink_data.video_details.durationInSec,
   }
 }

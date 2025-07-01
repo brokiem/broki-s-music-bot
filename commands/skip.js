@@ -1,13 +1,13 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import {SlashCommandBuilder} from "@discordjs/builders";
 import {
-  create_yt_data_from_playdl_data,
+  create_yt_data_from_lavalink_data,
   get_control_button_row,
   is_same_vc_as,
   make_playing_embed,
-  make_simple_embed
+  make_simple_embed,
 } from "../utils/utils.js";
-import { any_audio_playing, play_audio } from "../utils/audio.js";
-import { client } from "../index.js";
+import {any_audio_playing, play_audio} from "../utils/audio.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder().setName("skip").setDescription("Skip to next audio");
 
@@ -51,7 +51,7 @@ export async function execute(interaction) {
 
   const url = guild_stream.queue.shift()?.url;
   const stream_data = await play_audio(url, interaction.guildId, interaction.member.voice.channelId, true);
-  const yt_data = create_yt_data_from_playdl_data(stream_data);
+  const yt_data = create_yt_data_from_lavalink_data(stream_data);
 
   await message.edit({
     embeds: [
