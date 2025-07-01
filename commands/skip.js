@@ -13,21 +13,21 @@ export const data = new SlashCommandBuilder().setName("skip").setDescription("Sk
 
 export async function execute(interaction) {
   if (!interaction.member.roles.cache.find((role) => role.name.toLowerCase() === "dj")) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("You dont have permission! (You need `DJ` role to skip)")],
     });
     return;
   }
 
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("No audio is currently playing")],
       allowedMentions: { repliedUser: false },
     });
@@ -37,14 +37,14 @@ export async function execute(interaction) {
   const guild_stream = client.streams.get(interaction.guildId);
 
   if (guild_stream.queue.length <= 0) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("No queue left, cannot skipping")],
       allowedMentions: { repliedUser: false },
     });
     return;
   }
 
-  const message = await interaction.channel.send({
+  const message = await interaction.editReply({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Skipping to next queue...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -63,7 +63,7 @@ export async function execute(interaction) {
     allowedMentions: { repliedUser: false },
   });
 
-  await interaction.channel.send({
+  await interaction.editReply({
     embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data)],
     components: [get_control_button_row(yt_data.url)],
     allowedMentions: { repliedUser: false },

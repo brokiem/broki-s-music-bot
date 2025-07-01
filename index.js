@@ -189,8 +189,10 @@ client.on(discord.Events.InteractionCreate, async (interaction) => {
 });
 
 async function handleChatInputCommand(interaction) {
+    await interaction.deferReply();
+
     if (!interaction.channel) {
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [make_simple_embed("You must be in a server to use this command!")],
             ephemeral: true,
         });
@@ -198,7 +200,7 @@ async function handleChatInputCommand(interaction) {
     }
 
     if (is_maintenance && interaction.user.id !== "548120702373593090") {
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [make_simple_embed("This bot is currently in maintenance mode. Please try again later.")],
         });
         return;
@@ -206,7 +208,7 @@ async function handleChatInputCommand(interaction) {
 
     const execute = client.commands.get(interaction.commandName);
     if (!execute) {
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [make_simple_embed("There was an error while executing this command!")],
         });
         return;
@@ -214,14 +216,12 @@ async function handleChatInputCommand(interaction) {
 
     // check if the bot has permission to send message to the channel
     if (!interaction.guild.members.me?.permissionsIn(interaction.channel).has(discord.PermissionsBitField.Flags.SendMessages)) {
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [make_simple_embed("I don't have permission to send message to this channel!")],
             ephemeral: true,
         });
         return;
     }
-
-    await interaction.reply({content: "..."});
 
     try {
         await execute(interaction);
@@ -229,7 +229,7 @@ async function handleChatInputCommand(interaction) {
         console.error(error);
 
         try {
-            await interaction.channel.send({
+            await interaction.editReply({
                 embeds: [make_simple_embed("There was an error while executing this command!")],
             });
         } catch (ignored) {
@@ -238,10 +238,12 @@ async function handleChatInputCommand(interaction) {
 }
 
 async function handleButton(interaction) {
+    await interaction.deferReply();
+
     switch (interaction.customId) {
         case "pause":
             if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("You are not in the same voice channel!")],
                     ephemeral: true
                 });
@@ -249,7 +251,7 @@ async function handleButton(interaction) {
             }
 
             if (!any_audio_playing(interaction.guildId)) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("No audio is currently playing")],
                     ephemeral: true,
                 });
@@ -257,7 +259,7 @@ async function handleButton(interaction) {
             }
 
             if (pause_audio(interaction.guildId) === 0) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [
                         make_simple_embed("The currently playing audio has been successfully **resumed**").setFooter({
                             text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -266,7 +268,7 @@ async function handleButton(interaction) {
                     ],
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [
                         make_simple_embed("The currently playing audio has been successfully **paused**").setFooter({
                             text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -278,7 +280,7 @@ async function handleButton(interaction) {
             break;
         case "stop":
             if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("You are not in the same voice channel!")],
                     ephemeral: true
                 });
@@ -286,7 +288,7 @@ async function handleButton(interaction) {
             }
 
             if (!any_audio_playing(interaction.guildId)) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("No audio is currently playing")],
                     ephemeral: true,
                 });
@@ -294,7 +296,7 @@ async function handleButton(interaction) {
             }
 
             stop_audio(interaction.guildId);
-            await interaction.reply({
+            await interaction.editReply({
                 embeds: [
                     make_simple_embed("YouTube audio successfully stopped!").setFooter({
                         text: "by " + interaction.user.username + "#" + interaction.user.discriminator,
@@ -305,7 +307,7 @@ async function handleButton(interaction) {
             break;
         case "loop":
             if (!(await is_same_vc_as(interaction.user.id, interaction.guildId))) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("You are not in the same voice channel!")],
                     ephemeral: true
                 });
@@ -313,7 +315,7 @@ async function handleButton(interaction) {
             }
 
             if (!any_audio_playing(interaction.guildId)) {
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [make_simple_embed("No audio is currently playing")],
                     ephemeral: true,
                 });
@@ -322,7 +324,7 @@ async function handleButton(interaction) {
 
             const guild_stream = client.streams.get(interaction.guildId);
             guild_stream.loop = !guild_stream.loop;
-            await interaction.reply({
+            await interaction.editReply({
                 embeds: [
                     make_simple_embed(
                         guild_stream.loop ? "Loop successfully **enabled** for current audio" : "Loop successfully **disabled** for current audio"
@@ -342,7 +344,7 @@ async function handleButton(interaction) {
                 const user = guild.members.cache.get(interaction.member.id);
 
                 if (!user.voice.channel) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         embeds: [make_simple_embed("You are not in a voice channel!")],
                         ephemeral: true,
                     });
@@ -351,7 +353,7 @@ async function handleButton(interaction) {
 
                 if (bot.voice.channel) {
                     if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-                        await interaction.reply({
+                        await interaction.editReply({
                             embeds: [make_simple_embed("You are not in the same voice channel!")],
                             ephemeral: true
                         });
@@ -359,15 +361,10 @@ async function handleButton(interaction) {
                     }
                 }
 
-                await interaction.reply({
-                    content: "..."
-                });
-
-                let message = null;
                 const guild_stream = client.streams.get(interaction.guildId);
                 if (guild_stream?.queue?.length >= 5) {
                     const timeoutId = setTimeout(async () => {
-                        message = await interaction.channel.send({
+                        await interaction.editReply({
                             embeds: [make_simple_embed("<a:loading:1032708714605592596>  Loading...")],
                         });
                     }, 1500);
@@ -382,11 +379,7 @@ async function handleButton(interaction) {
                             ],
                         };
 
-                        if (message) {
-                            await message.edit(contents);
-                        } else {
-                            await interaction.channel.send(contents);
-                        }
+                        await interaction.editReply(contents);
                         return;
                     }
 
@@ -397,16 +390,12 @@ async function handleButton(interaction) {
                             embeds: [make_simple_embed("Queue is full (max 10)!")],
                         };
 
-                        if (message) {
-                            await message.edit(contents);
-                        } else {
-                            await interaction.channel.send(contents);
-                        }
+                        await interaction.editReply(contents);
                         return;
                     }
                 }
 
-                message = await interaction.channel.send({
+                await interaction.editReply({
                     embeds: [make_simple_embed(`<a:loading:1032708714605592596> Replaying audio...`)],
                     allowedMentions: {repliedUser: false},
                 });
@@ -414,7 +403,7 @@ async function handleButton(interaction) {
                 const stream_data = await play_audio(replay_url, interaction.guildId, interaction.member.voice.channelId);
 
                 if (stream_data === null) {
-                    await message.edit({
+                    await interaction.editReply({
                         embeds: [make_simple_embed("No results found!")],
                     });
                     return;
@@ -423,7 +412,7 @@ async function handleButton(interaction) {
                 const yt_data = create_yt_data_from_lavalink_data(stream_data);
 
                 if (guild_stream?.queue?.length >= 1) {
-                    await message.edit({
+                    await interaction.editReply({
                         embeds: [
                             await make_playing_embed(interaction.guildId, interaction.member, yt_data)
                                 .setTitle(`Added to queue (#${guild_stream?.queue?.length})`)
@@ -432,7 +421,7 @@ async function handleButton(interaction) {
                         allowedMentions: {repliedUser: false},
                     });
                 } else {
-                    await message.edit({
+                    await interaction.editReply({
                         embeds: [await make_playing_embed(interaction.guildId, interaction.member, yt_data)],
                         components: [get_control_button_row(yt_data.url)],
                         allowedMentions: {repliedUser: false},

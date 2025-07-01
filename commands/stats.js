@@ -14,7 +14,7 @@ export async function execute(interaction) {
 
     const activeAudioPlayers = client.streams.filter((stream) => stream.playing).size;
 
-    await interaction.channel.send({
+    await interaction.editReply({
         components: [row],
         embeds: [
             make_simple_embed(

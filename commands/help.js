@@ -1,7 +1,7 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import {SlashCommandBuilder} from "@discordjs/builders";
 import discord from "discord.js";
-import { make_simple_embed } from "../utils/utils.js";
-import { client } from "../index.js";
+import {make_simple_embed} from "../utils/utils.js";
+import {client} from "../index.js";
 
 export const data = new SlashCommandBuilder().setName("help").setDescription("Help command");
 
@@ -12,7 +12,7 @@ export async function execute(interaction) {
     .setURL("https://discord.com/oauth2/authorize?client_id=" + client.user.id + "&permissions=4331670528&scope=bot");
   const row = new discord.ActionRowBuilder().addComponents([loop]);
 
-  await interaction.channel.send({
+  await interaction.editReply({
     components: [row],
     embeds: [
       make_simple_embed(

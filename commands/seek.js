@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { convert_seconds_to_minutes, is_same_vc_as, make_simple_embed } from "../utils/utils.js";
-import { any_audio_playing, seek_audio } from "../utils/audio.js";
+import {SlashCommandBuilder} from "@discordjs/builders";
+import {convert_seconds_to_minutes, is_same_vc_as, make_simple_embed} from "../utils/utils.js";
+import {any_audio_playing, seek_audio} from "../utils/audio.js";
 
 export const data = new SlashCommandBuilder()
   .setName("seek")
@@ -9,14 +9,14 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("No audio is currently playing")],
     });
     return;
@@ -24,7 +24,7 @@ export async function execute(interaction) {
 
   const seekTime = interaction.options.getNumber("time");
 
-  const message = await interaction.channel.send({
+  await interaction.editReply({
     embeds: [await make_simple_embed(`<a:loading:1032708714605592596>  Seeking to ${convert_seconds_to_minutes(seekTime)}...`)],
     allowedMentions: { repliedUser: false },
   });
@@ -32,7 +32,7 @@ export async function execute(interaction) {
   const video_info = await seek_audio(interaction.guildId, seekTime);
 
   if (video_info === null) {
-    await message.edit({
+    await interaction.editReply({
       embeds: [make_simple_embed("An error occured while seeking!")],
       allowedMentions: { repliedUser: false },
     });
@@ -40,12 +40,12 @@ export async function execute(interaction) {
   }
 
   if (seekTime > video_info.video_details.durationInSec || seekTime < 0) {
-    await message.edit({
+    await interaction.editReply({
       embeds: [make_simple_embed(`Seeking beyond limit. [ 0 - ${video_info.video_details.durationInSec - 1}]`)],
       allowedMentions: { repliedUser: false },
     });
   } else {
-    await message.edit({
+    await interaction.editReply({
       embeds: [
         make_simple_embed(`Audio successfully seeked to ${convert_seconds_to_minutes(seekTime)}!`).setFooter({
           text: "by " + interaction.member.user.username + "#" + interaction.member.user.discriminator,

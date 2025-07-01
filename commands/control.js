@@ -7,14 +7,14 @@ export const data = new SlashCommandBuilder().setName("control").setDescription(
 
 export async function execute(interaction) {
   if (!(await is_same_vc_as(interaction.member.id, interaction.guildId))) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("You are not in the same voice channel!")],
     });
     return;
   }
 
   if (!any_audio_playing(interaction.guildId)) {
-    await interaction.channel.send({
+    await interaction.editReply({
       embeds: [make_simple_embed("No audio is currently playing")],
     });
     return;
@@ -27,7 +27,7 @@ export async function execute(interaction) {
     thumbnail_url: stream_data.yt_thumbnail_url,
     duration: 0
   }
-  await interaction.channel.send({
+  await interaction.editReply({
     embeds: [
       make_playing_embed(interaction.guildId, interaction.member, yt_data),
     ],
