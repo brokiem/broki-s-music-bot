@@ -11,6 +11,7 @@
     "bufferutil": "^4.0.9",
     "discord-api-types": "^0.38.14",
     "discord.js": "^14.21.0",
+    "dotenv": "^17.0.0",
     "lavalink": "^2.13.0",
     "sodium-native": "^5.0.6",
     "utf-8-validate": "^6.0.5"

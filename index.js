@@ -1,5 +1,6 @@
 "use strict";
 
+import 'dotenv/config'
 import discord from "discord.js";
 import * as fs from "fs";
 import {
@@ -14,8 +15,7 @@ import {
 } from "./utils/utils.js";
 import {any_audio_playing, pause_audio, play_audio, stop_audio} from "./utils/audio.js";
 import topgg from "@top-gg/sdk";
-
-const {Node} = require('lavalink');
+import {Node} from "lavalink";
 
 console.log("Loading broki's music bot...");
 
